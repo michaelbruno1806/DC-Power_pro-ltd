@@ -1,0 +1,298 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import GlassCard from "@/components/GlassCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { Shield, Building2, Users, Plus, Edit2, Trash2, UserPlus, Search } from "lucide-react";
+
+interface Company {
+  id: string;
+  name: string;
+  ern: string | null;
+  brn: string | null;
+  email: string | null;
+  phone: string | null;
+  created_at: string;
+}
+
+interface UserProfile {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  company_id: string | null;
+}
+
+interface UserRole {
+  id: string;
+  user_id: string;
+  role: string;
+}
+
+const AdminPanel = () => {
+  const { role } = useAuth();
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [roles, setRoles] = useState<UserRole[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [companyDialogOpen, setCompanyDialogOpen] = useState(false);
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [companyForm, setCompanyForm] = useState({ name: "", ern: "", brn: "", email: "", phone: "" });
+  const [assignForm, setAssignForm] = useState({ userId: "", companyId: "", role: "client_admin" });
+
+  const fetchData = async () => {
+    setLoading(true);
+    const [companiesRes, profilesRes, rolesRes] = await Promise.all([
+      supabase.from("companies").select("*").order("name"),
+      supabase.from("profiles").select("*"),
+      supabase.from("user_roles").select("*"),
+    ]);
+    if (companiesRes.data) setCompanies(companiesRes.data);
+    if (profilesRes.data) setUsers(profilesRes.data);
+    if (rolesRes.data) setRoles(rolesRes.data);
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  const handleCreateCompany = async () => {
+    if (!companyForm.name.trim()) { toast.error("Company name required"); return; }
+    const { error } = await supabase.from("companies").insert({
+      name: companyForm.name.trim(),
+      ern: companyForm.ern || null,
+      brn: companyForm.brn || null,
+      email: companyForm.email || null,
+      phone: companyForm.phone || null,
+    });
+    if (error) { toast.error(error.message); return; }
+    toast.success("Company created");
+    setCompanyDialogOpen(false);
+    setCompanyForm({ name: "", ern: "", brn: "", email: "", phone: "" });
+    fetchData();
+  };
+
+  const handleDeleteCompany = async (id: string) => {
+    if (!confirm("Delete this company and ALL its data?")) return;
+    const { error } = await supabase.from("companies").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Company deleted"); fetchData(); }
+  };
+
+  const handleAssignUser = async () => {
+    if (!assignForm.userId || !assignForm.companyId) { toast.error("Select user and company"); return; }
+    
+    const [profileRes, roleRes] = await Promise.all([
+      supabase.from("profiles").update({ company_id: assignForm.companyId }).eq("user_id", assignForm.userId),
+      supabase.from("user_roles").upsert({ user_id: assignForm.userId, role: assignForm.role as any }, { onConflict: "user_id,role" }),
+    ]);
+    
+    if (profileRes.error) { toast.error(profileRes.error.message); return; }
+    if (roleRes.error) { toast.error(roleRes.error.message); return; }
+    
+    toast.success("User assigned");
+    setAssignDialogOpen(false);
+    setAssignForm({ userId: "", companyId: "", role: "client_admin" });
+    fetchData();
+  };
+
+  const getUserRole = (userId: string) => roles.find(r => r.user_id === userId)?.role || "none";
+  const getUserCompany = (companyId: string | null) => companies.find(c => c.id === companyId)?.name || "Unassigned";
+
+  if (role !== "super_admin") {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <GlassCard className="text-center max-w-md">
+          <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">You need super admin privileges to access this page.</p>
+        </GlassCard>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary" /> Admin Panel
+          </h1>
+          <p className="text-sm text-muted-foreground">Manage companies, users, and roles</p>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <GlassCard>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Building2 className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{companies.length}</div>
+              <div className="text-xs text-muted-foreground">Companies</div>
+            </div>
+          </div>
+        </GlassCard>
+        <GlassCard>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Users className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{users.length}</div>
+              <div className="text-xs text-muted-foreground">Users</div>
+            </div>
+          </div>
+        </GlassCard>
+        <GlassCard>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Shield className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{roles.filter(r => r.role === "super_admin").length}</div>
+              <div className="text-xs text-muted-foreground">Super Admins</div>
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
+      {/* Companies Section */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Companies</h2>
+        <Dialog open={companyDialogOpen} onOpenChange={setCompanyDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2"><Plus className="h-4 w-4" /> Add Company</Button>
+          </DialogTrigger>
+          <DialogContent className="glass-elevated border-border/50">
+            <DialogHeader><DialogTitle>Create Company</DialogTitle></DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2"><Label>Company Name *</Label><Input value={companyForm.name} onChange={e => setCompanyForm({...companyForm, name: e.target.value})} className="bg-secondary/50" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>ERN</Label><Input value={companyForm.ern} onChange={e => setCompanyForm({...companyForm, ern: e.target.value})} className="bg-secondary/50" /></div>
+                <div className="space-y-2"><Label>BRN</Label><Input value={companyForm.brn} onChange={e => setCompanyForm({...companyForm, brn: e.target.value})} className="bg-secondary/50" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Email</Label><Input value={companyForm.email} onChange={e => setCompanyForm({...companyForm, email: e.target.value})} className="bg-secondary/50" /></div>
+                <div className="space-y-2"><Label>Phone</Label><Input value={companyForm.phone} onChange={e => setCompanyForm({...companyForm, phone: e.target.value})} className="bg-secondary/50" /></div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button variant="outline" onClick={() => setCompanyDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleCreateCompany} className="glow-brand">Create</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <GlassCard className="p-0 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/50">
+              {["Company", "ERN", "BRN", "Email", "Created", "Actions"].map(h => (
+                <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Loading...</td></tr>
+            ) : companies.map(c => (
+              <tr key={c.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
+                <td className="px-4 py-3 font-medium">{c.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.ern || "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.brn || "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.email || "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">{new Date(c.created_at).toLocaleDateString()}</td>
+                <td className="px-4 py-3">
+                  <button onClick={() => handleDeleteCompany(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </GlassCard>
+
+      {/* Users Section */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Users & Roles</h2>
+        <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> Assign User</Button>
+          </DialogTrigger>
+          <DialogContent className="glass-elevated border-border/50">
+            <DialogHeader><DialogTitle>Assign User to Company</DialogTitle></DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label>User</Label>
+                <select value={assignForm.userId} onChange={e => setAssignForm({...assignForm, userId: e.target.value})} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
+                  <option value="">Select user</option>
+                  {users.map(u => <option key={u.user_id} value={u.user_id}>{u.display_name || u.user_id}</option>)}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Company</Label>
+                <select value={assignForm.companyId} onChange={e => setAssignForm({...assignForm, companyId: e.target.value})} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
+                  <option value="">Select company</option>
+                  {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Role</Label>
+                <select value={assignForm.role} onChange={e => setAssignForm({...assignForm, role: e.target.value})} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
+                  <option value="client_admin">Client Admin</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-4">
+              <Button variant="outline" onClick={() => setAssignDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleAssignUser} className="glow-brand">Assign</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <GlassCard className="p-0 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-border/50">
+              {["User", "Role", "Company", "Actions"].map(h => (
+                <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {users.map(u => (
+              <tr key={u.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
+                <td className="px-4 py-3 font-medium">{u.display_name || "Unnamed"}</td>
+                <td className="px-4 py-3">
+                  <span className={`text-xs font-medium px-2.5 py-1 rounded-lg ${
+                    getUserRole(u.user_id) === "super_admin" ? "bg-primary/10 text-primary" :
+                    getUserRole(u.user_id) === "client_admin" ? "bg-success/10 text-success" :
+                    "bg-secondary text-muted-foreground"
+                  }`}>{getUserRole(u.user_id)}</span>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">{getUserCompany(u.company_id)}</td>
+                <td className="px-4 py-3">
+                  <button onClick={() => { setAssignForm({ userId: u.user_id, companyId: u.company_id || "", role: getUserRole(u.user_id) || "client_admin" }); setAssignDialogOpen(true); }} className="p-1.5 rounded-lg hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </GlassCard>
+    </div>
+  );
+};
+
+export default AdminPanel;

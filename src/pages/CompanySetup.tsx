@@ -1,158 +1,163 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import GlassCard from "@/components/GlassCard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Building2, Save, ArrowLeft } from "lucide-react";
 
 const CompanySetup = () => {
+  const { companyId } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    name: "DC Power Pro Ltd",
-    ern: "ERN123456",
-    brn: "C12345678",
-    address: "10 Royal Street, Port Louis, 11328",
-    directors: "Jane Doe, John Lee",
-    contact_email: "accounts@dcpower.mu",
-    phone: "2123456",
-    mobile: "59999999",
-    payroll_start_day: "1",
-    payroll_end_day: "31",
-    mra_due_day: "30",
+    name: "", ern: "", brn: "", address: "", city: "", country: "Mauritius",
+    phone: "", email: "", director_name: "", director_nic: "",
+    pay_period_start_day: "1", pay_period_end_day: "31", mra_due_day: "20",
   });
-  const [msg, setMsg] = useState("");
 
-  const update = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
+  useEffect(() => {
+    if (!companyId) return;
+    supabase.from("companies").select("*").eq("id", companyId).single().then(({ data }) => {
+      if (data) setForm({
+        name: data.name || "", ern: data.ern || "", brn: data.brn || "",
+        address: data.address || "", city: data.city || "", country: data.country || "Mauritius",
+        phone: data.phone || "", email: data.email || "",
+        director_name: data.director_name || "", director_nic: data.director_nic || "",
+        pay_period_start_day: String(data.pay_period_start_day || 1),
+        pay_period_end_day: String(data.pay_period_end_day || 31),
+        mra_due_day: String(data.mra_due_day || 20),
+      });
+    });
+  }, [companyId]);
 
-  const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
-
-  const handleSave = () => {
-    if (!form.name.trim()) {
-      setMsg("Please provide Company name (required).");
-      return;
-    }
-    setMsg("Saved! Redirecting…");
-    setTimeout(() => navigate("/"), 500);
+  const handleSave = async () => {
+    if (!companyId) { toast.error("No company assigned"); return; }
+    if (!form.name.trim()) { toast.error("Company name is required"); return; }
+    setLoading(true);
+    const { error } = await supabase.from("companies").update({
+      name: form.name.trim(), ern: form.ern || null, brn: form.brn || null,
+      address: form.address || null, city: form.city || null, country: form.country || null,
+      phone: form.phone || null, email: form.email || null,
+      director_name: form.director_name || null, director_nic: form.director_nic || null,
+      pay_period_start_day: parseInt(form.pay_period_start_day),
+      pay_period_end_day: parseInt(form.pay_period_end_day),
+      mra_due_day: parseInt(form.mra_due_day),
+    }).eq("id", companyId);
+    setLoading(false);
+    if (error) toast.error(error.message);
+    else toast.success("Company details saved!");
   };
 
+  const update = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
+  const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
+
   return (
-    <div className="max-w-[860px] mx-auto">
-      <header className="flex justify-between items-center mb-[18px] gap-3 flex-wrap">
+    <div className="max-w-4xl mx-auto space-y-5">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-[10px] flex items-center justify-center font-bold text-foreground" style={{ background: 'var(--gradient-brand)' }}>
-            DC
+          <div className="h-11 w-11 rounded-2xl flex items-center justify-center font-bold text-foreground glow-brand" style={{ background: 'var(--gradient-brand)' }}>
+            <Building2 className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-[22px] font-semibold m-0">Company Details</h1>
-            <div className="text-sm text-muted-foreground">This information appears on payslips and MRA CSV.</div>
+            <h1 className="text-2xl font-bold">Company Details</h1>
+            <p className="text-sm text-muted-foreground">Information for payslips and MRA CSV</p>
           </div>
         </div>
-        <span className="bg-panel-2 border border-border text-muted-foreground px-2.5 py-2 rounded-[10px] text-xs">
-          Editing current company
-        </span>
-      </header>
+      </div>
 
-      <div className="bg-card border border-border rounded-2xl p-[18px]">
-        <p className="text-muted-foreground mb-[18px]">You can edit this anytime.</p>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <div>
-              <label className="text-[13px] text-muted-foreground block mb-1.5">Company name <span className="text-destructive">*</span></label>
-              <input value={form.name} onChange={e => update("name", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" placeholder="e.g. DC Power Pro Ltd" />
+      <GlassCard elevated>
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Company Name <span className="text-destructive">*</span></Label>
+              <Input value={form.name} onChange={e => update("name", e.target.value)} placeholder="DC Power Pro Ltd" className="bg-secondary/50" />
             </div>
-            <div>
-              <label className="text-[13px] text-muted-foreground block mb-1.5">Employer Registration Number (ERN)</label>
-              <input value={form.ern} onChange={e => update("ern", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" placeholder="e.g. ERN123456" />
-              <div className="text-xs text-muted-foreground mt-1.5">You can add this later if you don't have it right now.</div>
-            </div>
-            <div>
-              <label className="text-[13px] text-muted-foreground block mb-1.5">Business Registration Number (BRN)</label>
-              <input value={form.brn} onChange={e => update("brn", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" placeholder="e.g. C12345678" />
-            </div>
-            <div>
-              <label className="text-[13px] text-muted-foreground block mb-1.5">Registered address</label>
-              <textarea value={form.address} onChange={e => update("address", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground min-h-[90px] resize-y" placeholder="Street, City, Postcode" />
-            </div>
-            <div>
-              <label className="text-[13px] text-muted-foreground block mb-1.5">Director(s)</label>
-              <input value={form.directors} onChange={e => update("directors", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" placeholder="e.g. Jane Doe, John Lee" />
-              <div className="text-xs text-muted-foreground mt-1.5">Separate multiple names with commas.</div>
-            </div>
-            <div>
-              <label className="text-[13px] text-muted-foreground block mb-1.5">Contact email</label>
-              <input value={form.contact_email} onChange={e => update("contact_email", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" type="email" placeholder="accounts@company.com" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[13px] text-muted-foreground block mb-1.5">Telephone</label>
-                <input value={form.phone} onChange={e => update("phone", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" placeholder="e.g. 2123456" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>ERN</Label>
+                <Input value={form.ern} onChange={e => update("ern", e.target.value)} placeholder="ERN123456" className="bg-secondary/50" />
               </div>
-              <div>
-                <label className="text-[13px] text-muted-foreground block mb-1.5">Mobile</label>
-                <input value={form.mobile} onChange={e => update("mobile", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground" placeholder="e.g. 59999999" />
+              <div className="space-y-2">
+                <Label>BRN</Label>
+                <Input value={form.brn} onChange={e => update("brn", e.target.value)} placeholder="C12345678" className="bg-secondary/50" />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label>Address</Label>
+              <Input value={form.address} onChange={e => update("address", e.target.value)} placeholder="10 Royal Street" className="bg-secondary/50" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>City</Label>
+                <Input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Port Louis" className="bg-secondary/50" />
+              </div>
+              <div className="space-y-2">
+                <Label>Country</Label>
+                <Input value={form.country} onChange={e => update("country", e.target.value)} className="bg-secondary/50" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Phone</Label>
+                <Input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="2123456" className="bg-secondary/50" />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input type="email" value={form.email} onChange={e => update("email", e.target.value)} placeholder="accounts@company.com" className="bg-secondary/50" />
+              </div>
+            </div>
+          </div>
 
-            <div className="pt-3">
-              <div className="font-semibold mb-2">Payroll Period</div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-[13px] text-muted-foreground block mb-1.5">Start day (1–31)</label>
-                  <select value={form.payroll_start_day} onChange={e => update("payroll_start_day", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Director Name</Label>
+              <Input value={form.director_name} onChange={e => update("director_name", e.target.value)} placeholder="Jane Doe" className="bg-secondary/50" />
+            </div>
+            <div className="space-y-2">
+              <Label>Director NIC</Label>
+              <Input value={form.director_nic} onChange={e => update("director_nic", e.target.value)} placeholder="D1234567890" className="bg-secondary/50" />
+            </div>
+
+            <GlassCard className="mt-4">
+              <h3 className="font-semibold mb-3">Payroll Period</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs">Start Day</Label>
+                  <select value={form.pay_period_start_day} onChange={e => update("pay_period_start_day", e.target.value)} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
                     {dayOptions.map(d => <option key={d} value={String(d)}>{d}</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="text-[13px] text-muted-foreground block mb-1.5">End day (1–31)</label>
-                  <select value={form.payroll_end_day} onChange={e => update("payroll_end_day", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground">
+                <div className="space-y-2">
+                  <Label className="text-xs">End Day</Label>
+                  <select value={form.pay_period_end_day} onChange={e => update("pay_period_end_day", e.target.value)} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
                     {dayOptions.map(d => <option key={d} value={String(d)}>{d}</option>)}
                   </select>
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground mt-1.5">
-                Default payroll window: {form.payroll_start_day} → {form.payroll_end_day}.
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[13px] text-muted-foreground block mb-1.5">MRA Due day (1–31)</label>
-                <select value={form.mra_due_day} onChange={e => update("mra_due_day", e.target.value)} className="w-full px-3 py-3 rounded-[10px] border border-input bg-panel-2 text-foreground">
+              <div className="space-y-2 mt-3">
+                <Label className="text-xs">MRA Due Day</Label>
+                <select value={form.mra_due_day} onChange={e => update("mra_due_day", e.target.value)} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
                   {dayOptions.map(d => <option key={d} value={String(d)}>{d}</option>)}
                 </select>
               </div>
-            </div>
-            <div className="text-xs text-muted-foreground">We'll show deadlines and status on your dashboard using this date.</div>
-          </div>
-
-          <div>
-            <label className="text-[13px] text-muted-foreground block mb-1.5">Company logo (optional)</label>
-            <div className="flex gap-3 items-center">
-              <input type="file" accept="image/*" className="text-sm text-muted-foreground file:mr-2 file:px-3 file:py-2 file:rounded-[10px] file:border file:border-input file:bg-panel-2 file:text-foreground" />
-              <div className="h-14 w-14 rounded-[10px] border border-border bg-panel-2 flex items-center justify-center text-2xl">
-                🖼️
-              </div>
-            </div>
-            <div className="text-xs text-muted-foreground mt-1.5">PNG/JPG/WebP. Square works best.</div>
-
-            <div className="bg-panel-2 border border-border rounded-2xl p-4 mt-6">
-              <strong>Pro tip</strong>
-              <div className="text-xs text-muted-foreground mt-1.5">Save to see your logo and name across the portal.</div>
-            </div>
+              <p className="text-xs text-muted-foreground mt-2">Deadlines shown on dashboard using this date.</p>
+            </GlassCard>
           </div>
         </div>
 
-        <div className="flex gap-3 items-center mt-4 flex-wrap">
-          <button onClick={handleSave} className="bg-primary text-primary-foreground font-bold px-4 py-3 rounded-xl hover:bg-brand-hover transition-all hover:-translate-y-px">
-            Save company profile
-          </button>
-          <button onClick={() => navigate("/")} className="bg-transparent text-foreground border border-border font-bold px-4 py-3 rounded-xl hover:bg-secondary transition-colors">
-            Back to dashboard
-          </button>
-          {msg && <span className={`text-sm ${msg.includes("Saved") ? "text-primary" : "text-destructive"}`}>{msg}</span>}
+        <div className="flex gap-3 mt-6">
+          <Button onClick={handleSave} disabled={loading} className="gap-2 glow-brand">
+            <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Company"}
+          </Button>
+          <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+            <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+          </Button>
         </div>
-      </div>
-
-      <div className="mt-5 mb-2 text-center text-muted-foreground text-xs">
-        © {new Date().getFullYear()} DC Payroll — All rights reserved.
-      </div>
+      </GlassCard>
     </div>
   );
 };
