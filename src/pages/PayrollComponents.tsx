@@ -55,8 +55,10 @@ const PayrollComponents = () => {
     fetch();
   };
 
-  const toggle = async (id: string, field: string, value: boolean) => {
-    const { error } = await supabase.from("payroll_components").update({ [field]: !value }).eq("id", id);
+  const toggle = async (id: string, field: "taxable" | "in_wage_bill" | "is_active", value: boolean) => {
+    const updateObj: Record<string, boolean> = {};
+    updateObj[field] = !value;
+    const { error } = await supabase.from("payroll_components").update(updateObj as any).eq("id", id);
     if (error) toast.error(error.message);
     else fetch();
   };
