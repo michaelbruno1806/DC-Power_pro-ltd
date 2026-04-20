@@ -11,8 +11,8 @@ interface GlassCardProps {
 const GlassCard = ({ children, className, elevated = false, glow = false }: GlassCardProps) => (
   <div
     className={cn(
-      "rounded-2xl p-5",
-      elevated ? "glass-elevated" : "glass-card",
+      "premium-card p-6 transition-all duration-400 ease-elegant",
+      elevated && "shadow-[var(--shadow-card)]",
       glow && "animate-glow-pulse",
       className
     )}

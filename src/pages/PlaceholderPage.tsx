@@ -17,15 +17,20 @@ const PlaceholderPage = () => {
   const Icon = page.icon;
 
   return (
-    <div className="max-w-2xl mx-auto mt-12">
-      <GlassCard elevated className="text-center py-12">
-        <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-          <Icon className="h-8 w-8 text-primary" />
+    <div className="max-w-2xl mx-auto mt-16 animate-fade-up">
+      <GlassCard elevated className="text-center py-16 border-primary/10">
+        <div
+          className="h-16 w-16 rounded-lg flex items-center justify-center mx-auto mb-6"
+          style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
+        >
+          <Icon className="h-7 w-7 text-primary-foreground" />
         </div>
-        <h1 className="text-2xl font-bold mb-2">{page.title}</h1>
-        <p className="text-muted-foreground mb-6">{page.desc}</p>
-        <span className="inline-flex items-center gap-2 bg-primary/10 text-primary font-medium text-sm px-4 py-2 rounded-full">
-          <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+        <div className="eyebrow mb-3">In Development</div>
+        <h1 className="heading-display text-foreground mb-3">{page.title}</h1>
+        <div className="divider-elegant mx-auto mb-5" />
+        <p className="text-muted-foreground max-w-md mx-auto leading-relaxed">{page.desc}</p>
+        <span className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/20 font-medium text-xs uppercase tracking-wider px-4 py-2 rounded-full mt-8">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           Coming Soon
         </span>
       </GlassCard>

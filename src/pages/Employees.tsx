@@ -131,19 +131,23 @@ const Employees = () => {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="space-y-8 animate-fade-up">
+      <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Employees</h1>
-          <p className="text-sm text-muted-foreground">Manage your workforce</p>
+          <div className="eyebrow mb-2">People</div>
+          <h1 className="heading-display text-foreground">Employees</h1>
+          <div className="divider-elegant mt-3" />
+          <p className="text-sm text-muted-foreground mt-3">Manage your workforce records</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setEditingId(null); setForm(emptyForm); } }}>
           <DialogTrigger asChild>
-            <Button className="gap-2 glow-brand"><Plus className="h-4 w-4" /> Add Employee</Button>
+            <Button className="gap-2 h-11 px-5 font-medium tracking-wide" style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
+              <Plus className="h-4 w-4" /> Add Employee
+            </Button>
           </DialogTrigger>
-          <DialogContent className="glass-elevated border-border/50 max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-card border-border max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingId ? "Edit Employee" : "Add New Employee"}</DialogTitle>
+              <DialogTitle className="font-display text-2xl font-medium">{editingId ? "Edit Employee" : "Add New Employee"}</DialogTitle>
             </DialogHeader>
             <div className="grid grid-cols-2 gap-4 mt-4">
               <div className="space-y-2">
@@ -202,29 +206,29 @@ const Employees = () => {
                 <Input value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Port Louis, Mauritius" className="bg-secondary/50" />
               </div>
             </div>
-            <div className="flex justify-end gap-3 mt-4">
+            <div className="flex justify-end gap-3 mt-6">
               <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleSubmit} className="glow-brand">{editingId ? "Update" : "Add"} Employee</Button>
+              <Button onClick={handleSubmit} style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>{editingId ? "Update" : "Add"} Employee</Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: "Total Employees", value: stats.total, icon: Users, color: "text-primary" },
           { label: "Active", value: stats.active, icon: UserCheck, color: "text-success" },
           { label: "Inactive / Terminated", value: stats.inactive, icon: UserX, color: "text-destructive" },
         ].map(s => (
-          <GlassCard key={s.label}>
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <GlassCard key={s.label} className="hover:border-primary/30">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
                 <s.icon className={`h-5 w-5 ${s.color}`} />
               </div>
               <div>
-                <div className="text-2xl font-bold">{s.value}</div>
-                <div className="text-xs text-muted-foreground">{s.label}</div>
+                <div className="font-display text-3xl font-semibold text-foreground">{s.value}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mt-0.5">{s.label}</div>
               </div>
             </div>
           </GlassCard>
@@ -232,13 +236,13 @@ const Employees = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 items-center">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex gap-3 items-center flex-wrap">
+        <div className="relative flex-1 max-w-sm min-w-[240px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="pl-10 bg-secondary/50" />
+          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search employees..." className="pl-10 h-11 bg-secondary/40" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40 bg-secondary/50"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-40 h-11 bg-secondary/40"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
@@ -253,39 +257,46 @@ const Employees = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border/50">
-                {["Name", "NIC", "Email", "Salary", "Status", "Actions"].map(h => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{h}</th>
+              <tr className="border-b border-border bg-secondary/20">
+                {["Name", "NIC", "Email", "Salary", "Status", ""].map(h => (
+                  <th key={h} className="text-left px-5 py-3.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Loading...</td></tr>
+                <tr><td colSpan={6} className="px-5 py-12 text-center text-muted-foreground">Loading...</td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No employees found</td></tr>
+                <tr><td colSpan={6} className="px-5 py-12 text-center text-muted-foreground">No employees found</td></tr>
               ) : filtered.map(emp => (
-                <tr key={emp.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
-                  <td className="px-4 py-3 font-medium">{emp.first_name} {emp.last_name}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{emp.nic || "—"}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{emp.email || "—"}</td>
-                  <td className="px-4 py-3 font-medium">MUR {emp.basic_salary?.toLocaleString() || "0"}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs font-medium px-2.5 py-1 rounded-lg ${
+                <tr key={emp.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xs font-semibold text-primary">
+                        {(emp.first_name[0] || "") + (emp.last_name[0] || "")}
+                      </div>
+                      <span className="font-medium text-foreground">{emp.first_name} {emp.last_name}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-muted-foreground font-mono text-xs">{emp.nic || "—"}</td>
+                  <td className="px-5 py-4 text-muted-foreground">{emp.email || "—"}</td>
+                  <td className="px-5 py-4 font-medium text-foreground">MUR {emp.basic_salary?.toLocaleString() || "0"}</td>
+                  <td className="px-5 py-4">
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${
                       emp.status === "active" ? "bg-success/10 text-success" :
                       emp.status === "terminated" ? "bg-destructive/10 text-destructive" :
                       "bg-warning/10 text-warning"
                     }`}>{emp.status || "active"}</span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-5 py-4">
                     <div className="flex gap-1">
-                      <button onClick={() => { setViewEmployee(emp); setViewDialogOpen(true); }} className="p-1.5 rounded-lg hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+                      <button onClick={() => { setViewEmployee(emp); setViewDialogOpen(true); }} className="p-2 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors">
                         <Eye className="h-4 w-4" />
                       </button>
-                      <button onClick={() => handleEdit(emp)} className="p-1.5 rounded-lg hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors">
+                      <button onClick={() => handleEdit(emp)} className="p-2 rounded-md hover:bg-secondary text-muted-foreground hover:text-primary transition-colors">
                         <Edit2 className="h-4 w-4" />
                       </button>
-                      <button onClick={() => handleDelete(emp.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                      <button onClick={() => handleDelete(emp.id)} className="p-2 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -299,9 +310,9 @@ const Employees = () => {
 
       {/* View Employee Dialog */}
       <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent className="glass-elevated border-border/50 max-w-lg">
+        <DialogContent className="bg-card border-border max-w-lg">
           <DialogHeader>
-            <DialogTitle>Employee Details</DialogTitle>
+            <DialogTitle className="font-display text-2xl font-medium">Employee Details</DialogTitle>
           </DialogHeader>
           {viewEmployee && (
             <div className="space-y-3 mt-2">

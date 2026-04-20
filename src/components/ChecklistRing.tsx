@@ -1,25 +1,31 @@
 interface ChecklistRingProps {
   done: number;
   total: number;
+  size?: number;
 }
 
-const ChecklistRing = ({ done, total }: ChecklistRingProps) => {
-  const deg = (done / total) * 360;
+const ChecklistRing = ({ done, total, size = 130 }: ChecklistRingProps) => {
+  const deg = total > 0 ? (done / total) * 360 : 0;
+  const inset = size * 0.085;
 
   return (
-    <div className="relative h-[120px] w-[120px]">
+    <div className="relative shrink-0" style={{ height: size, width: size }}>
       <div
-        className="h-[120px] w-[120px] rounded-full"
+        className="rounded-full"
         style={{
+          height: size,
+          width: size,
           background: `conic-gradient(hsl(var(--primary)) ${deg}deg, hsl(var(--border)) ${deg}deg)`,
+          boxShadow: "0 0 40px -10px hsl(var(--primary) / 0.25)",
         }}
       />
-      <div className="absolute inset-[10px] rounded-full bg-panel-2 border border-border" />
-      <div className="absolute inset-0 flex items-center justify-center font-extrabold text-foreground">
-        {done}/{total}
-      </div>
-      <div className="absolute -bottom-1 left-0 right-0 text-center text-[11px] text-muted-foreground">
-        Complete
+      <div
+        className="absolute rounded-full bg-card border border-border"
+        style={{ inset }}
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="font-display text-3xl font-semibold text-foreground leading-none">{done}<span className="text-muted-foreground text-xl">/{total}</span></div>
+        <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground mt-1.5">Complete</div>
       </div>
     </div>
   );
