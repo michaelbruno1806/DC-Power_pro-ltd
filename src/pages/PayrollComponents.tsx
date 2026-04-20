@@ -114,11 +114,6 @@ const PayrollComponents = () => {
       <GlassCard className="p-0 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border/50">
-      {/* Table */}
-      <GlassCard className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
             <tr className="border-b border-border bg-secondary/20">
               {["Name", "Type", "Taxable", "In Wage Bill", "Active", ""].map(h => (
                 <th key={h} className="text-left px-5 py-3.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">{h}</th>

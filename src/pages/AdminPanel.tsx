@@ -180,24 +180,24 @@ const AdminPanel = () => {
       <GlassCard className="p-0 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border/50">
-              {["Company", "ERN", "BRN", "Email", "Created", "Actions"].map(h => (
-                <th key={h} className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">{h}</th>
+            <tr className="border-b border-border bg-secondary/20">
+              {["Company", "ERN", "BRN", "Email", "Created", ""].map(h => (
+                <th key={h} className="text-left px-5 py-3.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em]">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Loading...</td></tr>
+              <tr><td colSpan={6} className="px-5 py-12 text-center text-muted-foreground">Loading...</td></tr>
             ) : companies.map(c => (
-              <tr key={c.id} className="border-b border-border/30 hover:bg-secondary/20 transition-colors">
-                <td className="px-4 py-3 font-medium">{c.name}</td>
-                <td className="px-4 py-3 text-muted-foreground">{c.ern || "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{c.brn || "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{c.email || "—"}</td>
-                <td className="px-4 py-3 text-muted-foreground">{new Date(c.created_at).toLocaleDateString()}</td>
-                <td className="px-4 py-3">
-                  <button onClick={() => handleDeleteCompany(c.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+              <tr key={c.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
+                <td className="px-5 py-4 font-medium text-foreground">{c.name}</td>
+                <td className="px-5 py-4 text-muted-foreground font-mono text-xs">{c.ern || "—"}</td>
+                <td className="px-5 py-4 text-muted-foreground font-mono text-xs">{c.brn || "—"}</td>
+                <td className="px-5 py-4 text-muted-foreground">{c.email || "—"}</td>
+                <td className="px-5 py-4 text-muted-foreground text-xs">{new Date(c.created_at).toLocaleDateString()}</td>
+                <td className="px-5 py-4">
+                  <button onClick={() => handleDeleteCompany(c.id)} className="p-2 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </td>
@@ -208,43 +208,45 @@ const AdminPanel = () => {
       </GlassCard>
 
       {/* Users Section */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Users & Roles</h2>
-        <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="gap-2"><UserPlus className="h-4 w-4" /> Assign User</Button>
-          </DialogTrigger>
-          <DialogContent className="glass-elevated border-border/50">
-            <DialogHeader><DialogTitle>Assign User to Company</DialogTitle></DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label>User</Label>
-                <select value={assignForm.userId} onChange={e => setAssignForm({...assignForm, userId: e.target.value})} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
-                  <option value="">Select user</option>
-                  {users.map(u => <option key={u.user_id} value={u.user_id}>{u.display_name || u.user_id}</option>)}
-                </select>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="heading-section text-foreground">Users & Roles</h2>
+          <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2 h-10"><UserPlus className="h-4 w-4" /> Assign User</Button>
+            </DialogTrigger>
+            <DialogContent className="bg-card border-border">
+              <DialogHeader><DialogTitle className="font-display text-2xl font-medium">Assign User to Company</DialogTitle></DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">User</Label>
+                  <select value={assignForm.userId} onChange={e => setAssignForm({...assignForm, userId: e.target.value})} className="w-full px-3 py-2.5 rounded-md border border-input bg-secondary/40 text-foreground text-sm">
+                    <option value="">Select user</option>
+                    {users.map(u => <option key={u.user_id} value={u.user_id}>{u.display_name || u.user_id}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">Company</Label>
+                  <select value={assignForm.companyId} onChange={e => setAssignForm({...assignForm, companyId: e.target.value})} className="w-full px-3 py-2.5 rounded-md border border-input bg-secondary/40 text-foreground text-sm">
+                    <option value="">Select company</option>
+                    {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
+                  <select value={assignForm.role} onChange={e => setAssignForm({...assignForm, role: e.target.value})} className="w-full px-3 py-2.5 rounded-md border border-input bg-secondary/40 text-foreground text-sm">
+                    <option value="client_admin">Client Admin</option>
+                    <option value="super_admin">Super Admin</option>
+                  </select>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Company</Label>
-                <select value={assignForm.companyId} onChange={e => setAssignForm({...assignForm, companyId: e.target.value})} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
-                  <option value="">Select company</option>
-                  {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setAssignDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleAssignUser} style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>Assign</Button>
               </div>
-              <div className="space-y-2">
-                <Label>Role</Label>
-                <select value={assignForm.role} onChange={e => setAssignForm({...assignForm, role: e.target.value})} className="w-full px-3 py-2 rounded-xl border border-input bg-secondary/50 text-foreground text-sm">
-                  <option value="client_admin">Client Admin</option>
-                  <option value="super_admin">Super Admin</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-4">
-              <Button variant="outline" onClick={() => setAssignDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleAssignUser} className="glow-brand">Assign</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <GlassCard className="p-0 overflow-hidden">
