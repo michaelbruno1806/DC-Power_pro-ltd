@@ -196,10 +196,6 @@ const Dashboard = () => {
           </div>
         )}
       </GlassCard>
-
-      <div className="text-center text-[11px] uppercase tracking-[0.2em] text-muted-foreground pt-4">
-        © {currentYear} DC Payroll · All rights reserved
-      </div>
     </div>
   );
 };
