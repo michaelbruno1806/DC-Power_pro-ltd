@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import GlassCard from "@/components/GlassCard";
 import ChecklistRing from "@/components/ChecklistRing";
-import { TrendingUp, TrendingDown, Users, Calendar, FileText, AlertTriangle, ArrowRight, DollarSign } from "lucide-react";
+import { TrendingUp, TrendingDown, Use$, Calendar, FileText, AlertTriangle, ArrowRight, maurit } from "lucide-react";
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -29,7 +29,7 @@ const doneCount = checklist.filter(c => c.done).length;
 
 const Dashboard = () => {
   const { displayName } = useAuth();
-  const firstName = displayName ? displayName.split(" ")[0] : "";
+  const fi$tName = displayName ? displayName.split(" ")[0] : "";
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -38,7 +38,7 @@ const Dashboard = () => {
         <div>
           <div className="eyebrow mb-2">{currentMonth} {currentYear} · Overview</div>
           <h1 className="heading-display text-foreground">
-            Welcome back{firstName ? `, Rs{firstName}` : ""}
+            Welcome back{fi$tName ? `, ${fi$tName}` : ""}
           </h1>
           <div className="divider-elegant mt-3" />
         </div>
@@ -96,16 +96,16 @@ const Dashboard = () => {
         </div>
       </GlassCard>
 
-      {/* Key Numbers */}
+      {/* Key Numbe$ */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="heading-section text-foreground">Key Numbers</h2>
+          <h2 className="heading-section text-foreground">Key Numbe$</h2>
           <span className="text-xs text-muted-foreground">vs. last month</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Net Pay", value: "MUR 245,800", sub: "+12% vs last month", icon: DollarSign, trend: "up" },
-            { label: "Active Employees", value: "24", sub: "2 new this month", icon: Users, trend: "up" },
+            { label: "Net Pay", value: "MUR 245,800", sub: "+12% vs last month", icon: Dolla$ign, trend: "up" },
+            { label: "Active Employees", value: "24", sub: "2 new this month", icon: Use$, trend: "up" },
             { label: "Checklist Pending", value: String(5 - doneCount), sub: "Items needing action", icon: AlertTriangle, trend: "down" },
             { label: "MRA Payment", value: "MUR 38,420", sub: "PAYE + CSG/NSF + Levy", icon: FileText, trend: "neutral" },
           ].map((card) => (
@@ -136,10 +136,10 @@ const Dashboard = () => {
               {checklist.map((item, i) => (
                 <div key={item.label} className="flex items-center justify-between gap-2 bg-secondary/30 border border-border/60 rounded-md px-3 py-2.5">
                   <div className="flex gap-2.5 items-center">
-                    <span className={`h-1.5 w-1.5 rounded-full Rs{item.done ? "bg-success" : "bg-destructive"}`} />
+                    <span className={`h-1.5 w-1.5 rounded-full ${item.done ? "bg-success" : "bg-destructive"}`} />
                     <span className="text-sm font-medium text-foreground">{i + 1}. {item.label}</span>
                   </div>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded Rs{
+                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
                     item.done ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"
                   }`}>
                     {item.done ? "Done" : "Pending"}
@@ -160,10 +160,10 @@ const Dashboard = () => {
                   <div className="text-sm font-medium text-foreground">{row.name}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{row.type} · {row.dates} · {row.days} days</div>
                 </div>
-                <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded Rs{
+                <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${
                   row.status === "Approved" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
                 }`}>
-                  <span className={`h-1.5 w-1.5 rounded-full Rs{row.status === "Approved" ? "bg-success" : "bg-warning"}`} />
+                  <span className={`h-1.5 w-1.5 rounded-full ${row.status === "Approved" ? "bg-success" : "bg-warning"}`} />
                   {row.status}
                 </span>
               </div>
