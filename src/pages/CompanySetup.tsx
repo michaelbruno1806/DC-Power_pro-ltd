@@ -56,16 +56,15 @@ const CompanySetup = () => {
   const dayOptions = Array.from({ length: 31 }, (_, i) => i + 1);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-2xl flex items-center justify-center font-bold text-foreground glow-brand" style={{ background: 'var(--gradient-brand)' }}>
-            <Building2 className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Company Details</h1>
-            <p className="text-sm text-muted-foreground">Information for payslips and MRA CSV</p>
-          </div>
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-up">
+      <div className="flex items-end justify-between flex-wrap gap-4">
+        <div>
+          <div className="eyebrow mb-2">Company</div>
+          <h1 className="heading-display text-foreground flex items-center gap-3">
+            <Building2 className="h-7 w-7 text-primary" /> Company Details
+          </h1>
+          <div className="divider-elegant mt-3" />
+          <p className="text-sm text-muted-foreground mt-3">Information used for payslips and MRA filings</p>
         </div>
       </div>
 
@@ -149,11 +148,11 @@ const CompanySetup = () => {
           </div>
         </div>
 
-        <div className="flex gap-3 mt-6">
-          <Button onClick={handleSave} disabled={loading} className="gap-2 glow-brand">
+        <div className="flex gap-3 mt-8 pt-6 border-t border-border">
+          <Button onClick={handleSave} disabled={loading} className="gap-2 h-11 px-6 font-medium tracking-wide" style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
             <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Company"}
           </Button>
-          <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+          <Button variant="outline" onClick={() => navigate("/")} className="gap-2 h-11">
             <ArrowLeft className="h-4 w-4" /> Back to Dashboard
           </Button>
         </div>

@@ -104,10 +104,11 @@ const AdminPanel = () => {
 
   if (role !== "super_admin") {
     return (
-      <div className="flex items-center justify-center h-96">
-        <GlassCard className="text-center max-w-md">
+      <div className="flex items-center justify-center h-96 animate-fade-up">
+        <GlassCard className="text-center max-w-md py-12">
           <Shield className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Access Denied</h2>
+          <h2 className="font-display text-2xl font-medium mb-2">Access Denied</h2>
+          <div className="divider-elegant mx-auto mb-4" />
           <p className="text-muted-foreground">You need super admin privileges to access this page.</p>
         </GlassCard>
       </div>
@@ -115,79 +116,65 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" /> Admin Panel
-          </h1>
-          <p className="text-sm text-muted-foreground">Manage companies, users, and roles</p>
-        </div>
+    <div className="space-y-8 animate-fade-up">
+      <div>
+        <div className="eyebrow mb-2">Administration</div>
+        <h1 className="heading-display text-foreground flex items-center gap-3">
+          <Shield className="h-7 w-7 text-primary" /> Admin Panel
+        </h1>
+        <div className="divider-elegant mt-3" />
+        <p className="text-sm text-muted-foreground mt-3">Manage companies, users and roles</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <GlassCard>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-primary" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { icon: Building2, label: "Companies", value: companies.length },
+          { icon: Users, label: "Users", value: users.length },
+          { icon: Shield, label: "Super Admins", value: roles.filter(r => r.role === "super_admin").length },
+        ].map(s => (
+          <GlassCard key={s.label} className="hover:border-primary/30">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
+                <s.icon className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <div className="font-display text-3xl font-semibold text-foreground">{s.value}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground mt-0.5">{s.label}</div>
+              </div>
             </div>
-            <div>
-              <div className="text-2xl font-bold">{companies.length}</div>
-              <div className="text-xs text-muted-foreground">Companies</div>
-            </div>
-          </div>
-        </GlassCard>
-        <GlassCard>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Users className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{users.length}</div>
-              <div className="text-xs text-muted-foreground">Users</div>
-            </div>
-          </div>
-        </GlassCard>
-        <GlassCard>
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Shield className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <div className="text-2xl font-bold">{roles.filter(r => r.role === "super_admin").length}</div>
-              <div className="text-xs text-muted-foreground">Super Admins</div>
-            </div>
-          </div>
-        </GlassCard>
+          </GlassCard>
+        ))}
       </div>
 
       {/* Companies Section */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Companies</h2>
-        <Dialog open={companyDialogOpen} onOpenChange={setCompanyDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="gap-2"><Plus className="h-4 w-4" /> Add Company</Button>
-          </DialogTrigger>
-          <DialogContent className="glass-elevated border-border/50">
-            <DialogHeader><DialogTitle>Create Company</DialogTitle></DialogHeader>
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2"><Label>Company Name *</Label><Input value={companyForm.name} onChange={e => setCompanyForm({...companyForm, name: e.target.value})} className="bg-secondary/50" /></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>ERN</Label><Input value={companyForm.ern} onChange={e => setCompanyForm({...companyForm, ern: e.target.value})} className="bg-secondary/50" /></div>
-                <div className="space-y-2"><Label>BRN</Label><Input value={companyForm.brn} onChange={e => setCompanyForm({...companyForm, brn: e.target.value})} className="bg-secondary/50" /></div>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="heading-section text-foreground">Companies</h2>
+          <Dialog open={companyDialogOpen} onOpenChange={setCompanyDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2 h-10"><Plus className="h-4 w-4" /> Add Company</Button>
+            </DialogTrigger>
+            <DialogContent className="bg-card border-border">
+              <DialogHeader><DialogTitle className="font-display text-2xl font-medium">Create Company</DialogTitle></DialogHeader>
+              <div className="space-y-4 mt-4">
+                <div className="space-y-2"><Label className="text-xs uppercase tracking-wider text-muted-foreground">Company Name *</Label><Input value={companyForm.name} onChange={e => setCompanyForm({...companyForm, name: e.target.value})} className="bg-secondary/40 h-11" /></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label className="text-xs uppercase tracking-wider text-muted-foreground">ERN</Label><Input value={companyForm.ern} onChange={e => setCompanyForm({...companyForm, ern: e.target.value})} className="bg-secondary/40 h-11" /></div>
+                  <div className="space-y-2"><Label className="text-xs uppercase tracking-wider text-muted-foreground">BRN</Label><Input value={companyForm.brn} onChange={e => setCompanyForm({...companyForm, brn: e.target.value})} className="bg-secondary/40 h-11" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label className="text-xs uppercase tracking-wider text-muted-foreground">Email</Label><Input value={companyForm.email} onChange={e => setCompanyForm({...companyForm, email: e.target.value})} className="bg-secondary/40 h-11" /></div>
+                  <div className="space-y-2"><Label className="text-xs uppercase tracking-wider text-muted-foreground">Phone</Label><Input value={companyForm.phone} onChange={e => setCompanyForm({...companyForm, phone: e.target.value})} className="bg-secondary/40 h-11" /></div>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Email</Label><Input value={companyForm.email} onChange={e => setCompanyForm({...companyForm, email: e.target.value})} className="bg-secondary/50" /></div>
-                <div className="space-y-2"><Label>Phone</Label><Input value={companyForm.phone} onChange={e => setCompanyForm({...companyForm, phone: e.target.value})} className="bg-secondary/50" /></div>
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setCompanyDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleCreateCompany} style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>Create</Button>
               </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-4">
-              <Button variant="outline" onClick={() => setCompanyDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleCreateCompany} className="glow-brand">Create</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <GlassCard className="p-0 overflow-hidden">
