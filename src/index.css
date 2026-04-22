@@ -260,4 +260,30 @@
     0%, 100% { box-shadow: 0 0 30px -10px hsl(142, 76%, 45%, 0.2); }
     50% { box-shadow: 0 0 60px -10px hsl(142, 76%, 45%, 0.4); }
   }
+
+  /* Splash screen animations */
+  .animate-splash-rise {
+    animation: splash-rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-splash-fade { animation: splash-fade 1.4s ease-out both; }
+  .animate-splash-fade-delayed { animation: splash-fade 1.6s ease-out 0.5s both; }
+  .animate-splash-spin { animation: splash-spin 12s linear infinite; }
+  .animate-splash-spin-reverse { animation: splash-spin 18s linear infinite reverse; }
+  .animate-splash-glow { animation: splash-glow 3s ease-in-out infinite; }
+  .animate-splash-bar {
+    animation: splash-bar 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: left;
+  }
+
+  @keyframes splash-rise {
+    0% { opacity: 0; transform: translateY(30px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes splash-fade { 0% { opacity: 0; } 100% { opacity: 1; } }
+  @keyframes splash-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes splash-glow {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  }
+  @keyframes splash-bar { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
 }
