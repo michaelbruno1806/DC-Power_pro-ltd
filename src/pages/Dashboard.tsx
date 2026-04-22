@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import GlassCard from "@/components/GlassCard";
 import ChecklistRing from "@/components/ChecklistRing";
-import { TrendingUp, TrendingDown, Users, Calendar, FileText, AlertTriangle, ArrowRight, maurit } from "lucide-react";
+import { TrendingUp, TrendingDown, Users, Calendar, FileText, AlertTriangle, ArrowRight, DollarSign } from "lucide-react";
 
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -104,7 +104,7 @@ const Dashboard = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Net Pay", value: "MUR 245,800", sub: "+12% vs last month", icon: Dollarsign, trend: "up" },
+            { label: "Net Pay", value: "MUR 245,800", sub: "+12% vs last month", icon: DollarSign, trend: "up" },
             { label: "Active Employees", value: "24", sub: "2 new this month", icon: Users, trend: "up" },
             { label: "Checklist Pending", value: String(5 - doneCount), sub: "Items needing action", icon: AlertTriangle, trend: "down" },
             { label: "MRA Payment", value: "MUR 38,420", sub: "PAYE + CSG/NSF + Levy", icon: FileText, trend: "neutral" },
