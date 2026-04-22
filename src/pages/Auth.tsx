@@ -172,9 +172,14 @@ const Auth = () => {
           </div>
         </div>
 
-        <p className="text-center text-[11px] uppercase tracking-[0.2em] text-muted-foreground mt-8">
-          © {new Date().getFullYear()} DC Payroll
-        </p>
+        <div className="text-center mt-8 space-y-1.5">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+            © {new Date().getFullYear()} DC Payroll
+          </p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70">
+            Powered by <span className="text-[#d4af37]/90 font-medium">MB18 Solutions</span>
+          </p>
+        </div>
       </div>
     </div>
   );
