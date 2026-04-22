@@ -84,11 +84,13 @@ const PayrollRun = () => {
   const { companyId } = useAuth();
 
   const [file, setFile] = useState<PayrollFile | null>(null);
+  const [company, setCompany] = useState<CompanyInfo | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [components, setComponents] = useState<ComponentRow[]>([]);
   const [drafts, setDrafts] = useState<Record<string, EntryDraft>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -97,9 +99,12 @@ const PayrollRun = () => {
 
     (async () => {
       setLoading(true);
-      const [fileRes, empRes, compRes, entryRes] = await Promise.all([
+      const [fileRes, companyRes, empRes, compRes, entryRes] = await Promise.all([
         supabase.from("payroll_files").select("*").eq("id", payrollFileId).maybeSingle(),
-        supabase.from("employees").select("id, first_name, last_name, basic_salary, status")
+        supabase.from("companies").select("name, address, city, brn, ern, phone, email")
+          .eq("id", companyId).maybeSingle(),
+        supabase.from("employees")
+          .select("id, first_name, last_name, basic_salary, status, nic, bank_name, bank_account, employment_date")
           .eq("company_id", companyId).eq("status", "active")
           .order("first_name", { ascending: true }),
         supabase.from("payroll_components").select("*")
@@ -113,6 +118,7 @@ const PayrollRun = () => {
       if (compRes.error) toast.error(compRes.error.message);
 
       setFile(fileRes.data as PayrollFile | null);
+      setCompany((companyRes.data as CompanyInfo) || null);
       const emps = (empRes.data || []) as Employee[];
       setEmployees(emps);
       setComponents((compRes.data || []) as ComponentRow[]);
