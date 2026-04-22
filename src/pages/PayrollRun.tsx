@@ -481,7 +481,7 @@ const PayrollRun = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/20">
-                {["Employee","Basic","Unpaid Days","OT 1.5x (h)","OT 2x (h)","Bonus","Loan","Gross","Deductions","Net Pay"].map(h => (
+                {["Employee","Basic","Unpaid Days","OT 1.5x (h)","OT 2x (h)","Bonus","Loan","Gross","Deductions","Net Pay",""].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em] whitespace-nowrap">
                     {h}
                   </th>
@@ -490,7 +490,7 @@ const PayrollRun = () => {
             </thead>
             <tbody>
               {employees.length === 0 ? (
-                <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-5 py-12 text-center text-muted-foreground">
                   No active employees. Add some in the Employees page first.
                 </td></tr>
               ) : employees.map(e => {
@@ -522,6 +522,16 @@ const PayrollRun = () => {
                     </td>
                     <td className="px-4 py-2.5 font-semibold text-primary tabular-nums whitespace-nowrap">
                       {r.netPay.toLocaleString()}
+                    </td>
+                    <td className="px-2 py-2.5">
+                      <button
+                        onClick={() => handleSinglePayslip(e.id)}
+                        disabled={exporting}
+                        title="Download payslip"
+                        className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </button>
                     </td>
                   </tr>
                 );
