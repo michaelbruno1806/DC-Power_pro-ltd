@@ -14,6 +14,7 @@ import CompanySetup from "@/pages/CompanySetup";
 import PayrollComponents from "@/pages/PayrollComponents";
 import Employees from "@/pages/Employees";
 import PayrollFiles from "@/pages/PayrollFiles";
+import PayrollRun from "@/pages/PayrollRun";
 import AdminPanel from "@/pages/AdminPanel";
 import PlaceholderPage from "@/pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
@@ -47,6 +48,7 @@ const App = () => {
                 <Route path="/company-setup" element={<CompanySetup />} />
                 <Route path="/components" element={<PayrollComponents />} />
                 <Route path="/payroll" element={<PayrollFiles />} />
+                <Route path="/payroll/:id" element={<PayrollRun />} />
                 <Route path="/employees" element={<Employees />} />
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/payslips" element={<PlaceholderPage />} />
