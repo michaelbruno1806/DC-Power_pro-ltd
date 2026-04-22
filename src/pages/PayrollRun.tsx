@@ -5,14 +5,29 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Calculator, CheckCircle2, Users, RefreshCw, FileSpreadsheet } from "lucide-react";
+import {
+  ArrowLeft, Save, Calculator, CheckCircle2, Users, RefreshCw,
+  FileSpreadsheet, FileDown, FileText, ChevronDown,
+} from "lucide-react";
 import {
   calculatePayroll,
   aggregatePayrollTotals,
   type PayrollComponent,
   type PayrollResult,
 } from "@/lib/payroll/calc";
+import {
+  generatePayslipPDF,
+  generateBulkPayslipPDF,
+  generatePayrollExcel,
+  generatePayrollCSV,
+  type CompanyInfo,
+  type PayslipPayload,
+  type PayrollExportRow,
+} from "@/lib/payroll/exports";
 
 const months = [
   "January","February","March","April","May","June",
@@ -35,6 +50,10 @@ interface Employee {
   last_name: string;
   basic_salary: number | null;
   status: string | null;
+  nic?: string | null;
+  bank_name?: string | null;
+  bank_account?: string | null;
+  employment_date?: string | null;
 }
 
 interface ComponentRow {
@@ -65,11 +84,13 @@ const PayrollRun = () => {
   const { companyId } = useAuth();
 
   const [file, setFile] = useState<PayrollFile | null>(null);
+  const [company, setCompany] = useState<CompanyInfo | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [components, setComponents] = useState<ComponentRow[]>([]);
   const [drafts, setDrafts] = useState<Record<string, EntryDraft>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // ── Fetch ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -78,9 +99,12 @@ const PayrollRun = () => {
 
     (async () => {
       setLoading(true);
-      const [fileRes, empRes, compRes, entryRes] = await Promise.all([
+      const [fileRes, companyRes, empRes, compRes, entryRes] = await Promise.all([
         supabase.from("payroll_files").select("*").eq("id", payrollFileId).maybeSingle(),
-        supabase.from("employees").select("id, first_name, last_name, basic_salary, status")
+        supabase.from("companies").select("name, address, city, brn, ern, phone, email")
+          .eq("id", companyId).maybeSingle(),
+        supabase.from("employees")
+          .select("id, first_name, last_name, basic_salary, status, nic, bank_name, bank_account, employment_date")
           .eq("company_id", companyId).eq("status", "active")
           .order("first_name", { ascending: true }),
         supabase.from("payroll_components").select("*")
@@ -94,6 +118,7 @@ const PayrollRun = () => {
       if (compRes.error) toast.error(compRes.error.message);
 
       setFile(fileRes.data as PayrollFile | null);
+      setCompany((companyRes.data as CompanyInfo) || null);
       const emps = (empRes.data || []) as Employee[];
       setEmployees(emps);
       setComponents((compRes.data || []) as ComponentRow[]);
@@ -245,28 +270,97 @@ const PayrollRun = () => {
     }
   };
 
-  const exportCSV = () => {
-    const header = [
-      "Employee","Basic","Overtime","Bonus","Gross",
-      "PAYE","CSG (emp)","NSF (emp)","Loan","Total Deductions","Net Pay",
-    ].join(",");
-    const lines = employees.map(e => {
+  // ── Export helpers ────────────────────────────────────────────────────
+  const buildExportRows = (): PayrollExportRow[] =>
+    employees.map(e => {
       const r = computed[e.id]; const d = drafts[e.id];
-      if (!r || !d) return "";
-      return [
-        `"${e.first_name} ${e.last_name}"`,
-        r.basicSalary, r.overtimePay, d.bonus, r.grossPay,
-        r.paye, r.csgEmployee, r.nsfEmployee, d.loan,
-        r.totalEmployeeDeductions, r.netPay,
-      ].join(",");
-    }).filter(Boolean);
-    const blob = new Blob([[header, ...lines].join("\n")], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `payroll-${file?.year}-${String(file?.month).padStart(2,"0")}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+      if (!r || !d) return null;
+      return {
+        employee: `${e.first_name} ${e.last_name}`,
+        nic: e.nic,
+        basic: r.basicSalary,
+        unpaidLeaveDays: d.unpaidLeaveDays,
+        overtime: r.overtimePay,
+        bonus: d.bonus,
+        gross: r.grossPay,
+        paye: r.paye,
+        csgEmployee: r.csgEmployee,
+        nsfEmployee: r.nsfEmployee,
+        loan: d.loan,
+        totalDeductions: r.totalEmployeeDeductions,
+        netPay: r.netPay,
+        csgEmployer: r.csgEmployer,
+        nsfEmployer: r.nsfEmployer,
+        trainingLevy: r.trainingLevyEmployer,
+        employerCost: r.employerCost,
+      } as PayrollExportRow;
+    }).filter(Boolean) as PayrollExportRow[];
+
+  const requireCompany = (): boolean => {
+    if (!company || !file) {
+      toast.error("Missing company or payroll info");
+      return false;
+    }
+    return true;
+  };
+
+  const handleExportCSV = () => {
+    if (!requireCompany()) return;
+    generatePayrollCSV({ company: company!, month: file!.month, year: file!.year, rows: buildExportRows() });
+  };
+
+  const handleExportExcel = () => {
+    if (!requireCompany()) return;
+    generatePayrollExcel({ company: company!, month: file!.month, year: file!.year, rows: buildExportRows() });
+  };
+
+  const buildPayslipPayloads = (): PayslipPayload[] =>
+    employees.map(e => {
+      const r = computed[e.id];
+      if (!r || !file || !company) return null;
+      return {
+        company,
+        employee: {
+          first_name: e.first_name, last_name: e.last_name,
+          nic: e.nic, bank_name: e.bank_name, bank_account: e.bank_account,
+          employment_date: e.employment_date,
+        },
+        month: file.month, year: file.year, result: r,
+      } as PayslipPayload;
+    }).filter(Boolean) as PayslipPayload[];
+
+  const handleSinglePayslip = async (employeeId: string) => {
+    if (!requireCompany()) return;
+    const e = employees.find(x => x.id === employeeId);
+    const r = computed[employeeId];
+    if (!e || !r) return;
+    setExporting(true);
+    try {
+      await generatePayslipPDF({
+        company: company!,
+        employee: { first_name: e.first_name, last_name: e.last_name, nic: e.nic, bank_name: e.bank_name, bank_account: e.bank_account, employment_date: e.employment_date },
+        month: file!.month, year: file!.year, result: r,
+      });
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to generate payslip");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleBulkPayslips = async () => {
+    if (!requireCompany()) return;
+    const payloads = buildPayslipPayloads();
+    if (payloads.length === 0) { toast.error("No employees to export"); return; }
+    setExporting(true);
+    try {
+      await generateBulkPayslipPDF(payloads);
+      toast.success(`Generated ${payloads.length} payslips`);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to generate payslips");
+    } finally {
+      setExporting(false);
+    }
   };
 
   if (loading) {
@@ -312,15 +406,25 @@ const PayrollRun = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={exportCSV} className="gap-2">
-            <FileSpreadsheet className="h-4 w-4" /> Export CSV
-          </Button>
-          <Button
-            variant="outline"
-            disabled={saving || isFinalised}
-            onClick={() => saveAll("draft")}
-            className="gap-2"
-          >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2" disabled={exporting}>
+                <FileDown className="h-4 w-4" /> Export <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-card border-border">
+              <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4" /> Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportCSV} className="gap-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4" /> CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleBulkPayslips} className="gap-2 cursor-pointer">
+                <FileText className="h-4 w-4" /> All Payslips (PDF)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" disabled={saving || isFinalised} onClick={() => saveAll("draft")} className="gap-2">
             {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
           </Button>
@@ -377,7 +481,7 @@ const PayrollRun = () => {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary/20">
-                {["Employee","Basic","Unpaid Days","OT 1.5x (h)","OT 2x (h)","Bonus","Loan","Gross","Deductions","Net Pay"].map(h => (
+                {["Employee","Basic","Unpaid Days","OT 1.5x (h)","OT 2x (h)","Bonus","Loan","Gross","Deductions","Net Pay",""].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em] whitespace-nowrap">
                     {h}
                   </th>
@@ -386,7 +490,7 @@ const PayrollRun = () => {
             </thead>
             <tbody>
               {employees.length === 0 ? (
-                <tr><td colSpan={10} className="px-5 py-12 text-center text-muted-foreground">
+                <tr><td colSpan={11} className="px-5 py-12 text-center text-muted-foreground">
                   No active employees. Add some in the Employees page first.
                 </td></tr>
               ) : employees.map(e => {
@@ -418,6 +522,16 @@ const PayrollRun = () => {
                     </td>
                     <td className="px-4 py-2.5 font-semibold text-primary tabular-nums whitespace-nowrap">
                       {r.netPay.toLocaleString()}
+                    </td>
+                    <td className="px-2 py-2.5">
+                      <button
+                        onClick={() => handleSinglePayslip(e.id)}
+                        disabled={exporting}
+                        title="Download payslip"
+                        className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-primary transition-colors disabled:opacity-50"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </button>
                     </td>
                   </tr>
                 );

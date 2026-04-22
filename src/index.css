@@ -261,29 +261,53 @@
     50% { box-shadow: 0 0 60px -10px hsl(142, 76%, 45%, 0.4); }
   }
 
-  /* Splash screen animations */
-  .animate-splash-rise {
-    animation: splash-rise 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* ─── Splash screen — cinematic intro ─── */
+  @keyframes splash-spotlight {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+    60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+    100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
   }
-  .animate-splash-fade { animation: splash-fade 1.4s ease-out both; }
-  .animate-splash-fade-delayed { animation: splash-fade 1.6s ease-out 0.5s both; }
-  .animate-splash-spin { animation: splash-spin 12s linear infinite; }
-  .animate-splash-spin-reverse { animation: splash-spin 18s linear infinite reverse; }
-  .animate-splash-glow { animation: splash-glow 3s ease-in-out infinite; }
-  .animate-splash-bar {
-    animation: splash-bar 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    transform-origin: left;
+  @keyframes splash-drift {
+    from { background-position: 0 0; }
+    to   { background-position: 44px 44px; }
   }
-
-  @keyframes splash-rise {
-    0% { opacity: 0; transform: translateY(30px) scale(0.95); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+  @keyframes splash-beam {
+    0%   { transform: translateX(0) skewX(-12deg); opacity: 0; }
+    20%  { opacity: 1; }
+    100% { transform: translateX(280%) skewX(-12deg); opacity: 0; }
   }
-  @keyframes splash-fade { 0% { opacity: 0; } 100% { opacity: 1; } }
-  @keyframes splash-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  @keyframes splash-glow {
-    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  @keyframes splash-ring {
+    0%   { opacity: 0; transform: scale(0.6); }
+    60%  { opacity: 1; }
+    100% { opacity: 0.55; transform: scale(1); }
   }
-  @keyframes splash-bar { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
+  @keyframes splash-logo-in {
+    0%   { opacity: 0; transform: scale(1.35) translateY(8px); filter: blur(14px); }
+    55%  { opacity: 1; filter: blur(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+  }
+  @keyframes splash-mask-wipe {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-105%); }
+  }
+  @keyframes splash-logo-shimmer {
+    0%, 100% { filter: drop-shadow(0 0 30px rgba(212,175,55,0.45)) drop-shadow(0 0 60px rgba(212,175,55,0.2)); }
+    50%      { filter: drop-shadow(0 0 45px rgba(212,175,55,0.6)) drop-shadow(0 0 90px rgba(192,192,192,0.25)); }
+  }
+  @keyframes splash-fade-rise {
+    0%   { opacity: 0; transform: translateY(14px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes splash-bar {
+    0%   { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+  }
+  @keyframes splash-curtain-top {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-100%); }
+  }
+  @keyframes splash-curtain-bottom {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(100%); }
+  }
 }
