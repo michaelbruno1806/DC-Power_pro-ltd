@@ -5,14 +5,29 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Calculator, CheckCircle2, Users, RefreshCw, FileSpreadsheet } from "lucide-react";
+import {
+  ArrowLeft, Save, Calculator, CheckCircle2, Users, RefreshCw,
+  FileSpreadsheet, FileDown, FileText, ChevronDown,
+} from "lucide-react";
 import {
   calculatePayroll,
   aggregatePayrollTotals,
   type PayrollComponent,
   type PayrollResult,
 } from "@/lib/payroll/calc";
+import {
+  generatePayslipPDF,
+  generateBulkPayslipPDF,
+  generatePayrollExcel,
+  generatePayrollCSV,
+  type CompanyInfo,
+  type PayslipPayload,
+  type PayrollExportRow,
+} from "@/lib/payroll/exports";
 
 const months = [
   "January","February","March","April","May","June",
@@ -35,6 +50,10 @@ interface Employee {
   last_name: string;
   basic_salary: number | null;
   status: string | null;
+  nic?: string | null;
+  bank_name?: string | null;
+  bank_account?: string | null;
+  employment_date?: string | null;
 }
 
 interface ComponentRow {
