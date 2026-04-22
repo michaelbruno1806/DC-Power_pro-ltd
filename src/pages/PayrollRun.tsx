@@ -270,28 +270,97 @@ const PayrollRun = () => {
     }
   };
 
-  const exportCSV = () => {
-    const header = [
-      "Employee","Basic","Overtime","Bonus","Gross",
-      "PAYE","CSG (emp)","NSF (emp)","Loan","Total Deductions","Net Pay",
-    ].join(",");
-    const lines = employees.map(e => {
+  // ── Export helpers ────────────────────────────────────────────────────
+  const buildExportRows = (): PayrollExportRow[] =>
+    employees.map(e => {
       const r = computed[e.id]; const d = drafts[e.id];
-      if (!r || !d) return "";
-      return [
-        `"${e.first_name} ${e.last_name}"`,
-        r.basicSalary, r.overtimePay, d.bonus, r.grossPay,
-        r.paye, r.csgEmployee, r.nsfEmployee, d.loan,
-        r.totalEmployeeDeductions, r.netPay,
-      ].join(",");
-    }).filter(Boolean);
-    const blob = new Blob([[header, ...lines].join("\n")], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `payroll-${file?.year}-${String(file?.month).padStart(2,"0")}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+      if (!r || !d) return null;
+      return {
+        employee: `${e.first_name} ${e.last_name}`,
+        nic: e.nic,
+        basic: r.basicSalary,
+        unpaidLeaveDays: d.unpaidLeaveDays,
+        overtime: r.overtimePay,
+        bonus: d.bonus,
+        gross: r.grossPay,
+        paye: r.paye,
+        csgEmployee: r.csgEmployee,
+        nsfEmployee: r.nsfEmployee,
+        loan: d.loan,
+        totalDeductions: r.totalEmployeeDeductions,
+        netPay: r.netPay,
+        csgEmployer: r.csgEmployer,
+        nsfEmployer: r.nsfEmployer,
+        trainingLevy: r.trainingLevyEmployer,
+        employerCost: r.employerCost,
+      } as PayrollExportRow;
+    }).filter(Boolean) as PayrollExportRow[];
+
+  const requireCompany = (): boolean => {
+    if (!company || !file) {
+      toast.error("Missing company or payroll info");
+      return false;
+    }
+    return true;
+  };
+
+  const handleExportCSV = () => {
+    if (!requireCompany()) return;
+    generatePayrollCSV({ company: company!, month: file!.month, year: file!.year, rows: buildExportRows() });
+  };
+
+  const handleExportExcel = () => {
+    if (!requireCompany()) return;
+    generatePayrollExcel({ company: company!, month: file!.month, year: file!.year, rows: buildExportRows() });
+  };
+
+  const buildPayslipPayloads = (): PayslipPayload[] =>
+    employees.map(e => {
+      const r = computed[e.id];
+      if (!r || !file || !company) return null;
+      return {
+        company,
+        employee: {
+          first_name: e.first_name, last_name: e.last_name,
+          nic: e.nic, bank_name: e.bank_name, bank_account: e.bank_account,
+          employment_date: e.employment_date,
+        },
+        month: file.month, year: file.year, result: r,
+      } as PayslipPayload;
+    }).filter(Boolean) as PayslipPayload[];
+
+  const handleSinglePayslip = async (employeeId: string) => {
+    if (!requireCompany()) return;
+    const e = employees.find(x => x.id === employeeId);
+    const r = computed[employeeId];
+    if (!e || !r) return;
+    setExporting(true);
+    try {
+      await generatePayslipPDF({
+        company: company!,
+        employee: { first_name: e.first_name, last_name: e.last_name, nic: e.nic, bank_name: e.bank_name, bank_account: e.bank_account, employment_date: e.employment_date },
+        month: file!.month, year: file!.year, result: r,
+      });
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to generate payslip");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleBulkPayslips = async () => {
+    if (!requireCompany()) return;
+    const payloads = buildPayslipPayloads();
+    if (payloads.length === 0) { toast.error("No employees to export"); return; }
+    setExporting(true);
+    try {
+      await generateBulkPayslipPDF(payloads);
+      toast.success(`Generated ${payloads.length} payslips`);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to generate payslips");
+    } finally {
+      setExporting(false);
+    }
   };
 
   if (loading) {
