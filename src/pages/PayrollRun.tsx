@@ -406,15 +406,25 @@ const PayrollRun = () => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={exportCSV} className="gap-2">
-            <FileSpreadsheet className="h-4 w-4" /> Export CSV
-          </Button>
-          <Button
-            variant="outline"
-            disabled={saving || isFinalised}
-            onClick={() => saveAll("draft")}
-            className="gap-2"
-          >
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2" disabled={exporting}>
+                <FileDown className="h-4 w-4" /> Export <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-card border-border">
+              <DropdownMenuItem onClick={handleExportExcel} className="gap-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4" /> Excel (.xlsx)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportCSV} className="gap-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4" /> CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleBulkPayslips} className="gap-2 cursor-pointer">
+                <FileText className="h-4 w-4" /> All Payslips (PDF)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="outline" disabled={saving || isFinalised} onClick={() => saveAll("draft")} className="gap-2">
             {saving ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
             Save Draft
           </Button>
