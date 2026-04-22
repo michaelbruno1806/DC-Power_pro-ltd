@@ -26,6 +26,7 @@ interface PayrollFile {
 
 const PayrollFiles = () => {
   const { companyId, user } = useAuth();
+  const navigate = useNavigate();
   const [files, setFiles] = useState<PayrollFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -50,12 +51,12 @@ const PayrollFiles = () => {
 
   const handleCreate = async () => {
     if (!companyId || !user) return;
-    const { error } = await supabase.from("payroll_files").insert({
+    const { data, error } = await supabase.from("payroll_files").insert({
       company_id: companyId,
       month: parseInt(newMonth),
       year: parseInt(newYear),
       created_by: user.id,
-    });
+    }).select().single();
     if (error) {
       if (error.code === "23505") toast.error("Payroll file already exists for this period");
       else toast.error(error.message);
@@ -64,6 +65,7 @@ const PayrollFiles = () => {
     toast.success("Payroll file created");
     setDialogOpen(false);
     fetchFiles();
+    if (data?.id) navigate(`/payroll/${data.id}`);
   };
 
   const getStatusIcon = (status: string | null) => {
@@ -160,7 +162,11 @@ const PayrollFiles = () => {
               ) : files.length === 0 ? (
                 <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No payroll files yet. Create your first one.</td></tr>
               ) : files.map(f => (
-                <tr key={f.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
+                <tr
+                  key={f.id}
+                  onClick={() => navigate(`/payroll/${f.id}`)}
+                  className="border-b border-border/40 hover:bg-secondary/20 transition-colors cursor-pointer"
+                >
                   <td className="px-5 py-4 font-medium text-foreground">{months[f.month - 1]} {f.year}</td>
                   <td className="px-5 py-4">
                     <span className={`inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${getStatusStyle(f.status)}`}>
@@ -173,7 +179,11 @@ const PayrollFiles = () => {
                   <td className="px-5 py-4 font-semibold text-primary">MUR {(f.total_net || 0).toLocaleString()}</td>
                   <td className="px-5 py-4 text-muted-foreground text-xs">{new Date(f.created_at).toLocaleDateString()}</td>
                   <td className="px-5 py-4">
-                    <button className="p-2 rounded-md hover:bg-secondary text-muted-foreground hover:text-primary transition-colors">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/payroll/${f.id}`); }}
+                      className="p-2 rounded-md hover:bg-secondary text-muted-foreground hover:text-primary transition-colors"
+                      aria-label="Open payroll run"
+                    >
                       <Eye className="h-4 w-4" />
                     </button>
                   </td>
