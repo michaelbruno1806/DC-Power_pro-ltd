@@ -1,1 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="10" y="40" font-family="Arial" font-size="30" fill="gold">DC</text><text x="10" y="70" font-family="Arial" font-size="15" fill="gray">Payroll</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4af37"/>
+      <stop offset="100%" stop-color="#b8860b"/>
+    </linearGradient>
+    <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c0c0c0"/>
+      <stop offset="100%" stop-color="#808080"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#000000"/>
+  <text x="18" y="44" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="36" fill="url(#gold)">D</text>
+  <text x="44" y="44" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="36" fill="url(#silver)">C</text>
+</svg>
