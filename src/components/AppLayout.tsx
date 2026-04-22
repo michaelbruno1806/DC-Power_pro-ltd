@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import AppSidebar from "./AppSidebar";
-import logo from "@/assets/dc-payroll-logo.jpeg";
+import logo from "@/assets/dc-payroll-logo.png";
 
 const currentYear = new Date().getFullYear();
 
