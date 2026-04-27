@@ -427,6 +427,16 @@ const PayrollRun = () => {
           <p className="text-sm text-muted-foreground mt-3">
             {employees.length} active employees · status:{" "}
             <span className="text-foreground font-medium">{file.status || "draft"}</span>
+            <span className="mx-2 text-border">·</span>
+            <span className="text-xs">{periodCfg.workingDays} working days · {periodCfg.hoursPerWeek}h/week</span>
+            {Object.values(autoUnpaidDays).some(d => d > 0) && (
+              <>
+                <span className="mx-2 text-border">·</span>
+                <span className="text-xs text-warning">
+                  {Object.values(autoUnpaidDays).reduce((a, b) => a + b, 0)} unpaid leave day(s) auto-loaded from Leaves
+                </span>
+              </>
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
