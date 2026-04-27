@@ -16,6 +16,9 @@ import Employees from "@/pages/Employees";
 import PayrollFiles from "@/pages/PayrollFiles";
 import PayrollRun from "@/pages/PayrollRun";
 import AdminPanel from "@/pages/AdminPanel";
+import Leaves from "@/pages/Leaves";
+import Holidays from "@/pages/Holidays";
+import WorkingDays from "@/pages/WorkingDays";
 import PlaceholderPage from "@/pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
@@ -54,9 +57,9 @@ const App = () => {
                 <Route path="/payslips" element={<PlaceholderPage />} />
                 <Route path="/checklist" element={<PlaceholderPage />} />
                 <Route path="/mra-filings" element={<PlaceholderPage />} />
-                <Route path="/leaves" element={<PlaceholderPage />} />
-                <Route path="/working-days" element={<PlaceholderPage />} />
-                <Route path="/holidays" element={<PlaceholderPage />} />
+                <Route path="/leaves" element={<Leaves />} />
+                <Route path="/working-days" element={<WorkingDays />} />
+                <Route path="/holidays" element={<Holidays />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
