@@ -188,6 +188,7 @@ const WorkingDays = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </GlassCard>
     </div>
   );
