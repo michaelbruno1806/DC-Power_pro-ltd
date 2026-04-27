@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
@@ -8,6 +9,20 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Shield, Building2, Users, Plus, Edit2, Trash2, UserPlus, Search } from "lucide-react";
+
+const companySchema = z.object({
+  name: z.string().trim().min(1, "Company name required").max(120),
+  ern: z.string().trim().max(20).optional().or(z.literal("")),
+  brn: z.string().trim().max(20).optional().or(z.literal("")),
+  email: z.union([z.string().trim().email("Invalid email").max(255), z.literal("")]).optional(),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
+});
+
+const assignSchema = z.object({
+  userId: z.string().uuid("Select a user"),
+  companyId: z.string().uuid("Select a company"),
+  role: z.enum(["super_admin", "client_admin"]),
+});
 
 interface Company {
   id: string;
