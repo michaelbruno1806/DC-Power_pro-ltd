@@ -75,7 +75,8 @@ const AdminPanel = () => {
   useEffect(() => { fetchData(); }, []);
 
   const handleCreateCompany = async () => {
-    if (!companyForm.name.trim()) { toast.error("Company name required"); return; }
+    const parsed = companySchema.safeParse(companyForm);
+    if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
     const { error } = await supabase.from("companies").insert({
       name: companyForm.name.trim(),
       ern: companyForm.ern || null,
@@ -98,16 +99,25 @@ const AdminPanel = () => {
   };
 
   const handleAssignUser = async () => {
-    if (!assignForm.userId || !assignForm.companyId) { toast.error("Select user and company"); return; }
-    
+    const parsed = assignSchema.safeParse(assignForm);
+    if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
+
+    // Replace any existing role for this user, then insert the new one.
+    // Prevents accidental privilege accumulation when changing role.
+    const { error: delErr } = await supabase
+      .from("user_roles")
+      .delete()
+      .eq("user_id", assignForm.userId);
+    if (delErr) { toast.error(delErr.message); return; }
+
     const [profileRes, roleRes] = await Promise.all([
       supabase.from("profiles").update({ company_id: assignForm.companyId }).eq("user_id", assignForm.userId),
-      supabase.from("user_roles").upsert({ user_id: assignForm.userId, role: assignForm.role as any }, { onConflict: "user_id,role" }),
+      supabase.from("user_roles").insert({ user_id: assignForm.userId, role: assignForm.role as any }),
     ]);
-    
+
     if (profileRes.error) { toast.error(profileRes.error.message); return; }
     if (roleRes.error) { toast.error(roleRes.error.message); return; }
-    
+
     toast.success("User assigned");
     setAssignDialogOpen(false);
     setAssignForm({ userId: "", companyId: "", role: "client_admin" });
