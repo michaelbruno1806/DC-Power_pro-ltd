@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (rolesRes.data) setRole(rolesRes.data.role as AppRole);
     if (profileRes.data) {
       setCompanyId(profileRes.data.company_id);
-      setDisplayName(profileRes.data.display_name);
+      if (profileRes.data.display_name) setDisplayName(profileRes.data.display_name);
     }
   };
 
@@ -53,6 +53,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          // Optimistic name from auth metadata so the UI never shows blank
+          const meta = session.user.user_metadata as any;
+          setDisplayName(meta?.display_name || meta?.full_name || meta?.name || session.user.email || null);
           setTimeout(() => fetchUserMeta(session.user.id), 0);
         } else {
           setRole(null);
@@ -62,6 +65,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const meta = session.user.user_metadata as any;
+        setDisplayName(meta?.display_name || meta?.full_name || meta?.name || session.user.email || null);
+        fetchUserMeta(session.user.id);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
