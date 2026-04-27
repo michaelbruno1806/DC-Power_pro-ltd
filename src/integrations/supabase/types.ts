@@ -142,6 +142,90 @@ export type Database = {
           },
         ]
       }
+      leave_requests: {
+        Row: {
+          approved_by: string | null
+          company_id: string
+          created_at: string
+          days: number
+          decided_at: string | null
+          employee_id: string
+          end_date: string
+          id: string
+          leave_type_id: string | null
+          reason: string | null
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_by?: string | null
+          company_id: string
+          created_at?: string
+          days?: number
+          decided_at?: string | null
+          employee_id: string
+          end_date: string
+          id?: string
+          leave_type_id?: string | null
+          reason?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_by?: string | null
+          company_id?: string
+          created_at?: string
+          days?: number
+          decided_at?: string | null
+          employee_id?: string
+          end_date?: string
+          id?: string
+          leave_type_id?: string | null
+          reason?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      leave_types: {
+        Row: {
+          annual_entitlement_days: number | null
+          code: string | null
+          company_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          is_paid: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          annual_entitlement_days?: number | null
+          code?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_paid?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          annual_entitlement_days?: number | null
+          code?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          is_paid?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payroll_components: {
         Row: {
           amount: number | null
@@ -337,6 +421,36 @@ export type Database = {
           },
         ]
       }
+      public_holidays: {
+        Row: {
+          company_id: string
+          created_at: string
+          holiday_date: string
+          id: string
+          is_recurring: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          holiday_date: string
+          id?: string
+          is_recurring?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          holiday_date?: string
+          id?: string
+          is_recurring?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -355,6 +469,39 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      working_day_configs: {
+        Row: {
+          company_id: string
+          created_at: string
+          hours_per_week: number
+          id: string
+          month: number | null
+          updated_at: string
+          working_days: number
+          year: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          hours_per_week?: number
+          id?: string
+          month?: number | null
+          updated_at?: string
+          working_days?: number
+          year: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          hours_per_week?: number
+          id?: string
+          month?: number | null
+          updated_at?: string
+          working_days?: number
+          year?: number
         }
         Relationships: []
       }
