@@ -1,11 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Eye, EyeOff, Lock, Mail, User, ArrowRight } from "lucide-react";
+
+const loginSchema = z.object({
+  email: z.string().trim().email("Invalid email").max(255),
+  password: z.string().min(1, "Password required").max(128),
+});
+
+const signupSchema = loginSchema.extend({
+  password: z.string().min(8, "Password must be at least 8 characters").max(128),
+  displayName: z.string().trim().min(1, "Name required").max(100).optional(),
+});
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,8 +29,10 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
-      toast.error("Please fill in all fields");
+    const schema = isLogin ? loginSchema : signupSchema;
+    const parsed = schema.safeParse({ email, password, displayName });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
       return;
     }
     setLoading(true);

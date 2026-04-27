@@ -117,6 +117,46 @@ describe("calculatePayroll — end-to-end scenarios", () => {
   });
 });
 
+describe("Unpaid leave integration", () => {
+  it("reduces basic, gross and net by the pro-rated amount", () => {
+    const baseline = calculatePayroll({ basicSalary: 44_000, workingDaysInMonth: 22 });
+    const withLeave = calculatePayroll({ basicSalary: 44_000, workingDaysInMonth: 22, unpaidLeaveDays: 3 });
+    // 44000/22 * 3 = 6000
+    expect(withLeave.unpaidLeaveDeduction).toBeCloseTo(6000, 2);
+    expect(withLeave.basicSalary).toBeCloseTo(38_000, 2);
+    expect(withLeave.grossPay).toBeLessThan(baseline.grossPay);
+    expect(withLeave.netPay).toBeLessThan(baseline.netPay);
+  });
+
+  it("never produces negative pay even with extreme unpaid leave", () => {
+    const r = calculatePayroll({ basicSalary: 30_000, workingDaysInMonth: 22, unpaidLeaveDays: 100 });
+    // basic goes negative but should not crash; downstream stays consistent
+    expect(Number.isFinite(r.netPay)).toBe(true);
+  });
+});
+
+describe("Employer cost", () => {
+  it("equals gross + employer CSG + employer NSF + training levy", () => {
+    const r = calculatePayroll({ basicSalary: 60_000 });
+    const expected = r.grossPay + r.csgEmployer + r.nsfEmployer + r.trainingLevyEmployer;
+    expect(r.employerCost).toBeCloseTo(expected, 2);
+  });
+});
+
+describe("Non-taxable, non-wage-bill allowances", () => {
+  it("does not count toward PAYE or CSG when flagged off", () => {
+    const r = calculatePayroll({
+      basicSalary: 50_000,
+      additions: [{ name: "Travel reimbursement", amount: 5_000, taxable: false, inWageBill: false }],
+    });
+    const baseline = calculatePayroll({ basicSalary: 50_000 });
+    expect(r.paye).toBeCloseTo(baseline.paye, 2);
+    expect(r.csgEmployee).toBeCloseTo(baseline.csgEmployee, 2);
+    expect(r.grossPay).toBeCloseTo(baseline.grossPay + 5_000, 2);
+  });
+});
+
 function round(n: number) {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
+

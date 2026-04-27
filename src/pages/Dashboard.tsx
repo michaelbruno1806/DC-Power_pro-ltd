@@ -38,7 +38,7 @@ const Dashboard = () => {
         <div>
           <div className="eyebrow mb-2">{currentMonth} {currentYear} · Overview</div>
           <h1 className="heading-display text-foreground">
-            Welcome back{firstName ? `, rs{firstName}` : ""}
+            Welcome back{firstName ? `, ${firstName}` : ""}
           </h1>
           <div className="divider-elegant mt-3" />
         </div>
@@ -136,10 +136,10 @@ const Dashboard = () => {
               {checklist.map((item, i) => (
                 <div key={item.label} className="flex items-center justify-between gap-2 bg-secondary/30 border border-border/60 rounded-md px-3 py-2.5">
                   <div className="flex gap-2.5 items-center">
-                    <span className={`h-1.5 w-1.5 rounded-full rs{item.done ? "bg-success" : "bg-destructive"}`} />
+                    <span className={`h-1.5 w-1.5 rounded-full ${item.done ? "bg-success" : "bg-destructive"}`} />
                     <span className="text-sm font-medium text-foreground">{i + 1}. {item.label}</span>
                   </div>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded rs{
+                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
                     item.done ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"
                   }`}>
                     {item.done ? "Done" : "Pending"}
@@ -160,10 +160,10 @@ const Dashboard = () => {
                   <div className="text-sm font-medium text-foreground">{row.name}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{row.type} · {row.dates} · {row.days} days</div>
                 </div>
-                <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded rs{
+                <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${
                   row.status === "Approved" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
                 }`}>
-                  <span className={`h-1.5 w-1.5 rounded-full rs{row.status === "Approved" ? "bg-success" : "bg-warning"}`} />
+                  <span className={`h-1.5 w-1.5 rounded-full ${row.status === "Approved" ? "bg-success" : "bg-warning"}`} />
                   {row.status}
                 </span>
               </div>

@@ -28,6 +28,7 @@ import {
   type PayslipPayload,
   type PayrollExportRow,
 } from "@/lib/payroll/exports";
+import { getPeriodConfig, getUnpaidLeaveDaysByEmployee, type PeriodConfig } from "@/lib/payroll/period";
 
 const months = [
   "January","February","March","April","May","June",
@@ -88,6 +89,8 @@ const PayrollRun = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [components, setComponents] = useState<ComponentRow[]>([]);
   const [drafts, setDrafts] = useState<Record<string, EntryDraft>>({});
+  const [periodCfg, setPeriodCfg] = useState<PeriodConfig>({ workingDays: 22, hoursPerWeek: 45 });
+  const [autoUnpaidDays, setAutoUnpaidDays] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -117,13 +120,27 @@ const PayrollRun = () => {
       if (empRes.error) toast.error(empRes.error.message);
       if (compRes.error) toast.error(compRes.error.message);
 
-      setFile(fileRes.data as PayrollFile | null);
+      const fileRow = fileRes.data as PayrollFile | null;
+      setFile(fileRow);
       setCompany((companyRes.data as CompanyInfo) || null);
       const emps = (empRes.data || []) as Employee[];
       setEmployees(emps);
       setComponents((compRes.data || []) as ComponentRow[]);
 
-      // Hydrate drafts from existing entries (or seed from employee basic).
+      // Period config + auto unpaid-leave (depends on file year/month)
+      let cfg: PeriodConfig = { workingDays: 22, hoursPerWeek: 45 };
+      let autoUnpaid: Record<string, number> = {};
+      if (fileRow) {
+        [cfg, autoUnpaid] = await Promise.all([
+          getPeriodConfig(companyId, fileRow.year, fileRow.month),
+          getUnpaidLeaveDaysByEmployee(companyId, fileRow.year, fileRow.month),
+        ]);
+      }
+      if (cancelled) return;
+      setPeriodCfg(cfg);
+      setAutoUnpaidDays(autoUnpaid);
+
+      // Hydrate drafts from existing entries (or seed from employee basic + auto unpaid).
       const existing = new Map<string, any>();
       (entryRes.data || []).forEach((e: any) => existing.set(e.employee_id, e));
 
@@ -132,10 +149,15 @@ const PayrollRun = () => {
         const prev = existing.get(e.id);
         const adds = (prev?.additions as any) || {};
         const deds = (prev?.deductions as any) || {};
+        // If we already have a saved entry, respect its unpaidLeaveDays;
+        // otherwise seed from approved unpaid leaves in the leave system.
+        const seededUnpaid = prev != null
+          ? Number(adds.unpaidLeaveDays ?? 0)
+          : (autoUnpaid[e.id] || 0);
         seed[e.id] = {
           employeeId: e.id,
           basic: Number(prev?.basic_salary ?? e.basic_salary ?? 0),
-          unpaidLeaveDays: Number(adds.unpaidLeaveDays ?? 0),
+          unpaidLeaveDays: seededUnpaid,
           overtime1_5x: Number(adds.overtime1_5x ?? 0),
           overtime2x: Number(adds.overtime2x ?? 0),
           bonus: Number(adds.bonus ?? 0),
@@ -186,6 +208,8 @@ const PayrollRun = () => {
       out[e.id] = calculatePayroll({
         basicSalary: d.basic,
         unpaidLeaveDays: d.unpaidLeaveDays,
+        workingDaysInMonth: periodCfg.workingDays,
+        standardHoursPerWeek: periodCfg.hoursPerWeek,
         overtimeHours1_5x: d.overtime1_5x,
         overtimeHours2x: d.overtime2x,
         additions,
@@ -193,7 +217,7 @@ const PayrollRun = () => {
       });
     }
     return out;
-  }, [employees, drafts, companyAdditions, companyDeductions]);
+  }, [employees, drafts, companyAdditions, companyDeductions, periodCfg]);
 
   const totals = useMemo(
     () => aggregatePayrollTotals(Object.values(computed)),
@@ -403,6 +427,16 @@ const PayrollRun = () => {
           <p className="text-sm text-muted-foreground mt-3">
             {employees.length} active employees · status:{" "}
             <span className="text-foreground font-medium">{file.status || "draft"}</span>
+            <span className="mx-2 text-border">·</span>
+            <span className="text-xs">{periodCfg.workingDays} working days · {periodCfg.hoursPerWeek}h/week</span>
+            {Object.values(autoUnpaidDays).some(d => d > 0) && (
+              <>
+                <span className="mx-2 text-border">·</span>
+                <span className="text-xs text-warning">
+                  {Object.values(autoUnpaidDays).reduce((a, b) => a + b, 0)} unpaid leave day(s) auto-loaded from Leaves
+                </span>
+              </>
+            )}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

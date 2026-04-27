@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
@@ -9,6 +10,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Search, Edit2, Trash2, Users, UserCheck, UserX, Eye } from "lucide-react";
+
+const employeeSchema = z.object({
+  first_name: z.string().trim().min(1, "First name required").max(50),
+  last_name: z.string().trim().min(1, "Last name required").max(50),
+  nic: z.string().trim().max(20).optional().or(z.literal("")),
+  email: z.union([z.string().trim().email("Invalid email").max(255), z.literal("")]).optional(),
+  phone: z.string().trim().max(20).optional().or(z.literal("")),
+  basic_salary: z.number().min(0, "Salary must be ≥ 0").max(10_000_000),
+});
 
 interface Employee {
   id: string;
@@ -60,11 +70,19 @@ const Employees = () => {
   useEffect(() => { fetchEmployees(); }, [companyId]);
 
   const handleSubmit = async () => {
-    if (!form.first_name.trim() || !form.last_name.trim()) {
-      toast.error("First and last name are required");
+    if (!companyId) { toast.error("No company assigned"); return; }
+    const validated = employeeSchema.safeParse({
+      first_name: form.first_name,
+      last_name: form.last_name,
+      nic: form.nic,
+      email: form.email,
+      phone: form.phone,
+      basic_salary: form.basic_salary ? parseFloat(form.basic_salary) : 0,
+    });
+    if (!validated.success) {
+      toast.error(validated.error.issues[0].message);
       return;
     }
-    if (!companyId) { toast.error("No company assigned"); return; }
 
     const payload = {
       company_id: companyId,
