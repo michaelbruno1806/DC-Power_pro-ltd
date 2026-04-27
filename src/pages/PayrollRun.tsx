@@ -28,6 +28,7 @@ import {
   type PayslipPayload,
   type PayrollExportRow,
 } from "@/lib/payroll/exports";
+import { getPeriodConfig, getUnpaidLeaveDaysByEmployee, type PeriodConfig } from "@/lib/payroll/period";
 
 const months = [
   "January","February","March","April","May","June",
@@ -88,6 +89,8 @@ const PayrollRun = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [components, setComponents] = useState<ComponentRow[]>([]);
   const [drafts, setDrafts] = useState<Record<string, EntryDraft>>({});
+  const [periodCfg, setPeriodCfg] = useState<PeriodConfig>({ workingDays: 22, hoursPerWeek: 45 });
+  const [autoUnpaidDays, setAutoUnpaidDays] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
