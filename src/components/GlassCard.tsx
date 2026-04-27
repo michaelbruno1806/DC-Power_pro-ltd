@@ -1,24 +1,29 @@
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { forwardRef, HTMLAttributes, ReactNode } from "react";
 
-interface GlassCardProps {
+interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   className?: string;
   elevated?: boolean;
   glow?: boolean;
 }
 
-const GlassCard = ({ children, className, elevated = false, glow = false }: GlassCardProps) => (
-  <div
-    className={cn(
-      "premium-card p-6 transition-all duration-400 ease-elegant",
-      elevated && "shadow-[var(--shadow-card)]",
-      glow && "animate-glow-pulse",
-      className
-    )}
-  >
-    {children}
-  </div>
+const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
+  ({ children, className, elevated = false, glow = false, ...rest }, ref) => (
+    <div
+      ref={ref}
+      className={cn(
+        "premium-card p-6 transition-all duration-400 ease-elegant",
+        elevated && "shadow-[var(--shadow-card)]",
+        glow && "animate-glow-pulse",
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  ),
 );
+GlassCard.displayName = "GlassCard";
 
 export default GlassCard;

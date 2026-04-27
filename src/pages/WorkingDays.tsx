@@ -159,7 +159,8 @@ const WorkingDays = () => {
       </GlassCard>
 
       <GlassCard className="p-0 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="w-full overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-border bg-secondary/20">
               {["Year","Month","Working Days","Hours / Week",""].map(h => (
@@ -187,6 +188,7 @@ const WorkingDays = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </GlassCard>
     </div>
   );
