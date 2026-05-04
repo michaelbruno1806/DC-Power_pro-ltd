@@ -1,9 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   LayoutDashboard, FolderOpen, FileText, CheckSquare, BarChart3,
   Building2, Users, Palmtree, Puzzle, Clock, PartyPopper,
-  LogOut, Shield, ChevronLeft, ChevronRight
+  LogOut, Shield, ChevronLeft, ChevronRight, Sun, Moon
 } from "lucide-react";
 import { useState } from "react";
 
@@ -48,6 +49,7 @@ const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut, displayName, role } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
 
   const sections = role === "super_admin" ? [...navSections, adminSection] : navSections;
@@ -131,6 +133,16 @@ const AppSidebar = () => {
             </div>
           </div>
         )}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggleTheme}
+            className={`flex items-center gap-2 text-muted-foreground py-2.5 px-3 rounded-md hover:bg-sidebar-accent hover:text-foreground transition-colors text-sm ${collapsed ? "justify-center w-full" : ""}`}
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4 min-w-[16px]" /> : <Moon className="h-4 w-4 min-w-[16px]" />}
+            {!collapsed && (theme === "dark" ? "Light mode" : "Dark mode")}
+          </button>
+        </div>
         <button
           onClick={signOut}
           className={`w-full flex items-center gap-2 text-muted-foreground font-medium py-2.5 px-3 rounded-md hover:bg-destructive/10 hover:text-destructive transition-colors text-sm ${collapsed ? "justify-center" : ""}`}
