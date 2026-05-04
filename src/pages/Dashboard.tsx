@@ -1,9 +1,13 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import ChecklistRing from "@/components/ChecklistRing";
 import { TrendingUp, TrendingDown, Users, Calendar, FileText, AlertTriangle, ArrowRight, DollarSign } from "lucide-react";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
-const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const monthsShort = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const checklist = [
   { label: "Payroll", done: true },
@@ -13,23 +17,90 @@ const checklist = [
   { label: "Payment received by MRA", done: false },
 ];
 
-const leaveData = [
-  { name: "Client 1", type: "Annual", dates: "1 Jul – 5 Jul", days: 5, status: "Approved" },
-  { name: "Client 2", type: "Sick", dates: "10 Jul – 11 Jul", days: 2, status: "Pending" },
-];
-
-const openItems = [
-  { period: "Jun 2025", item: "MRA Filing", due: "20 Jul", status: "Overdue" },
-];
-
 const now = new Date();
-const currentMonth = months[now.getMonth()];
+const currentMonth = monthNames[now.getMonth()];
 const currentYear = now.getFullYear();
 const doneCount = checklist.filter(c => c.done).length;
 
 const Dashboard = () => {
-  const { displayName } = useAuth();
+  const { displayName, companyId } = useAuth();
   const firstName = displayName ? displayName.split(" ")[0] : "";
+
+  const [employeeCount, setEmployeeCount] = useState(0);
+  const [payrollTrend, setPayrollTrend] = useState<{ month: string; net: number; gross: number }[]>([]);
+  const [latestPayroll, setLatestPayroll] = useState<{ totalNet: number; totalGross: number; totalDeductions: number } | null>(null);
+  const [leaveData, setLeaveData] = useState<{ name: string; type: string; dates: string; days: number; status: string }[]>([]);
+
+  useEffect(() => {
+    if (!companyId) return;
+    loadDashboardData();
+  }, [companyId]);
+
+  const loadDashboardData = async () => {
+    // Employee count
+    const { count } = await supabase
+      .from("employees")
+      .select("id", { count: "exact", head: true })
+      .eq("company_id", companyId!)
+      .eq("status", "active");
+    setEmployeeCount(count || 0);
+
+    // Payroll files for trend (last 6 months)
+    const { data: files } = await supabase
+      .from("payroll_files")
+      .select("month, year, total_net, total_gross, total_deductions, status")
+      .eq("company_id", companyId!)
+      .order("year", { ascending: false })
+      .order("month", { ascending: false })
+      .limit(6);
+
+    if (files && files.length > 0) {
+      const trend = files.reverse().map(f => ({
+        month: monthsShort[f.month - 1],
+        net: Number(f.total_net) || 0,
+        gross: Number(f.total_gross) || 0,
+      }));
+      setPayrollTrend(trend);
+
+      const latest = files[files.length - 1];
+      setLatestPayroll({
+        totalNet: Number(latest.total_net) || 0,
+        totalGross: Number(latest.total_gross) || 0,
+        totalDeductions: Number(latest.total_deductions) || 0,
+      });
+    }
+
+    // Recent leave requests
+    const { data: leaves } = await supabase
+      .from("leave_requests")
+      .select("employee_id, start_date, end_date, days, status, leave_type_id")
+      .eq("company_id", companyId!)
+      .order("created_at", { ascending: false })
+      .limit(4);
+
+    if (leaves && leaves.length > 0) {
+      const empIds = [...new Set(leaves.map(l => l.employee_id))];
+      const ltIds = [...new Set(leaves.map(l => l.leave_type_id).filter(Boolean))];
+
+      const { data: emps } = await supabase.from("employees").select("id, first_name, last_name").in("id", empIds);
+      const { data: lts } = ltIds.length > 0
+        ? await supabase.from("leave_types").select("id, name").in("id", ltIds)
+        : { data: [] };
+
+      const empMap = new Map(emps?.map(e => [e.id, `${e.first_name} ${e.last_name}`]) || []);
+      const ltMap = new Map(lts?.map(lt => [lt.id, lt.name]) || []);
+
+      setLeaveData(leaves.map(l => ({
+        name: empMap.get(l.employee_id) || "Employee",
+        type: ltMap.get(l.leave_type_id!) || "Leave",
+        dates: `${l.start_date} – ${l.end_date}`,
+        days: Number(l.days),
+        status: l.status.charAt(0).toUpperCase() + l.status.slice(1),
+      })));
+    }
+  };
+
+  const formatMUR = (v: number) => `MUR ${v.toLocaleString()}`;
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -42,21 +113,6 @@ const Dashboard = () => {
           </h1>
           <div className="divider-elegant mt-3" />
         </div>
-        <div className="flex items-center gap-2">
-          <select className="premium-card px-4 py-2 text-sm text-foreground bg-secondary/40">
-            <option>DC Power Pro Ltd</option>
-          </select>
-          <select className="premium-card px-4 py-2 text-sm text-foreground bg-secondary/40">
-            {months.map((m, i) => (
-              <option key={m} selected={i === now.getMonth()}>{m}</option>
-            ))}
-          </select>
-          <select className="premium-card px-4 py-2 text-sm text-foreground bg-secondary/40">
-            {[currentYear - 1, currentYear, currentYear + 1].map(y => (
-              <option key={y} selected={y === currentYear}>{y}</option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {/* Payroll Assistant */}
@@ -68,7 +124,9 @@ const Dashboard = () => {
               <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
               Payroll Assistant
             </span>
-            <div className="font-display text-2xl text-foreground">MRA filing is pending for this period</div>
+            <div className="font-display text-2xl text-foreground">
+              {latestPayroll ? "Payroll processed for this period" : "No payroll data yet — create your first payroll file"}
+            </div>
             <div className="text-sm text-muted-foreground mt-2">
               Period: 1 {currentMonth} – {new Date(currentYear, now.getMonth() + 1, 0).getDate()} {currentMonth} {currentYear}
             </div>
@@ -77,14 +135,8 @@ const Dashboard = () => {
                 <span className="h-1.5 w-1.5 rounded-full bg-success" /> On track
               </span>
               <span className="inline-flex gap-2 items-center bg-secondary/50 border border-border rounded-full px-3 py-1.5 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" /> Filing due 30 {months[(now.getMonth() + 1) % 12]}
+                <Calendar className="h-3 w-3" /> Filing due 20 {monthNames[(now.getMonth() + 1) % 12]}
               </span>
-              <button
-                className="inline-flex gap-1.5 items-center rounded-full px-4 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-                style={{ background: "var(--gradient-emerald)" }}
-              >
-                Next: File MRA returns <ArrowRight className="h-3 w-3" />
-              </button>
             </div>
           </div>
           <div
@@ -100,14 +152,14 @@ const Dashboard = () => {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="heading-section text-foreground">Key Numbers</h2>
-          <span className="text-xs text-muted-foreground">vs. last month</span>
+          <span className="text-xs text-muted-foreground">Current period</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Net Pay", value: "MUR 245,800", sub: "+12% vs last month", icon: DollarSign, trend: "up" },
-            { label: "Active Employees", value: "24", sub: "2 new this month", icon: Users, trend: "up" },
-            { label: "Checklist Pending", value: String(5 - doneCount), sub: "Items needing action", icon: AlertTriangle, trend: "down" },
-            { label: "MRA Payment", value: "MUR 38,420", sub: "PAYE + CSG/NSF + Levy", icon: FileText, trend: "neutral" },
+            { label: "Net Pay", value: latestPayroll ? formatMUR(latestPayroll.totalNet) : "—", sub: "Total net payroll", icon: DollarSign, trend: "up" as const },
+            { label: "Active Employees", value: String(employeeCount), sub: "Currently active", icon: Users, trend: "up" as const },
+            { label: "Gross Pay", value: latestPayroll ? formatMUR(latestPayroll.totalGross) : "—", sub: "Total gross payroll", icon: FileText, trend: "neutral" as const },
+            { label: "Deductions", value: latestPayroll ? formatMUR(latestPayroll.totalDeductions) : "—", sub: "PAYE + CSG/NSF + Levy", icon: AlertTriangle, trend: "down" as const },
           ].map((card) => (
             <GlassCard key={card.label} className="group hover:-translate-y-0.5 hover:border-primary/30">
               <div className="flex items-start justify-between mb-4">
@@ -124,6 +176,52 @@ const Dashboard = () => {
           ))}
         </div>
       </div>
+
+      {/* Charts */}
+      {payrollTrend.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <GlassCard>
+            <h3 className="heading-section text-foreground mb-1">Payroll Trend</h3>
+            <p className="text-xs text-muted-foreground mb-5">Net pay over recent months</p>
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={payrollTrend}>
+                <defs>
+                  <linearGradient id="netGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(142, 76%, 45%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(142, 76%, 45%)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 18%)" />
+                <XAxis dataKey="month" tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                <Tooltip
+                  contentStyle={{ background: "hsl(220, 15%, 9%)", border: "1px solid hsl(220, 12%, 18%)", borderRadius: 8, fontSize: 12 }}
+                  formatter={(v: number) => [`MUR ${v.toLocaleString()}`, "Net Pay"]}
+                />
+                <Area type="monotone" dataKey="net" stroke="hsl(142, 76%, 45%)" fill="url(#netGrad)" strokeWidth={2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="heading-section text-foreground mb-1">Gross vs Deductions</h3>
+            <p className="text-xs text-muted-foreground mb-5">Monthly comparison</p>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={payrollTrend}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 18%)" />
+                <XAxis dataKey="month" tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                <Tooltip
+                  contentStyle={{ background: "hsl(220, 15%, 9%)", border: "1px solid hsl(220, 12%, 18%)", borderRadius: 8, fontSize: 12 }}
+                  formatter={(v: number) => [`MUR ${v.toLocaleString()}`]}
+                />
+                <Bar dataKey="gross" fill="hsl(142, 76%, 45%)" radius={[4, 4, 0, 0]} name="Gross" />
+                <Bar dataKey="net" fill="hsl(142, 70%, 55%)" radius={[4, 4, 0, 0]} opacity={0.6} name="Net" />
+              </BarChart>
+            </ResponsiveContainer>
+          </GlassCard>
+        </div>
+      )}
 
       {/* Checklist + Leaves */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -151,51 +249,30 @@ const Dashboard = () => {
         </GlassCard>
 
         <GlassCard>
-          <h3 className="heading-section text-foreground mb-1">Leaves</h3>
-          <p className="text-xs text-muted-foreground mb-5">{currentMonth} {currentYear}</p>
+          <h3 className="heading-section text-foreground mb-1">Recent Leaves</h3>
+          <p className="text-xs text-muted-foreground mb-5">Latest leave requests</p>
           <div className="space-y-2">
-            {leaveData.map((row, i) => (
-              <div key={i} className="bg-secondary/30 border border-border/60 rounded-md px-4 py-3 flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-medium text-foreground">{row.name}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{row.type} · {row.dates} · {row.days} days</div>
+            {leaveData.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">No leave requests yet.</p>
+            ) : (
+              leaveData.map((row, i) => (
+                <div key={i} className="bg-secondary/30 border border-border/60 rounded-md px-4 py-3 flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-medium text-foreground">{row.name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{row.type} · {row.days} days</div>
+                  </div>
+                  <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${
+                    row.status === "Approved" ? "bg-success/10 text-success" : row.status === "Pending" ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"
+                  }`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${row.status === "Approved" ? "bg-success" : row.status === "Pending" ? "bg-warning" : "bg-destructive"}`} />
+                    {row.status}
+                  </span>
                 </div>
-                <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${
-                  row.status === "Approved" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"
-                }`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${row.status === "Approved" ? "bg-success" : "bg-warning"}`} />
-                  {row.status}
-                </span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </GlassCard>
       </div>
-
-      {/* Open Items */}
-      <GlassCard>
-        <h3 className="heading-section text-foreground mb-1">Open Items</h3>
-        <p className="text-xs text-muted-foreground mb-5">Items from previous periods needing attention</p>
-        {openItems.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-6">All caught up — nothing pending.</p>
-        ) : (
-          <div className="space-y-2">
-            {openItems.map((row, i) => (
-              <div key={i} className="bg-secondary/30 border border-border/60 rounded-md px-4 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                  <span className="text-sm font-medium text-foreground w-20">{row.period}</span>
-                  <span className="text-sm text-muted-foreground">{row.item}</span>
-                  <span className="text-sm text-muted-foreground">Due: {row.due}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-destructive bg-destructive/10 px-2.5 py-1 rounded">{row.status}</span>
-                  <button className="text-xs font-medium text-primary link-subtle">Resolve</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </GlassCard>
     </div>
   );
 };
