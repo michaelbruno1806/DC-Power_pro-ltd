@@ -87,6 +87,76 @@
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
   }
+
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 220 15% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 15%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 12% 93%;
+    --secondary-foreground: 220 15% 15%;
+
+    --muted: 220 10% 90%;
+    --muted-foreground: 220 8% 46%;
+
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 12% 88%;
+    --input: 220 12% 90%;
+    --ring: 142 76% 36%;
+
+    --sidebar-background: 0 0% 99%;
+    --sidebar-foreground: 220 8% 46%;
+    --sidebar-primary: 142 76% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 12% 95%;
+    --sidebar-accent-foreground: 220 15% 15%;
+    --sidebar-border: 220 12% 90%;
+    --sidebar-ring: 142 76% 36%;
+
+    --panel: 0 0% 100%;
+    --panel-2: 0 0% 98%;
+    --brand: 142 76% 36%;
+    --brand-hover: 142 76% 30%;
+    --brand-glow: 142 76% 36%;
+    --warning: 38 92% 55%;
+    --success: 142 76% 36%;
+    --chip: 220 12% 95%;
+
+    --emerald: 142 76% 36%;
+    --emerald-light: 142 70% 45%;
+    --emerald-dark: 142 80% 28%;
+
+    --glass: 0 0% 100% / 0.7;
+    --glass-border: 220 12% 85% / 0.6;
+    --glass-highlight: 0 0% 100% / 0.5;
+    --glass-blur: 16px;
+    --glass-card: 0 0% 100% / 0.9;
+
+    --gradient-brand: linear-gradient(135deg, hsl(142, 80%, 28%), hsl(142, 76%, 36%), hsl(142, 70%, 45%));
+    --gradient-emerald: linear-gradient(135deg, hsl(142, 80%, 28%), hsl(142, 76%, 36%), hsl(142, 70%, 45%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0, 0%, 98%), hsl(0, 0%, 95%));
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%), hsl(0, 0%, 98%));
+    --gradient-luxury: linear-gradient(135deg, hsl(0, 0%, 97%), hsl(220, 12%, 95%));
+    --gradient-glass: linear-gradient(135deg, hsl(0, 0%, 100%, 0.5), transparent);
+
+    --shadow-glow: 0 0 60px hsl(142, 76%, 36%, 0.12);
+    --shadow-card: 0 10px 30px -10px hsl(220, 20%, 60%, 0.2);
+    --shadow-elegant: 0 2px 12px hsl(220, 20%, 60%, 0.1);
+    --shadow-elevated: 0 16px 40px -12px hsl(220, 20%, 60%, 0.2);
+  }
 }
 
 @layer base {
