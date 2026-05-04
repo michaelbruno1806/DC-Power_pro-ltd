@@ -87,12 +87,12 @@ const Dashboard = () => {
         ? await supabase.from("leave_types").select("id, name").in("id", ltIds)
         : { data: [] };
 
-      const empMap = new Map(emps?.map(e => [e.id, `${e.first_name} ${e.last_name}`]) || []);
-      const ltMap = new Map(lts?.map(lt => [lt.id, lt.name]) || []);
+      const empMap = new Map((emps || []).map(e => [e.id, `${e.first_name} ${e.last_name}`]));
+      const ltMap = new Map((lts || []).map(lt => [lt.id, lt.name]));
 
       setLeaveData(leaves.map(l => ({
         name: empMap.get(l.employee_id) || "Employee",
-        type: ltMap.get(l.leave_type_id!) || "Leave",
+        type: (l.leave_type_id ? ltMap.get(l.leave_type_id) : "Leave") || "Leave",
         dates: `${l.start_date} – ${l.end_date}`,
         days: Number(l.days),
         status: l.status.charAt(0).toUpperCase() + l.status.slice(1),
