@@ -1,9 +1,10 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import {
   LayoutDashboard, FolderOpen, FileText, CheckSquare, BarChart3,
   Building2, Users, Palmtree, Puzzle, Clock, PartyPopper,
-  LogOut, Shield, ChevronLeft, ChevronRight
+  LogOut, Shield, ChevronLeft, ChevronRight, Sun, Moon
 } from "lucide-react";
 import { useState } from "react";
 
@@ -48,6 +49,7 @@ const AppSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut, displayName, role } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
 
   const sections = role === "super_admin" ? [...navSections, adminSection] : navSections;
