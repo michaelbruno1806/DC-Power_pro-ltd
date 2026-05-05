@@ -11,7 +11,7 @@ import { useState } from "react";
 const navSections = [
   {
     label: "Home",
-    items: [{ icon: LayoutDashboard, label: "Dashboard", path: "/" }],
+    items: [{ icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" }],
   },
   {
     label: "Payroll",
