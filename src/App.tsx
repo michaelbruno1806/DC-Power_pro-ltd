@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,7 +24,9 @@ import Leaves from "@/pages/Leaves";
 import Holidays from "@/pages/Holidays";
 import WorkingDays from "@/pages/WorkingDays";
 import EmployeePortal from "@/pages/EmployeePortal";
-import PlaceholderPage from "@/pages/PlaceholderPage";
+import Payslips from "@/pages/Payslips";
+import Checklist from "@/pages/Checklist";
+import MraFilings from "@/pages/MraFilings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,22 +52,26 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <Routes>
-                <Route path="/landing" element={<Landing />} />
+                {/* Public marketing routes */}
+                <Route path="/" element={<Landing />} />
+                <Route path="/landing" element={<Navigate to="/" replace />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/my-portal" element={<ProtectedRoute><EmployeePortal /></ProtectedRoute>} />
+
+                {/* Protected admin routes */}
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/company-setup" element={<CompanySetup />} />
                   <Route path="/components" element={<PayrollComponents />} />
                   <Route path="/payroll" element={<PayrollFiles />} />
                   <Route path="/payroll/:id" element={<PayrollRun />} />
                   <Route path="/employees" element={<Employees />} />
                   <Route path="/admin" element={<AdminPanel />} />
-                  <Route path="/payslips" element={<PlaceholderPage />} />
-                  <Route path="/checklist" element={<PlaceholderPage />} />
-                  <Route path="/mra-filings" element={<PlaceholderPage />} />
+                  <Route path="/payslips" element={<Payslips />} />
+                  <Route path="/checklist" element={<Checklist />} />
+                  <Route path="/mra-filings" element={<MraFilings />} />
                   <Route path="/leaves" element={<Leaves />} />
                   <Route path="/working-days" element={<WorkingDays />} />
                   <Route path="/holidays" element={<Holidays />} />
