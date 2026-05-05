@@ -101,16 +101,23 @@ const Payslips = () => {
     if (!emp || !company || !selectedFile) return null;
     const adds = entry.additions || {};
     const deds = entry.deductions || {};
+    const additionsList = adds.list || [];
+    const deductionsList = deds.list || [];
+    const grossPay = Number(entry.gross_pay);
     const result: PayrollResult = {
       basicSalary: Number(entry.basic_salary),
       unpaidLeaveDeduction: 0,
       overtimePay: Number(adds.overtimePay ?? 0),
-      additions: adds.list || [],
-      grossPay: Number(entry.gross_pay),
+      additions: additionsList,
+      totalAdditions: additionsList.reduce((s: number, a: any) => s + Number(a.amount ?? 0), 0),
+      grossPay,
+      taxableIncome: grossPay,
+      wageBill: grossPay,
       paye: Number(deds.paye ?? 0),
       csgEmployee: Number(deds.csg ?? 0),
       nsfEmployee: Number(deds.nsf ?? 0),
-      customDeductions: deds.list || [],
+      customDeductions: deductionsList,
+      totalCustomDeductions: deductionsList.reduce((s: number, d: any) => s + Number(d.amount ?? 0), 0),
       totalEmployeeDeductions: Number(entry.total_deductions),
       netPay: Number(entry.net_pay),
       csgEmployer: 0,
