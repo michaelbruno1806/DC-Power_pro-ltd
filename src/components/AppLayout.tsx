@@ -15,7 +15,7 @@ const AppLayout = () => {
 
       <AppSidebar />
       <main className="flex-1 overflow-auto relative flex flex-col">
-        <div className="max-w-[1400px] w-full mx-auto px-8 py-10 animate-fade-in flex-1">
+        <div className="max-w-[1400px] w-full mx-auto px-4 sm:px-8 py-6 sm:py-10 pt-16 sm:pt-10 animate-fade-in flex-1">
           <Outlet />
         </div>
 

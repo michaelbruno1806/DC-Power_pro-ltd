@@ -331,53 +331,25 @@
     50% { box-shadow: 0 0 60px -10px hsl(142, 76%, 45%, 0.4); }
   }
 
-  /* ─── Splash screen — cinematic intro ─── */
-  @keyframes splash-spotlight {
-    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
-    60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
-    100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
+  /* ─── Splash screen v2 ─── */
+  @keyframes splash-orb-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+    50%      { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
   }
-  @keyframes splash-drift {
-    from { background-position: 0 0; }
-    to   { background-position: 44px 44px; }
-  }
-  @keyframes splash-beam {
-    0%   { transform: translateX(0) skewX(-12deg); opacity: 0; }
-    20%  { opacity: 1; }
-    100% { transform: translateX(280%) skewX(-12deg); opacity: 0; }
-  }
-  @keyframes splash-ring {
-    0%   { opacity: 0; transform: scale(0.6); }
-    60%  { opacity: 1; }
-    100% { opacity: 0.55; transform: scale(1); }
-  }
-  @keyframes splash-logo-in {
-    0%   { opacity: 0; transform: scale(1.35) translateY(8px); filter: blur(14px); }
-    55%  { opacity: 1; filter: blur(0); }
+  @keyframes splash-logo-enter {
+    0%   { opacity: 0; transform: scale(0.85) translateY(20px); filter: blur(10px); }
     100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
   }
-  @keyframes splash-mask-wipe {
-    0%   { transform: translateY(0); }
-    100% { transform: translateY(-105%); }
+  @keyframes splash-glow-breathe {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50%      { opacity: 1; transform: scale(1.1); }
   }
-  @keyframes splash-logo-shimmer {
-    0%, 100% { filter: drop-shadow(0 0 30px rgba(212,175,55,0.45)) drop-shadow(0 0 60px rgba(212,175,55,0.2)); }
-    50%      { filter: drop-shadow(0 0 45px rgba(212,175,55,0.6)) drop-shadow(0 0 90px rgba(192,192,192,0.25)); }
-  }
-  @keyframes splash-fade-rise {
-    0%   { opacity: 0; transform: translateY(14px); }
+  @keyframes splash-fade-up {
+    0%   { opacity: 0; transform: translateY(12px); }
     100% { opacity: 1; transform: translateY(0); }
   }
-  @keyframes splash-bar {
+  @keyframes splash-progress {
     0%   { transform: scaleX(0); }
     100% { transform: scaleX(1); }
-  }
-  @keyframes splash-curtain-top {
-    0%   { transform: translateY(0); }
-    100% { transform: translateY(-100%); }
-  }
-  @keyframes splash-curtain-bottom {
-    0%   { transform: translateY(0); }
-    100% { transform: translateY(100%); }
   }
 }

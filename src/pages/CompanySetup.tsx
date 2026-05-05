@@ -152,7 +152,7 @@ const CompanySetup = () => {
           <Button onClick={handleSave} disabled={loading} className="gap-2 h-11 px-6 font-medium tracking-wide" style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
             <Save className="h-4 w-4" /> {loading ? "Saving..." : "Save Company"}
           </Button>
-          <Button variant="outline" onClick={() => navigate("/")} className="gap-2 h-11">
+          <Button variant="outline" onClick={() => navigate("/dashboard")} className="gap-2 h-11">
             <ArrowLeft className="h-4 w-4" /> Back to Dashboard
           </Button>
         </div>
