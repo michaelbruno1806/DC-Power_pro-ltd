@@ -159,11 +159,20 @@ const Leaves = () => {
   };
   const typeOf = (id: string | null) => types.find(t => t.id === id);
 
+  // Filter requests by selected period (overlap)
+  const filteredRequests = useMemo(() => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const pStart = `${selYear}-${pad(selMonth)}-01`;
+    const lastDay = new Date(selYear, selMonth, 0).getDate();
+    const pEnd = `${selYear}-${pad(selMonth)}-${pad(lastDay)}`;
+    return requests.filter(r => r.start_date <= pEnd && r.end_date >= pStart);
+  }, [requests, selMonth, selYear]);
+
   const stats = useMemo(() => ({
-    pending: requests.filter(r => r.status === "pending").length,
-    approved: requests.filter(r => r.status === "approved").length,
-    rejected: requests.filter(r => r.status === "rejected").length,
-  }), [requests]);
+    pending: filteredRequests.filter(r => r.status === "pending").length,
+    approved: filteredRequests.filter(r => r.status === "approved").length,
+    rejected: filteredRequests.filter(r => r.status === "rejected").length,
+  }), [filteredRequests]);
 
   return (
     <div className="space-y-8 animate-fade-up">
