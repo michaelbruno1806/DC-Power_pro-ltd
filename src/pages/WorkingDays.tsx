@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Clock, Trash2 } from "lucide-react";
+import PeriodSelector from "@/components/PeriodSelector";
 
 interface WorkingDayConfig {
   id: string;
@@ -33,6 +34,8 @@ const WorkingDays = () => {
   const [configs, setConfigs] = useState<WorkingDayConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [form, setForm] = useState({
     year: new Date().getFullYear(),
     month: "" as "" | number,
@@ -141,6 +144,12 @@ const WorkingDays = () => {
         </Dialog>
       </div>
 
+      <PeriodSelector
+        month={filterMonth}
+        year={filterYear}
+        onChange={(m, y) => { setFilterMonth(m); setFilterYear(y); }}
+      />
+
       <GlassCard className="p-5">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <div>
@@ -171,9 +180,9 @@ const WorkingDays = () => {
           <tbody>
             {loading ? (
               <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground">Loading...</td></tr>
-            ) : configs.length === 0 ? (
-              <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground">No configurations yet — platform defaults are in use.</td></tr>
-            ) : configs.map(c => (
+            ) : configs.filter(c => c.year === filterYear && (c.month === null || c.month === filterMonth)).length === 0 ? (
+              <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground">No configurations for this period — platform defaults are in use.</td></tr>
+            ) : configs.filter(c => c.year === filterYear && (c.month === null || c.month === filterMonth)).map(c => (
               <tr key={c.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
                 <td className="px-5 py-3.5 font-medium text-foreground">{c.year}</td>
                 <td className="px-5 py-3.5 text-muted-foreground">{c.month ? months[c.month] : "All months"}</td>

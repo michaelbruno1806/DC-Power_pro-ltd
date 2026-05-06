@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Palmtree, CheckCircle2, XCircle, Clock, Trash2, Settings2 } from "lucide-react";
+import PeriodSelector from "@/components/PeriodSelector";
 
 interface LeaveType {
   id: string;
@@ -60,6 +61,9 @@ const calcDays = (start: string, end: string) => {
 const Leaves = () => {
   const { companyId, user } = useAuth();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
+  const now = new Date();
+  const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
+  const [selYear, setSelYear] = useState(now.getFullYear());
   const [types, setTypes] = useState<LeaveType[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -155,11 +159,20 @@ const Leaves = () => {
   };
   const typeOf = (id: string | null) => types.find(t => t.id === id);
 
+  // Filter requests by selected period (overlap)
+  const filteredRequests = useMemo(() => {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const pStart = `${selYear}-${pad(selMonth)}-01`;
+    const lastDay = new Date(selYear, selMonth, 0).getDate();
+    const pEnd = `${selYear}-${pad(selMonth)}-${pad(lastDay)}`;
+    return requests.filter(r => r.start_date <= pEnd && r.end_date >= pStart);
+  }, [requests, selMonth, selYear]);
+
   const stats = useMemo(() => ({
-    pending: requests.filter(r => r.status === "pending").length,
-    approved: requests.filter(r => r.status === "approved").length,
-    rejected: requests.filter(r => r.status === "rejected").length,
-  }), [requests]);
+    pending: filteredRequests.filter(r => r.status === "pending").length,
+    approved: filteredRequests.filter(r => r.status === "approved").length,
+    rejected: filteredRequests.filter(r => r.status === "rejected").length,
+  }), [filteredRequests]);
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -272,6 +285,12 @@ const Leaves = () => {
         </div>
       </div>
 
+      <PeriodSelector
+        month={selMonth}
+        year={selYear}
+        onChange={(m, y) => { setSelMonth(m); setSelYear(y); }}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: "Pending", value: stats.pending, icon: Clock, color: "text-warning" },
@@ -305,9 +324,9 @@ const Leaves = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">Loading...</td></tr>
-              ) : requests.length === 0 ? (
-                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No leave requests yet</td></tr>
-              ) : requests.map(r => {
+              ) : filteredRequests.length === 0 ? (
+                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No leave requests for this period</td></tr>
+              ) : filteredRequests.map(r => {
                 const t = typeOf(r.leave_type_id);
                 return (
                   <tr key={r.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">

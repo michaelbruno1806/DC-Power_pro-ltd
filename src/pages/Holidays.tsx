@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, PartyPopper, Trash2, Calendar } from "lucide-react";
+import PeriodSelector from "@/components/PeriodSelector";
 
 interface Holiday {
   id: string;
@@ -28,6 +29,7 @@ const Holidays = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [filterMonth, setFilterMonth] = useState<number>(new Date().getMonth() + 1);
   const [filterYear, setFilterYear] = useState<number>(new Date().getFullYear());
   const [form, setForm] = useState({ name: "", holiday_date: "", is_recurring: false });
 
@@ -70,11 +72,10 @@ const Holidays = () => {
     else { toast.success("Removed"); fetchAll(); }
   };
 
-  const filtered = holidays.filter(h => new Date(h.holiday_date).getFullYear() === filterYear);
-  const years = Array.from(new Set(holidays.map(h => new Date(h.holiday_date).getFullYear())))
-    .concat([new Date().getFullYear()])
-    .filter((v, i, a) => a.indexOf(v) === i)
-    .sort();
+  const filtered = holidays.filter(h => {
+    const d = new Date(h.holiday_date);
+    return d.getFullYear() === filterYear && (d.getMonth() + 1) === filterMonth;
+  });
 
   return (
     <div className="space-y-8 animate-fade-up">
@@ -89,10 +90,7 @@ const Holidays = () => {
             Manage public holidays. Hours worked on a public holiday qualify for 2× overtime.
           </p>
         </div>
-        <div className="flex gap-2">
-          <select value={filterYear} onChange={e => setFilterYear(Number(e.target.value))} className="premium-card px-4 py-2 text-sm text-foreground bg-secondary/40">
-            {years.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
+        <div className="flex gap-2 items-center">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 h-10 px-5" style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
@@ -123,6 +121,12 @@ const Holidays = () => {
           </Dialog>
         </div>
       </div>
+
+      <PeriodSelector
+        month={filterMonth}
+        year={filterYear}
+        onChange={(m, y) => { setFilterMonth(m); setFilterYear(y); }}
+      />
 
       <GlassCard className="p-0 overflow-hidden">
         <table className="w-full text-sm">
