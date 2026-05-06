@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Clock, Trash2 } from "lucide-react";
+import PeriodSelector from "@/components/PeriodSelector";
 
 interface WorkingDayConfig {
   id: string;
@@ -33,6 +34,8 @@ const WorkingDays = () => {
   const [configs, setConfigs] = useState<WorkingDayConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear());
   const [form, setForm] = useState({
     year: new Date().getFullYear(),
     month: "" as "" | number,
@@ -140,6 +143,12 @@ const WorkingDays = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      <PeriodSelector
+        month={filterMonth}
+        year={filterYear}
+        onChange={(m, y) => { setFilterMonth(m); setFilterYear(y); }}
+      />
 
       <GlassCard className="p-5">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
