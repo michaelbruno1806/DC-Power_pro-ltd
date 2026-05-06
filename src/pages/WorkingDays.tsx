@@ -180,9 +180,9 @@ const WorkingDays = () => {
           <tbody>
             {loading ? (
               <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground">Loading...</td></tr>
-            ) : configs.length === 0 ? (
-              <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground">No configurations yet — platform defaults are in use.</td></tr>
-            ) : configs.map(c => (
+            ) : configs.filter(c => c.year === filterYear && (c.month === null || c.month === filterMonth)).length === 0 ? (
+              <tr><td colSpan={5} className="px-5 py-12 text-center text-muted-foreground">No configurations for this period — platform defaults are in use.</td></tr>
+            ) : configs.filter(c => c.year === filterYear && (c.month === null || c.month === filterMonth)).map(c => (
               <tr key={c.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
                 <td className="px-5 py-3.5 font-medium text-foreground">{c.year}</td>
                 <td className="px-5 py-3.5 text-muted-foreground">{c.month ? months[c.month] : "All months"}</td>
