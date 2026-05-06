@@ -318,9 +318,9 @@ const Leaves = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">Loading...</td></tr>
-              ) : requests.length === 0 ? (
-                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No leave requests yet</td></tr>
-              ) : requests.map(r => {
+              ) : filteredRequests.length === 0 ? (
+                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted-foreground">No leave requests for this period</td></tr>
+              ) : filteredRequests.map(r => {
                 const t = typeOf(r.leave_type_id);
                 return (
                   <tr key={r.id} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
