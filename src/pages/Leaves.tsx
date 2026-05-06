@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Palmtree, CheckCircle2, XCircle, Clock, Trash2, Settings2 } from "lucide-react";
+import PeriodSelector from "@/components/PeriodSelector";
 
 interface LeaveType {
   id: string;
@@ -60,6 +61,9 @@ const calcDays = (start: string, end: string) => {
 const Leaves = () => {
   const { companyId, user } = useAuth();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
+  const now = new Date();
+  const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
+  const [selYear, setSelYear] = useState(now.getFullYear());
   const [types, setTypes] = useState<LeaveType[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
