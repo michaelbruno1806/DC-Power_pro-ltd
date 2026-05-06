@@ -122,6 +122,12 @@ const Holidays = () => {
         </div>
       </div>
 
+      <PeriodSelector
+        month={filterMonth}
+        year={filterYear}
+        onChange={(m, y) => { setFilterMonth(m); setFilterYear(y); }}
+      />
+
       <GlassCard className="p-0 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
