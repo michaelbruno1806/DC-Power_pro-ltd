@@ -285,6 +285,12 @@ const Leaves = () => {
         </div>
       </div>
 
+      <PeriodSelector
+        month={selMonth}
+        year={selYear}
+        onChange={(m, y) => { setSelMonth(m); setSelYear(y); }}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: "Pending", value: stats.pending, icon: Clock, color: "text-warning" },
