@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import ChecklistRing from "@/components/ChecklistRing";
+import PeriodSelector from "@/components/PeriodSelector";
 import { TrendingUp, TrendingDown, Users, Calendar, FileText, AlertTriangle, ArrowRight, DollarSign } from "lucide-react";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
@@ -17,14 +18,23 @@ const checklist = [
   { label: "Payment received by MRA", done: false },
 ];
 
-const now = new Date();
-const currentMonth = monthNames[now.getMonth()];
-const currentYear = now.getFullYear();
 const doneCount = checklist.filter(c => c.done).length;
+
+/** MRA filing deadline: end of the month following the payroll month */
+const getMraDeadline = (month: number, year: number) => {
+  const deadlineMonth = month === 12 ? 1 : month + 1;
+  const deadlineYear = month === 12 ? year + 1 : year;
+  const lastDay = new Date(deadlineYear, deadlineMonth, 0).getDate();
+  return `${lastDay} ${monthNames[deadlineMonth - 1]} ${deadlineYear}`;
+};
 
 const Dashboard = () => {
   const { displayName, companyId } = useAuth();
   const firstName = displayName ? displayName.split(" ")[0] : "";
+
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
 
   const [employeeCount, setEmployeeCount] = useState(0);
   const [payrollTrend, setPayrollTrend] = useState<{ month: string; net: number; gross: number }[]>([]);
@@ -34,7 +44,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (!companyId) return;
     loadDashboardData();
-  }, [companyId]);
+  }, [companyId, month, year]);
 
   const loadDashboardData = async () => {
     // Employee count
@@ -62,19 +72,34 @@ const Dashboard = () => {
       }));
       setPayrollTrend(trend);
 
-      const latest = files[files.length - 1];
-      setLatestPayroll({
-        totalNet: Number(latest.total_net) || 0,
-        totalGross: Number(latest.total_gross) || 0,
-        totalDeductions: Number(latest.total_deductions) || 0,
-      });
+      // Find payroll for the selected month
+      const selectedFile = files.find(f => f.month === month && f.year === year);
+      if (selectedFile) {
+        setLatestPayroll({
+          totalNet: Number(selectedFile.total_net) || 0,
+          totalGross: Number(selectedFile.total_gross) || 0,
+          totalDeductions: Number(selectedFile.total_deductions) || 0,
+        });
+      } else {
+        setLatestPayroll(null);
+      }
+    } else {
+      setPayrollTrend([]);
+      setLatestPayroll(null);
     }
 
-    // Recent leave requests
+    // Recent leave requests for selected period
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const startDate = `${year}-${pad(month)}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${pad(month)}-${pad(lastDay)}`;
+
     const { data: leaves } = await supabase
       .from("leave_requests")
       .select("employee_id, start_date, end_date, days, status, leave_type_id")
       .eq("company_id", companyId!)
+      .lte("start_date", endDate)
+      .gte("end_date", startDate)
       .order("created_at", { ascending: false })
       .limit(4);
 
@@ -97,23 +122,34 @@ const Dashboard = () => {
         days: Number(l.days),
         status: l.status.charAt(0).toUpperCase() + l.status.slice(1),
       })));
+    } else {
+      setLeaveData([]);
     }
   };
 
   const formatMUR = (v: number) => `MUR ${v.toLocaleString()}`;
+  const lastDayOfMonth = new Date(year, month, 0).getDate();
 
   return (
     <div className="space-y-8 animate-fade-up">
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
-          <div className="eyebrow mb-2">{currentMonth} {currentYear} · Overview</div>
+          <div className="eyebrow mb-2">{monthNames[month - 1]} {year} · Overview</div>
           <h1 className="heading-display text-foreground">
             Welcome back{firstName ? `, ${firstName}` : ""}
           </h1>
           <div className="divider-elegant mt-3" />
         </div>
       </div>
+
+      {/* Period Selector */}
+      <PeriodSelector
+        month={month}
+        year={year}
+        onChange={(m, y) => { setMonth(m); setYear(y); }}
+        badge={`MRA Deadline: ${getMraDeadline(month, year)}`}
+      />
 
       {/* Payroll Assistant */}
       <GlassCard elevated className="relative overflow-hidden border-primary/20">
@@ -125,17 +161,17 @@ const Dashboard = () => {
               Payroll Assistant
             </span>
             <div className="font-display text-2xl text-foreground">
-              {latestPayroll ? "Payroll processed for this period" : "No payroll data yet — create your first payroll file"}
+              {latestPayroll ? "Payroll processed for this period" : "No payroll data yet for this period"}
             </div>
             <div className="text-sm text-muted-foreground mt-2">
-              Period: 1 {currentMonth} – {new Date(currentYear, now.getMonth() + 1, 0).getDate()} {currentMonth} {currentYear}
+              Period: 1 {monthNames[month - 1]} – {lastDayOfMonth} {monthNames[month - 1]} {year}
             </div>
             <div className="flex gap-2 mt-5 flex-wrap">
               <span className="inline-flex gap-2 items-center bg-success/10 text-success border border-success/20 rounded-full px-3 py-1.5 text-xs font-medium">
-                <span className="h-1.5 w-1.5 rounded-full bg-success" /> On track
+                <span className="h-1.5 w-1.5 rounded-full bg-success" /> {latestPayroll ? "On track" : "Pending"}
               </span>
               <span className="inline-flex gap-2 items-center bg-secondary/50 border border-border rounded-full px-3 py-1.5 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" /> Filing due 20 {monthNames[(now.getMonth() + 1) % 12]}
+                <Calendar className="h-3 w-3" /> Filing due {getMraDeadline(month, year)}
               </span>
             </div>
           </div>
@@ -143,134 +179,118 @@ const Dashboard = () => {
             className="h-16 w-16 rounded-lg flex items-center justify-center font-display font-semibold text-lg text-primary-foreground shrink-0"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
           >
-            DC
+            {monthsShort[month - 1]}
           </div>
         </div>
       </GlassCard>
 
-      {/* Key Numbers */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="heading-section text-foreground">Key Numbers</h2>
-          <span className="text-xs text-muted-foreground">Current period</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { label: "Net Pay", value: latestPayroll ? formatMUR(latestPayroll.totalNet) : "—", sub: "Total net payroll", icon: DollarSign, trend: "up" as const },
-            { label: "Active Employees", value: String(employeeCount), sub: "Currently active", icon: Users, trend: "up" as const },
-            { label: "Gross Pay", value: latestPayroll ? formatMUR(latestPayroll.totalGross) : "—", sub: "Total gross payroll", icon: FileText, trend: "neutral" as const },
-            { label: "Deductions", value: latestPayroll ? formatMUR(latestPayroll.totalDeductions) : "—", sub: "PAYE + CSG/NSF + Levy", icon: AlertTriangle, trend: "down" as const },
-          ].map((card) => (
-            <GlassCard key={card.label} className="group hover:-translate-y-0.5 hover:border-primary/30">
-              <div className="flex items-start justify-between mb-4">
-                <div className="h-10 w-10 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
-                  <card.icon className="h-4 w-4 text-primary" />
-                </div>
-                {card.trend === "up" && <TrendingUp className="h-4 w-4 text-success" />}
-                {card.trend === "down" && <TrendingDown className="h-4 w-4 text-destructive" />}
-              </div>
-              <div className="font-display text-3xl font-semibold text-foreground tracking-wide">{card.value}</div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mt-2">{card.label}</div>
-              <div className="text-[11px] text-muted-foreground/80 mt-1">{card.sub}</div>
-            </GlassCard>
-          ))}
-        </div>
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {[
+          { label: "Employees", value: String(employeeCount), icon: Users, trend: null },
+          { label: "Gross Pay", value: latestPayroll ? formatMUR(latestPayroll.totalGross) : "—", icon: DollarSign, trend: null },
+          { label: "Total Deductions", value: latestPayroll ? formatMUR(latestPayroll.totalDeductions) : "—", icon: TrendingDown, trend: null },
+          { label: "Net Pay", value: latestPayroll ? formatMUR(latestPayroll.totalNet) : "—", icon: TrendingUp, trend: null },
+        ].map(card => (
+          <GlassCard key={card.label} className="relative group">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{card.label}</span>
+              <card.icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </div>
+            <div className="font-display text-2xl text-foreground leading-tight">{card.value}</div>
+          </GlassCard>
+        ))}
       </div>
 
       {/* Charts */}
       {payrollTrend.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <GlassCard>
-            <h3 className="heading-section text-foreground mb-1">Payroll Trend</h3>
-            <p className="text-xs text-muted-foreground mb-5">Net pay over recent months</p>
-            <ResponsiveContainer width="100%" height={220}>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">Net Pay Trend</div>
+            <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={payrollTrend}>
                 <defs>
-                  <linearGradient id="netGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(142, 76%, 45%)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(142, 76%, 45%)" stopOpacity={0} />
+                  <linearGradient id="gNet" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 18%)" />
-                <XAxis dataKey="month" tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} width={70} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  contentStyle={{ background: "hsl(220, 15%, 9%)", border: "1px solid hsl(220, 12%, 18%)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v: number) => [`MUR ${v.toLocaleString()}`, "Net Pay"]}
+                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                  labelStyle={{ color: "hsl(var(--foreground))" }}
+                  formatter={(v: number) => [formatMUR(v), "Net Pay"]}
                 />
-                <Area type="monotone" dataKey="net" stroke="hsl(142, 76%, 45%)" fill="url(#netGrad)" strokeWidth={2} />
+                <Area type="monotone" dataKey="net" stroke="hsl(var(--primary))" fill="url(#gNet)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </GlassCard>
 
           <GlassCard>
-            <h3 className="heading-section text-foreground mb-1">Gross vs Deductions</h3>
-            <p className="text-xs text-muted-foreground mb-5">Monthly comparison</p>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={payrollTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 12%, 18%)" />
-                <XAxis dataKey="month" tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "hsl(220, 8%, 65%)", fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+            <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">Gross vs Net</div>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={payrollTrend} barGap={4}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="month" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
+                <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} width={70} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  contentStyle={{ background: "hsl(220, 15%, 9%)", border: "1px solid hsl(220, 12%, 18%)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v: number) => [`MUR ${v.toLocaleString()}`]}
+                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                  labelStyle={{ color: "hsl(var(--foreground))" }}
+                  formatter={(v: number, name: string) => [formatMUR(v), name === "gross" ? "Gross" : "Net"]}
                 />
-                <Bar dataKey="gross" fill="hsl(142, 76%, 45%)" radius={[4, 4, 0, 0]} name="Gross" />
-                <Bar dataKey="net" fill="hsl(142, 70%, 55%)" radius={[4, 4, 0, 0]} opacity={0.6} name="Net" />
+                <Bar dataKey="gross" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="net" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </GlassCard>
         </div>
       )}
 
-      {/* Checklist + Leaves */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* Bottom row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Checklist Ring */}
         <GlassCard>
-          <h3 className="heading-section text-foreground mb-1">Checklist Summary</h3>
-          <p className="text-xs text-muted-foreground mb-5">Your monthly payroll checklist</p>
-          <div className="flex gap-6 items-start">
-            <ChecklistRing done={doneCount} total={5} />
-            <div className="flex-1 space-y-2">
-              {checklist.map((item, i) => (
-                <div key={item.label} className="flex items-center justify-between gap-2 bg-secondary/30 border border-border/60 rounded-md px-3 py-2.5">
-                  <div className="flex gap-2.5 items-center">
-                    <span className={`h-1.5 w-1.5 rounded-full ${item.done ? "bg-success" : "bg-destructive"}`} />
-                    <span className="text-sm font-medium text-foreground">{i + 1}. {item.label}</span>
-                  </div>
-                  <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded ${
-                    item.done ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"
-                  }`}>
-                    {item.done ? "Done" : "Pending"}
-                  </span>
+          <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">Monthly Checklist</div>
+          <div className="flex items-center gap-6">
+            <ChecklistRing done={doneCount} total={checklist.length} size={80} />
+            <div className="space-y-2">
+              {checklist.map(c => (
+                <div key={c.label} className={`flex items-center gap-2 text-sm ${c.done ? "text-foreground" : "text-muted-foreground"}`}>
+                  {c.done ? <span className="h-2 w-2 rounded-full bg-primary" /> : <span className="h-2 w-2 rounded-full bg-border" />}
+                  {c.label}
                 </div>
               ))}
             </div>
           </div>
         </GlassCard>
 
+        {/* Recent leaves */}
         <GlassCard>
-          <h3 className="heading-section text-foreground mb-1">Recent Leaves</h3>
-          <p className="text-xs text-muted-foreground mb-5">Latest leave requests</p>
-          <div className="space-y-2">
-            {leaveData.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-6">No leave requests yet.</p>
-            ) : (
-              leaveData.map((row, i) => (
-                <div key={i} className="bg-secondary/30 border border-border/60 rounded-md px-4 py-3 flex items-center justify-between">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-4">Leave Requests — {monthNames[month - 1]}</div>
+          {leaveData.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-6 text-center">No leave requests for this period.</p>
+          ) : (
+            <div className="space-y-3">
+              {leaveData.map((l, i) => (
+                <div key={i} className="flex items-center justify-between gap-4 text-sm">
                   <div>
-                    <div className="text-sm font-medium text-foreground">{row.name}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{row.type} · {row.days} days</div>
+                    <div className="font-medium text-foreground">{l.name}</div>
+                    <div className="text-xs text-muted-foreground">{l.type} · {l.dates}</div>
                   </div>
-                  <span className={`inline-flex gap-1.5 items-center text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded ${
-                    row.status === "Approved" ? "bg-success/10 text-success" : row.status === "Pending" ? "bg-warning/10 text-warning" : "bg-destructive/10 text-destructive"
-                  }`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${row.status === "Approved" ? "bg-success" : row.status === "Pending" ? "bg-warning" : "bg-destructive"}`} />
-                    {row.status}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground tabular-nums">{l.days}d</span>
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-1 rounded ${
+                      l.status === "Approved" ? "bg-success/10 text-success" :
+                      l.status === "Rejected" ? "bg-destructive/10 text-destructive" :
+                      "bg-warning/10 text-warning"
+                    }`}>{l.status}</span>
+                  </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </GlassCard>
       </div>
     </div>

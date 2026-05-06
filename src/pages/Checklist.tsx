@@ -2,12 +2,20 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
+import PeriodSelector from "@/components/PeriodSelector";
 import { CheckSquare, Square, Circle } from "lucide-react";
 
 const months = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
 ];
+
+const getMraDeadline = (month: number, year: number) => {
+  const dm = month === 12 ? 1 : month + 1;
+  const dy = month === 12 ? year + 1 : year;
+  const last = new Date(dy, dm, 0).getDate();
+  return `${last} ${months[dm - 1]} ${dy}`;
+};
 
 interface CheckItem {
   id: string;
@@ -18,8 +26,8 @@ interface CheckItem {
 const Checklist = () => {
   const { companyId } = useAuth();
   const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
   const [results, setResults] = useState<Record<string, boolean | null>>({});
   const [loading, setLoading] = useState(true);
 
@@ -112,7 +120,7 @@ const Checklist = () => {
       setResults(res);
       setLoading(false);
     })();
-  }, [companyId]);
+  }, [companyId, month, year]);
 
   const doneCount = Object.values(results).filter(v => v === true).length;
   const progress = items.length > 0 ? Math.round((doneCount / items.length) * 100) : 0;
@@ -127,6 +135,14 @@ const Checklist = () => {
           Track your monthly payroll preparation steps. {doneCount}/{items.length} completed.
         </p>
       </div>
+
+      {/* Period Selector */}
+      <PeriodSelector
+        month={month}
+        year={year}
+        onChange={(m, y) => { setMonth(m); setYear(y); }}
+        badge={`MRA Deadline: ${getMraDeadline(month, year)}`}
+      />
 
       {/* Progress */}
       <GlassCard>

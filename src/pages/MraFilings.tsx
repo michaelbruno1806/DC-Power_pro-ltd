@@ -2,14 +2,22 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
+import PeriodSelector from "@/components/PeriodSelector";
 import { Button } from "@/components/ui/button";
-import { BarChart3, FileSpreadsheet, Download } from "lucide-react";
+import { BarChart3, FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 
 const months = [
   "January","February","March","April","May","June",
   "July","August","September","October","November","December",
 ];
+
+const getMraDeadline = (month: number, year: number) => {
+  const dm = month === 12 ? 1 : month + 1;
+  const dy = month === 12 ? year + 1 : year;
+  const last = new Date(dy, dm, 0).getDate();
+  return `${last} ${months[dm - 1]} ${dy}`;
+};
 
 interface FilingRow {
   month: number;
@@ -21,10 +29,14 @@ interface FilingRow {
   levy: number;
   totalPayable: number;
   employeeCount: number;
+  deadline: string;
 }
 
 const MraFilings = () => {
   const { companyId } = useAuth();
+  const now = new Date();
+  const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
+  const [selYear, setSelYear] = useState(now.getFullYear());
   const [filings, setFilings] = useState<FilingRow[]>([]);
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -58,7 +70,6 @@ const MraFilings = () => {
           csgEmp += Number(d.csg ?? 0);
           nsfEmp += Number(d.nsf ?? 0);
         });
-        // Estimate employer contributions (simplified — mirrors calc.ts ratios)
         const totalGross = entries.reduce((s: number, e: any) => s + Number(e.gross_pay ?? 0), 0);
         const csgEmployer = totalGross * 0.06;
         const nsfEmployer = totalGross * 0.025;
@@ -74,12 +85,17 @@ const MraFilings = () => {
           levy,
           totalPayable: paye + csgEmp + csgEmployer + nsfEmp + nsfEmployer + levy,
           employeeCount: entries.length,
+          deadline: getMraDeadline(f.month, f.year),
         });
       }
       setFilings(rows);
       setLoading(false);
     })();
   }, [companyId]);
+
+  // Filter filings to selected month/year
+  const filteredFilings = filings.filter(r => r.month === selMonth && r.year === selYear);
+  const allFilingsForDisplay = filteredFilings.length > 0 ? filteredFilings : [];
 
   const exportMra = (row: FilingRow) => {
     const wb = XLSX.utils.book_new();
@@ -89,6 +105,7 @@ const MraFilings = () => {
       ["BRN", company?.brn ?? ""],
       ["ERN", company?.ern ?? ""],
       ["Period", `${months[row.month - 1]} ${row.year}`],
+      ["Filing Deadline", row.deadline],
       ["Employees", row.employeeCount],
       [],
       ["Contribution", "Amount (MUR)"],
@@ -124,18 +141,26 @@ const MraFilings = () => {
         </p>
       </div>
 
-      {filings.length === 0 ? (
+      {/* Period Selector */}
+      <PeriodSelector
+        month={selMonth}
+        year={selYear}
+        onChange={(m, y) => { setSelMonth(m); setSelYear(y); }}
+        badge={`Filing Deadline: ${getMraDeadline(selMonth, selYear)}`}
+      />
+
+      {allFilingsForDisplay.length === 0 ? (
         <GlassCard className="text-center py-16">
           <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No completed payroll runs to report.</p>
+          <p className="text-muted-foreground">No completed payroll run for {months[selMonth - 1]} {selYear}.</p>
         </GlassCard>
       ) : (
         <GlassCard className="p-0 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[700px]">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr className="border-b border-border bg-secondary/20">
-                  {["Period", "Employees", "PAYE", "CSG", "NSF", "HRDC Levy", "Total", ""].map(h => (
+                  {["Period", "Deadline", "Employees", "PAYE", "CSG", "NSF", "HRDC Levy", "Total", ""].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em] whitespace-nowrap">
                       {h}
                     </th>
@@ -143,10 +168,13 @@ const MraFilings = () => {
                 </tr>
               </thead>
               <tbody>
-                {filings.map(row => (
+                {allFilingsForDisplay.map(row => (
                   <tr key={`${row.year}-${row.month}`} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
                     <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">
                       {months[row.month - 1]} {row.year}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">
+                      {row.deadline}
                     </td>
                     <td className="px-4 py-3 text-foreground tabular-nums">{row.employeeCount}</td>
                     <td className="px-4 py-3 text-foreground tabular-nums">{row.paye.toLocaleString()}</td>
