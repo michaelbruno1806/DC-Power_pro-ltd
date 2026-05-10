@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      accountant_company_links: {
+        Row: {
+          accountant_user_id: string
+          company_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          accountant_user_id: string
+          company_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          accountant_user_id?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           address: string | null
@@ -21,17 +42,28 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          currency: string | null
           director_name: string | null
           director_nic: string | null
           email: string | null
           ern: string | null
           id: string
+          logo_url: string | null
           mra_due_day: number | null
           name: string
           pay_period_end_day: number | null
           pay_period_start_day: number | null
+          payroll_frequency: string | null
+          payroll_start_month: string | null
           phone: string | null
+          setup_completed: boolean
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
+          tan: string | null
+          trial_ends_at: string | null
           updated_at: string
+          vat_number: string | null
         }
         Insert: {
           address?: string | null
@@ -39,17 +71,28 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          currency?: string | null
           director_name?: string | null
           director_nic?: string | null
           email?: string | null
           ern?: string | null
           id?: string
+          logo_url?: string | null
           mra_due_day?: number | null
           name: string
           pay_period_end_day?: number | null
           pay_period_start_day?: number | null
+          payroll_frequency?: string | null
+          payroll_start_month?: string | null
           phone?: string | null
+          setup_completed?: boolean
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          tan?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
+          vat_number?: string | null
         }
         Update: {
           address?: string | null
@@ -57,17 +100,28 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          currency?: string | null
           director_name?: string | null
           director_nic?: string | null
           email?: string | null
           ern?: string | null
           id?: string
+          logo_url?: string | null
           mra_due_day?: number | null
           name?: string
           pay_period_end_day?: number | null
           pay_period_start_day?: number | null
+          payroll_frequency?: string | null
+          payroll_start_month?: string | null
           phone?: string | null
+          setup_completed?: boolean
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          tan?: string | null
+          trial_ends_at?: string | null
           updated_at?: string
+          vat_number?: string | null
         }
         Relationships: []
       }
@@ -389,7 +443,9 @@ export type Database = {
           company_id: string | null
           created_at: string
           display_name: string | null
+          full_name: string | null
           id: string
+          phone: string | null
           updated_at: string
           user_id: string
         }
@@ -398,7 +454,9 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           display_name?: string | null
+          full_name?: string | null
           id?: string
+          phone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -407,7 +465,9 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           display_name?: string | null
+          full_name?: string | null
           id?: string
+          phone?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -453,18 +513,21 @@ export type Database = {
       }
       user_roles: {
         Row: {
+          company_id: string | null
           created_at: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
@@ -518,9 +581,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_company_active: { Args: { _company_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "super_admin" | "client_admin"
+      app_role:
+        | "super_admin"
+        | "client_admin"
+        | "company_owner"
+        | "payroll_officer"
+        | "hr_user"
+        | "accountant"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -648,7 +718,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "client_admin"],
+      app_role: [
+        "super_admin",
+        "client_admin",
+        "company_owner",
+        "payroll_officer",
+        "hr_user",
+        "accountant",
+      ],
     },
   },
 } as const

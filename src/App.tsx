@@ -10,6 +10,11 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "@/components/AppLayout";
 import SplashScreen from "@/components/SplashScreen";
 import Auth from "@/pages/Auth";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
+import VerifyEmail from "@/pages/VerifyEmail";
+import Onboarding from "@/pages/Onboarding";
+import Pricing from "@/pages/Pricing";
 import Landing from "@/pages/Landing";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
@@ -57,7 +62,26 @@ const App = () => {
                 <Route path="/landing" element={<Navigate to="/" replace />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/pricing" element={<Pricing />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route
+                  path="/verify-email"
+                  element={
+                    <ProtectedRoute allowUnverified allowSetup>
+                      <VerifyEmail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/onboarding"
+                  element={
+                    <ProtectedRoute allowSetup>
+                      <Onboarding />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/my-portal" element={<ProtectedRoute><EmployeePortal /></ProtectedRoute>} />
 
                 {/* Protected admin routes */}
