@@ -227,9 +227,9 @@ const Onboarding = () => {
   const next = async () => {
     if (step === 1 && !(await saveStep1())) return;
     if (step === 2 && !(await saveStep2())) return;
-    setStep((s) => Math.min(3, (s + 1) as Step));
+    setStep((s) => Math.min(3, s + 1) as Step);
   };
-  const back = () => setStep((s) => Math.max(1, (s - 1) as Step));
+  const back = () => setStep((s) => Math.max(1, s - 1) as Step);
 
   return (
     <div className="min-h-screen bg-background py-10 px-4">
