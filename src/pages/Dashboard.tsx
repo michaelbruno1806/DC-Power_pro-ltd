@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
+import TrialBanner from "@/components/TrialBanner";
 import ChecklistRing from "@/components/ChecklistRing";
 import PeriodSelector from "@/components/PeriodSelector";
 import { TrendingUp, TrendingDown, Users, Calendar, FileText, AlertTriangle, ArrowRight, DollarSign } from "lucide-react";
@@ -132,6 +133,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8 animate-fade-up">
+      <TrialBanner />
       {/* Header */}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
