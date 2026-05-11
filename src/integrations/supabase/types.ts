@@ -37,6 +37,8 @@ export type Database = {
       }
       companies: {
         Row: {
+          accountant_email: string | null
+          accountant_name: string | null
           address: string | null
           brn: string | null
           city: string | null
@@ -48,6 +50,8 @@ export type Database = {
           email: string | null
           ern: string | null
           id: string
+          local_leave_cumulate: boolean
+          local_leave_payout_december: boolean
           logo_url: string | null
           mra_due_day: number | null
           name: string
@@ -57,6 +61,7 @@ export type Database = {
           payroll_start_month: string | null
           phone: string | null
           setup_completed: boolean
+          sick_leave_reset_january: boolean
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           subscription_status: string | null
@@ -66,6 +71,8 @@ export type Database = {
           vat_number: string | null
         }
         Insert: {
+          accountant_email?: string | null
+          accountant_name?: string | null
           address?: string | null
           brn?: string | null
           city?: string | null
@@ -77,6 +84,8 @@ export type Database = {
           email?: string | null
           ern?: string | null
           id?: string
+          local_leave_cumulate?: boolean
+          local_leave_payout_december?: boolean
           logo_url?: string | null
           mra_due_day?: number | null
           name: string
@@ -86,6 +95,7 @@ export type Database = {
           payroll_start_month?: string | null
           phone?: string | null
           setup_completed?: boolean
+          sick_leave_reset_january?: boolean
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string | null
@@ -95,6 +105,8 @@ export type Database = {
           vat_number?: string | null
         }
         Update: {
+          accountant_email?: string | null
+          accountant_name?: string | null
           address?: string | null
           brn?: string | null
           city?: string | null
@@ -106,6 +118,8 @@ export type Database = {
           email?: string | null
           ern?: string | null
           id?: string
+          local_leave_cumulate?: boolean
+          local_leave_payout_december?: boolean
           logo_url?: string | null
           mra_due_day?: number | null
           name?: string
@@ -115,6 +129,7 @@ export type Database = {
           payroll_start_month?: string | null
           phone?: string | null
           setup_completed?: boolean
+          sick_leave_reset_january?: boolean
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           subscription_status?: string | null
@@ -122,6 +137,42 @@ export type Database = {
           trial_ends_at?: string | null
           updated_at?: string
           vat_number?: string | null
+        }
+        Relationships: []
+      }
+      company_directors: {
+        Row: {
+          company_id: string
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          nic: string | null
+          phone: string | null
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          nic?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          nic?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -134,16 +185,25 @@ export type Database = {
           company_id: string
           created_at: string
           date_of_birth: string | null
+          department: string | null
+          dependents: number | null
+          edf_form_url: string | null
           email: string | null
+          employee_code: string | null
           employment_date: string | null
+          employment_type: string | null
           first_name: string
           gender: string | null
           id: string
+          id_card_url: string | null
+          job_title: string | null
           last_name: string
+          marital_status: string | null
           nic: string | null
           phone: string | null
           status: string | null
           termination_date: string | null
+          transport_allowance: number | null
           updated_at: string
         }
         Insert: {
@@ -154,16 +214,25 @@ export type Database = {
           company_id: string
           created_at?: string
           date_of_birth?: string | null
+          department?: string | null
+          dependents?: number | null
+          edf_form_url?: string | null
           email?: string | null
+          employee_code?: string | null
           employment_date?: string | null
+          employment_type?: string | null
           first_name: string
           gender?: string | null
           id?: string
+          id_card_url?: string | null
+          job_title?: string | null
           last_name: string
+          marital_status?: string | null
           nic?: string | null
           phone?: string | null
           status?: string | null
           termination_date?: string | null
+          transport_allowance?: number | null
           updated_at?: string
         }
         Update: {
@@ -174,16 +243,25 @@ export type Database = {
           company_id?: string
           created_at?: string
           date_of_birth?: string | null
+          department?: string | null
+          dependents?: number | null
+          edf_form_url?: string | null
           email?: string | null
+          employee_code?: string | null
           employment_date?: string | null
+          employment_type?: string | null
           first_name?: string
           gender?: string | null
           id?: string
+          id_card_url?: string | null
+          job_title?: string | null
           last_name?: string
+          marital_status?: string | null
           nic?: string | null
           phone?: string | null
           status?: string | null
           termination_date?: string | null
+          transport_allowance?: number | null
           updated_at?: string
         }
         Relationships: [
