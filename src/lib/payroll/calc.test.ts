@@ -96,13 +96,13 @@ describe("calculatePayroll — end-to-end scenarios", () => {
     expect(r.netPay).toBeGreaterThan(0);
   });
 
-  it("Net = Gross − (PAYE + CSG-emp + NSF-emp + custom deductions)", () => {
+  it("Net = Gross − (PAYE + CSG-emp + NSF-emp + PRGF-emp + custom deductions)", () => {
     const r = calculatePayroll({
       basicSalary: 60_000,
       additions: [{ name: "Bonus", amount: 5_000 }],
       deductions: [{ name: "Advance", amount: 2_000 }],
     });
-    const expected = r.grossPay - (r.paye + r.csgEmployee + r.nsfEmployee + r.totalCustomDeductions);
+    const expected = r.grossPay - (r.paye + r.csgEmployee + r.nsfEmployee + r.prgfEmployee + r.totalCustomDeductions);
     expect(r.netPay).toBeCloseTo(expected, 2);
   });
 
