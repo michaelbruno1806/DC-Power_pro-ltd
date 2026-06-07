@@ -224,6 +224,7 @@ async function drawPayslip(doc: jsPDF, p: PayslipPayload) {
     body: [
       ["CSG (employer)", fmt(r.csgEmployer)],
       ["NSF (employer)", fmt(r.nsfEmployer)],
+      ["PRGF (employer)", fmt(r.prgfEmployer)],
       ["HRDC Training Levy", fmt(r.trainingLevyEmployer)],
       [{ content: "Total Employer Cost", styles: { fontStyle: "bold" } }, { content: fmt(r.employerCost), styles: { halign: "right", fontStyle: "bold" } }],
     ],
