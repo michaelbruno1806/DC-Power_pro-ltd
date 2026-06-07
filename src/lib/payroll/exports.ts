@@ -169,6 +169,7 @@ async function drawPayslip(doc: jsPDF, p: PayslipPayload) {
   if (r.paye > 0) deductions.push(["PAYE (Income Tax)", fmt(r.paye)]);
   if (r.csgEmployee > 0) deductions.push(["CSG (employee)", fmt(r.csgEmployee)]);
   if (r.nsfEmployee > 0) deductions.push(["NSF (employee)", fmt(r.nsfEmployee)]);
+  if (r.prgfEmployee > 0) deductions.push(["PRGF (employee)", fmt(r.prgfEmployee)]);
   r.customDeductions.forEach(d => deductions.push([d.name, fmt(d.amount)]));
   if (deductions.length === 0) deductions.push(["—", "MUR 0.00"]);
 
