@@ -15,15 +15,13 @@ describe("PAYE", () => {
   it("returns 0 below the first band", () => {
     expect(calculatePAYE(20_000)).toBe(0);
   });
-  it("computes tax on a salary inside the first taxable band", () => {
-    // 35,000/month → 420,000/year. First 390k @ 0%, next 30k @ 2% = 600/year = 50/month
-    expect(calculatePAYE(35_000)).toBe(50);
+  it("computes flat 15% above the annual exemption", () => {
+    // 35,000/month → 420,000/yr. (420k − 390k) × 15% = 4,500/yr = 375/month
+    expect(calculatePAYE(35_000)).toBe(375);
   });
-  it("crosses bands progressively", () => {
-    // 100,000/month → 1,200,000/year. Verifies bands are summed, not flat.
-    const tax = calculatePAYE(100_000);
-    expect(tax).toBeGreaterThan(0);
-    expect(tax).toBeLessThan(100_000 * 0.2);
+  it("scales linearly above the exemption", () => {
+    // 100,000/month → 1,200,000/yr. (1.2M − 390k) × 15% = 121,500/yr = 10,125/mo
+    expect(calculatePAYE(100_000)).toBe(10_125);
   });
   it("handles zero/negative gracefully", () => {
     expect(calculatePAYE(0)).toBe(0);
