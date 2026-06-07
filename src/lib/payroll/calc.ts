@@ -59,68 +59,60 @@ export interface PayrollResult {
   overtimePay: number;
   additions: PayrollLineItem[];
   totalAdditions: number;
-  /** Sum of basic + additions − unpaid leave (before statutory deductions) */
   grossPay: number;
-  /** Income subject to PAYE (taxable additions only) */
   taxableIncome: number;
-  /** Income on which CSG/NSF are computed */
   wageBill: number;
   paye: number;
   csgEmployee: number;
   csgEmployer: number;
   nsfEmployee: number;
   nsfEmployer: number;
+  prgfEmployee: number;
+  prgfEmployer: number;
   trainingLevyEmployer: number;
   customDeductions: PayrollLineItem[];
   totalCustomDeductions: number;
-  /** Total deductions taken from the employee */
   totalEmployeeDeductions: number;
-  /** Total cost to the employer (gross + employer contributions) */
   employerCost: number;
   netPay: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Rate tables (Mauritius — adjust each fiscal year as needed)
+// Rate tables (DC Payroll — flat-rate Mauritius scheme)
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const RATES = {
-  // PAYE progressive bands — annual chargeable income (MUR)
-  // Source: MRA Income Tax Act (FY 2024-2025 baseline)
+  // PAYE — flat 15% above Rs 390,000/yr exemption (≈ Rs 32,500/mo)
   paye: {
+    annualExempt: 390_000,
+    flatRate: 0.15,
+    monthlyExemptThreshold: 32_500,
     annualBands: [
       { upTo: 390_000, rate: 0 },
-      { upTo: 430_000, rate: 0.02 },
-      { upTo: 470_000, rate: 0.04 },
-      { upTo: 530_000, rate: 0.06 },
-      { upTo: 590_000, rate: 0.08 },
-      { upTo: 890_000, rate: 0.10 },
-      { upTo: 1_190_000, rate: 0.12 },
-      { upTo: 1_490_000, rate: 0.14 },
-      { upTo: 1_890_000, rate: 0.16 },
-      { upTo: 2_390_000, rate: 0.18 },
-      { upTo: Infinity, rate: 0.20 },
+      { upTo: Infinity, rate: 0.15 },
     ],
-    /** Below this monthly basic, PAYE is not deducted. */
-    monthlyExemptThreshold: 32_500,
   },
 
-  // CSG (employee + employer) — split based on monthly basic wage bill
+  // CSG — 1.5% employee / 3% employer (flat)
   csg: {
-    threshold: 50_000, // MUR/month
-    /** ≤ 50k */
+    threshold: Infinity,
     lowEmployee: 0.015,
     lowEmployer: 0.03,
-    /** > 50k */
-    highEmployee: 0.03,
-    highEmployer: 0.06,
+    highEmployee: 0.015,
+    highEmployer: 0.03,
   },
 
-  // NSF (2.5% each, capped on insurable wage)
+  // NSF — 1.5% each, capped so monthly contribution maxes at Rs 375
   nsf: {
-    employee: 0.025,
-    employer: 0.025,
-    monthlyCap: 23_355, // ceiling on insurable monthly wage (MUR)
+    employee: 0.015,
+    employer: 0.015,
+    monthlyCap: 25_000,
+  },
+
+  // PRGF — Portable Retirement Gratuity Fund
+  prgf: {
+    employee: 0.03,
+    employer: 0.06,
   },
 
   // Training Levy (HRDC) — employer only
@@ -128,7 +120,6 @@ export const RATES = {
     employer: 0.015,
   },
 
-  // Default working / hours
   defaults: {
     workingDaysInMonth: 22,
     standardHoursPerWeek: 45,
