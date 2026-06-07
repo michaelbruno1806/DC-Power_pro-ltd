@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import PeriodSelector from "@/components/PeriodSelector";
 import { Button } from "@/components/ui/button";
-import { BarChart3, FileSpreadsheet } from "lucide-react";
+import { BarChart3, FileSpreadsheet, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 
 const months = [
@@ -19,17 +19,35 @@ const getMraDeadline = (month: number, year: number) => {
   return `${last} ${months[dm - 1]} ${dy}`;
 };
 
+interface EmployeeBreakdown {
+  employee_id: string;
+  name: string;
+  nic: string | null;
+  gross: number;
+  paye: number;
+  csgEmp: number;
+  csgEr: number;
+  nsfEmp: number;
+  nsfEr: number;
+  prgfEmp: number;
+  prgfEr: number;
+  levy: number;
+}
+
 interface FilingRow {
+  fileId: string;
   month: number;
   year: number;
   status: string | null;
   paye: number;
   csgTotal: number;
   nsfTotal: number;
+  prgfTotal: number;
   levy: number;
   totalPayable: number;
   employeeCount: number;
   deadline: string;
+  breakdown: EmployeeBreakdown[];
 }
 
 const MraFilings = () => {
@@ -45,47 +63,76 @@ const MraFilings = () => {
     if (!companyId) return;
     (async () => {
       setLoading(true);
-      const [filesRes, companyRes] = await Promise.all([
+      const [filesRes, companyRes, empRes] = await Promise.all([
         supabase.from("payroll_files").select("id, month, year, status")
           .eq("company_id", companyId)
           .in("status", ["completed", "approved"])
           .order("year", { ascending: false })
           .order("month", { ascending: false }),
-        supabase.from("companies").select("name, brn, ern").eq("id", companyId).maybeSingle(),
+        supabase.from("companies").select("name, brn, ern, tan").eq("id", companyId).maybeSingle(),
+        supabase.from("employees").select("id, first_name, last_name, nic").eq("company_id", companyId),
       ]);
       setCompany(companyRes.data);
+      const empMap = new Map((empRes.data || []).map((e: any) => [e.id, e]));
       const files = filesRes.data || [];
       const rows: FilingRow[] = [];
 
       for (const f of files) {
         const { data: entries } = await supabase.from("payroll_entries")
-          .select("deductions, gross_pay")
+          .select("employee_id, deductions, gross_pay")
           .eq("payroll_file_id", f.id);
         if (!entries) continue;
 
-        let paye = 0, csgEmp = 0, nsfEmp = 0;
+        const breakdown: EmployeeBreakdown[] = [];
+        let paye = 0, csgEmp = 0, csgEr = 0, nsfEmp = 0, nsfEr = 0, prgfEmp = 0, prgfEr = 0, levy = 0;
+
         entries.forEach((e: any) => {
           const d = e.deductions || {};
-          paye += Number(d.paye ?? 0);
-          csgEmp += Number(d.csg ?? 0);
-          nsfEmp += Number(d.nsf ?? 0);
+          const emp: any = empMap.get(e.employee_id);
+          const gross = Number(e.gross_pay ?? 0);
+          // Prefer stored values; fall back to ratios for legacy rows
+          const ePaye = Number(d.paye ?? 0);
+          const eCsgEmp = Number(d.csg ?? 0);
+          const eCsgEr = Number(d.csgEmployer ?? gross * 0.03);
+          const eNsfEmp = Number(d.nsf ?? 0);
+          const eNsfEr = Number(d.nsfEmployer ?? Math.min(gross, 25000) * 0.015);
+          const ePrgfEmp = Number(d.prgf ?? gross * 0.03);
+          const ePrgfEr = Number(d.prgfEmployer ?? gross * 0.06);
+          const eLevy = Number(d.trainingLevy ?? gross * 0.015);
+
+          paye += ePaye;
+          csgEmp += eCsgEmp; csgEr += eCsgEr;
+          nsfEmp += eNsfEmp; nsfEr += eNsfEr;
+          prgfEmp += ePrgfEmp; prgfEr += ePrgfEr;
+          levy += eLevy;
+
+          breakdown.push({
+            employee_id: e.employee_id,
+            name: emp ? `${emp.first_name} ${emp.last_name}` : "Unknown",
+            nic: emp?.nic ?? null,
+            gross,
+            paye: ePaye,
+            csgEmp: eCsgEmp, csgEr: eCsgEr,
+            nsfEmp: eNsfEmp, nsfEr: eNsfEr,
+            prgfEmp: ePrgfEmp, prgfEr: ePrgfEr,
+            levy: eLevy,
+          });
         });
-        const totalGross = entries.reduce((s: number, e: any) => s + Number(e.gross_pay ?? 0), 0);
-        const csgEmployer = totalGross * 0.06;
-        const nsfEmployer = totalGross * 0.025;
-        const levy = totalGross * 0.015;
 
         rows.push({
+          fileId: f.id,
           month: f.month,
           year: f.year,
           status: f.status,
           paye,
-          csgTotal: csgEmp + csgEmployer,
-          nsfTotal: nsfEmp + nsfEmployer,
+          csgTotal: csgEmp + csgEr,
+          nsfTotal: nsfEmp + nsfEr,
+          prgfTotal: prgfEmp + prgfEr,
           levy,
-          totalPayable: paye + csgEmp + csgEmployer + nsfEmp + nsfEmployer + levy,
+          totalPayable: paye + csgEmp + csgEr + nsfEmp + nsfEr + prgfEmp + prgfEr + levy,
           employeeCount: entries.length,
           deadline: getMraDeadline(f.month, f.year),
+          breakdown,
         });
       }
       setFilings(rows);
@@ -93,16 +140,96 @@ const MraFilings = () => {
     })();
   }, [companyId]);
 
-  // Filter filings to selected month/year
   const filteredFilings = filings.filter(r => r.month === selMonth && r.year === selYear);
-  const allFilingsForDisplay = filteredFilings.length > 0 ? filteredFilings : [];
 
-  const exportMra = (row: FilingRow) => {
+  const fileName = (row: FilingRow, kind: string) =>
+    `${kind}_${row.year}-${String(row.month).padStart(2, "0")}.csv`;
+
+  const downloadCsv = (filename: string, rows: (string | number)[][]) => {
+    const csv = rows.map(r => r.map(c => {
+      const s = String(c ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    }).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportPaye = (row: FilingRow) => {
+    // MRA PAYE / CSG / NSF Monthly Return — placeholder layout (replace once
+    // user uploads the official MRA template).
+    const header = [
+      "Company", company?.name ?? "",
+      "BRN", company?.brn ?? "",
+      "TAN", company?.tan ?? "",
+      "ERN", company?.ern ?? "",
+      "Period", `${months[row.month - 1]} ${row.year}`,
+    ];
+    const data: (string | number)[][] = [
+      header,
+      [],
+      ["NIC", "Employee Name", "Gross Emoluments (MUR)", "PAYE (MUR)", "CSG Emp (MUR)", "CSG Er (MUR)", "NSF Emp (MUR)", "NSF Er (MUR)"],
+      ...row.breakdown.map(b => [
+        b.nic ?? "",
+        b.name,
+        b.gross.toFixed(2),
+        b.paye.toFixed(2),
+        b.csgEmp.toFixed(2),
+        b.csgEr.toFixed(2),
+        b.nsfEmp.toFixed(2),
+        b.nsfEr.toFixed(2),
+      ]),
+      [],
+      ["TOTAL", "", row.breakdown.reduce((s, b) => s + b.gross, 0).toFixed(2),
+        row.paye.toFixed(2),
+        row.breakdown.reduce((s, b) => s + b.csgEmp, 0).toFixed(2),
+        row.breakdown.reduce((s, b) => s + b.csgEr, 0).toFixed(2),
+        row.breakdown.reduce((s, b) => s + b.nsfEmp, 0).toFixed(2),
+        row.breakdown.reduce((s, b) => s + b.nsfEr, 0).toFixed(2),
+      ],
+    ];
+    downloadCsv(fileName(row, "PAYE_CSG_NSF_Return"), data);
+  };
+
+  const exportPrgf = (row: FilingRow) => {
+    const header = [
+      "Company", company?.name ?? "",
+      "BRN", company?.brn ?? "",
+      "TAN", company?.tan ?? "",
+      "Period", `${months[row.month - 1]} ${row.year}`,
+    ];
+    const data: (string | number)[][] = [
+      header,
+      [],
+      ["NIC", "Employee Name", "Gross Emoluments (MUR)", "PRGF Employee (3%)", "PRGF Employer (6%)", "Total PRGF (MUR)"],
+      ...row.breakdown.map(b => [
+        b.nic ?? "",
+        b.name,
+        b.gross.toFixed(2),
+        b.prgfEmp.toFixed(2),
+        b.prgfEr.toFixed(2),
+        (b.prgfEmp + b.prgfEr).toFixed(2),
+      ]),
+      [],
+      ["TOTAL", "", row.breakdown.reduce((s, b) => s + b.gross, 0).toFixed(2),
+        row.breakdown.reduce((s, b) => s + b.prgfEmp, 0).toFixed(2),
+        row.breakdown.reduce((s, b) => s + b.prgfEr, 0).toFixed(2),
+        row.prgfTotal.toFixed(2),
+      ],
+    ];
+    downloadCsv(fileName(row, "PRGF_Return"), data);
+  };
+
+  const exportSummary = (row: FilingRow) => {
     const wb = XLSX.utils.book_new();
     const data = [
       ["MRA Monthly Filing Summary"],
       ["Company", company?.name ?? ""],
       ["BRN", company?.brn ?? ""],
+      ["TAN", company?.tan ?? ""],
       ["ERN", company?.ern ?? ""],
       ["Period", `${months[row.month - 1]} ${row.year}`],
       ["Filing Deadline", row.deadline],
@@ -112,13 +239,14 @@ const MraFilings = () => {
       ["PAYE (Income Tax)", row.paye],
       ["CSG (Employee + Employer)", row.csgTotal],
       ["NSF (Employee + Employer)", row.nsfTotal],
+      ["PRGF (Employee + Employer)", row.prgfTotal],
       ["HRDC Training Levy", row.levy],
       [],
       ["Total Payable to MRA", row.totalPayable],
     ];
     const ws = XLSX.utils.aoa_to_sheet(data);
-    ws["!cols"] = [{ wch: 30 }, { wch: 20 }];
-    XLSX.utils.book_append_sheet(wb, ws, "MRA Filing");
+    ws["!cols"] = [{ wch: 32 }, { wch: 20 }];
+    XLSX.utils.book_append_sheet(wb, ws, "Summary");
     XLSX.writeFile(wb, `MRA_Filing_${row.year}-${String(row.month).padStart(2, "0")}.xlsx`);
   };
 
@@ -137,11 +265,10 @@ const MraFilings = () => {
         <h1 className="heading-display text-foreground">Statutory Returns</h1>
         <div className="divider-elegant mt-3" />
         <p className="text-sm text-muted-foreground mt-3">
-          View and export MRA monthly filing summaries for PAYE, CSG, NSF, and HRDC Levy.
+          Export PAYE / CSG / NSF and PRGF returns in MRA-ready format for monthly filing.
         </p>
       </div>
 
-      {/* Period Selector */}
       <PeriodSelector
         month={selMonth}
         year={selYear}
@@ -149,51 +276,90 @@ const MraFilings = () => {
         badge={`Filing Deadline: ${getMraDeadline(selMonth, selYear)}`}
       />
 
-      {allFilingsForDisplay.length === 0 ? (
+      {filteredFilings.length === 0 ? (
         <GlassCard className="text-center py-16">
           <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">No completed payroll run for {months[selMonth - 1]} {selYear}.</p>
         </GlassCard>
-      ) : (
-        <GlassCard className="p-0 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[800px]">
-              <thead>
-                <tr className="border-b border-border bg-secondary/20">
-                  {["Period", "Deadline", "Employees", "PAYE", "CSG", "NSF", "HRDC Levy", "Total", ""].map(h => (
-                    <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em] whitespace-nowrap">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {allFilingsForDisplay.map(row => (
-                  <tr key={`${row.year}-${row.month}`} className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
-                    <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">
-                      {months[row.month - 1]} {row.year}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">
-                      {row.deadline}
-                    </td>
-                    <td className="px-4 py-3 text-foreground tabular-nums">{row.employeeCount}</td>
-                    <td className="px-4 py-3 text-foreground tabular-nums">{row.paye.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-foreground tabular-nums">{row.csgTotal.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-foreground tabular-nums">{row.nsfTotal.toLocaleString()}</td>
-                    <td className="px-4 py-3 text-foreground tabular-nums">{row.levy.toLocaleString()}</td>
-                    <td className="px-4 py-3 font-semibold text-primary tabular-nums">{row.totalPayable.toLocaleString()}</td>
-                    <td className="px-4 py-3">
-                      <Button variant="ghost" size="sm" onClick={() => exportMra(row)} className="gap-1.5 text-muted-foreground hover:text-primary">
-                        <FileSpreadsheet className="h-4 w-4" /> Export
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      ) : filteredFilings.map(row => (
+        <div key={row.fileId} className="space-y-4">
+          {/* Summary cards */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            {[
+              { label: "PAYE", value: row.paye },
+              { label: "CSG", value: row.csgTotal },
+              { label: "NSF", value: row.nsfTotal },
+              { label: "PRGF", value: row.prgfTotal },
+              { label: "Total Payable", value: row.totalPayable, accent: true },
+            ].map(c => (
+              <GlassCard key={c.label} className="p-4">
+                <div className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">{c.label}</div>
+                <div className={`mt-1 font-display text-lg tabular-nums ${c.accent ? "text-primary" : "text-foreground"}`}>
+                  {c.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </div>
+              </GlassCard>
+            ))}
           </div>
-        </GlassCard>
-      )}
+
+          {/* Export actions */}
+          <GlassCard>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-medium text-foreground">Download Returns</div>
+                <div className="text-xs text-muted-foreground">Generate MRA-format files for {months[row.month - 1]} {row.year}.</div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => exportPaye(row)} className="gap-1.5">
+                  <Download className="h-3.5 w-3.5" /> PAYE / CSG / NSF Return
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => exportPrgf(row)} className="gap-1.5">
+                  <Download className="h-3.5 w-3.5" /> PRGF Return
+                </Button>
+                <Button size="sm" onClick={() => exportSummary(row)} className="gap-1.5"
+                  style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
+                  <FileSpreadsheet className="h-3.5 w-3.5" /> Summary (XLSX)
+                </Button>
+              </div>
+            </div>
+          </GlassCard>
+
+          {/* Employee breakdown */}
+          <GlassCard className="p-0 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[800px]">
+                <thead>
+                  <tr className="border-b border-border bg-secondary/20">
+                    {["Employee", "NIC", "Gross", "PAYE", "CSG (E+R)", "NSF (E+R)", "PRGF (E+R)"].map(h => (
+                      <th key={h} className="text-left px-4 py-3 text-[10px] font-semibold text-muted-foreground uppercase tracking-[0.15em] whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {row.breakdown.map(b => (
+                    <tr key={b.employee_id} className="border-b border-border/40 hover:bg-secondary/20">
+                      <td className="px-4 py-2.5 font-medium text-foreground whitespace-nowrap">{b.name}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground text-xs">{b.nic ?? "—"}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-foreground">{b.gross.toLocaleString()}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-foreground">{b.paye.toLocaleString()}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-foreground">{(b.csgEmp + b.csgEr).toLocaleString()}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-foreground">{(b.nsfEmp + b.nsfEr).toLocaleString()}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-foreground">{(b.prgfEmp + b.prgfEr).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                  <tr className="bg-primary/5">
+                    <td className="px-4 py-3 font-bold text-foreground" colSpan={2}>TOTAL</td>
+                    <td className="px-4 py-3 tabular-nums font-bold">{row.breakdown.reduce((s, b) => s + b.gross, 0).toLocaleString()}</td>
+                    <td className="px-4 py-3 tabular-nums font-bold">{row.paye.toLocaleString()}</td>
+                    <td className="px-4 py-3 tabular-nums font-bold">{row.csgTotal.toLocaleString()}</td>
+                    <td className="px-4 py-3 tabular-nums font-bold">{row.nsfTotal.toLocaleString()}</td>
+                    <td className="px-4 py-3 tabular-nums font-bold text-primary">{row.prgfTotal.toLocaleString()}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </GlassCard>
+        </div>
+      ))}
     </div>
   );
 };
