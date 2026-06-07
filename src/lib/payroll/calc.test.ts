@@ -74,11 +74,11 @@ describe("Unpaid leave", () => {
 });
 
 describe("calculatePayroll — end-to-end scenarios", () => {
-  it("PAYE-exempt low earner with no extras: net == basic minus CSG/NSF", () => {
+  it("PAYE-exempt low earner with no extras: net == basic minus CSG/NSF/PRGF", () => {
     const r = calculatePayroll({ basicSalary: 20_000 });
     expect(r.paye).toBe(0);
     expect(r.grossPay).toBe(20_000);
-    expect(r.netPay).toBe(20_000 - r.csgEmployee - r.nsfEmployee);
+    expect(r.netPay).toBe(20_000 - r.csgEmployee - r.nsfEmployee - r.prgfEmployee);
   });
 
   it("Mid earner with overtime, taxable allowance and unpaid leave", () => {
