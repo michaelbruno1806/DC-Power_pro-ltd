@@ -134,9 +134,9 @@ describe("Unpaid leave integration", () => {
 });
 
 describe("Employer cost", () => {
-  it("equals gross + employer CSG + employer NSF + training levy", () => {
+  it("equals gross + employer CSG + employer NSF + employer PRGF + training levy", () => {
     const r = calculatePayroll({ basicSalary: 60_000 });
-    const expected = r.grossPay + r.csgEmployer + r.nsfEmployer + r.trainingLevyEmployer;
+    const expected = r.grossPay + r.csgEmployer + r.nsfEmployer + r.prgfEmployer + r.trainingLevyEmployer;
     expect(r.employerCost).toBeCloseTo(expected, 2);
   });
 });
