@@ -271,6 +271,8 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   const csg = calculateCSG(wageBill);
   const nsf = calculateNSF(wageBill);
   const trainingLevy = calculateTrainingLevy(wageBill);
+  const prgfEmployee = round2(wageBill * RATES.prgf.employee);
+  const prgfEmployer = round2(wageBill * RATES.prgf.employer);
 
   // 7. Custom deductions
   const customDeductionsList: PayrollLineItem[] = [];
@@ -283,9 +285,13 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
   }
 
   // 8. Totals
-  const totalEmployeeDeductions = round2(paye + csg.employee + nsf.employee + totalCustomDeductions);
+  const totalEmployeeDeductions = round2(
+    paye + csg.employee + nsf.employee + prgfEmployee + totalCustomDeductions
+  );
   const netPay = round2(grossPay - totalEmployeeDeductions);
-  const employerCost = round2(grossPay + csg.employer + nsf.employer + trainingLevy);
+  const employerCost = round2(
+    grossPay + csg.employer + nsf.employer + prgfEmployer + trainingLevy
+  );
 
   return {
     basicSalary: adjustedBasic,
@@ -301,6 +307,8 @@ export function calculatePayroll(input: PayrollInput): PayrollResult {
     csgEmployer: csg.employer,
     nsfEmployee: nsf.employee,
     nsfEmployer: nsf.employer,
+    prgfEmployee,
+    prgfEmployer,
     trainingLevyEmployer: trainingLevy,
     customDeductions: customDeductionsList,
     totalCustomDeductions: round2(totalCustomDeductions),
