@@ -259,6 +259,11 @@ const PayrollRun = () => {
             paye: r.paye,
             csg: r.csgEmployee,
             nsf: r.nsfEmployee,
+            prgf: r.prgfEmployee,
+            csgEmployer: r.csgEmployer,
+            nsfEmployer: r.nsfEmployer,
+            prgfEmployer: r.prgfEmployer,
+            trainingLevy: r.trainingLevyEmployer,
             list: r.customDeductions,
           },
         };
