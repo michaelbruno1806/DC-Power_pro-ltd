@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CompanySwitcher from "@/components/CompanySwitcher";
 import {
   LayoutDashboard, FolderOpen, FileText, CheckSquare, BarChart3,
   Building2, Users, Palmtree, Puzzle, Clock, PartyPopper,
