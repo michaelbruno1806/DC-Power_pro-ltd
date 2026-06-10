@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ interface PayrollComp {
 }
 
 const PayrollComponents = () => {
-  const { companyId } = useAuth();
+  const companyId = useCompanyId();
   const [components, setComponents] = useState<PayrollComp[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");

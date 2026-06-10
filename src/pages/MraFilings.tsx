@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import PeriodSelector from "@/components/PeriodSelector";
@@ -51,7 +52,7 @@ interface FilingRow {
 }
 
 const MraFilings = () => {
-  const { companyId } = useAuth();
+  const companyId = useCompanyId();
   const now = new Date();
   const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
   const [selYear, setSelYear] = useState(now.getFullYear());

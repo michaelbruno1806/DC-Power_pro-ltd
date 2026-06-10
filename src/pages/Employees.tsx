@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { z } from "zod";
 import * as XLSX from "xlsx";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,7 @@ const emptyForm = {
 };
 
 const Employees = () => {
-  const { companyId } = useAuth();
+  const companyId = useCompanyId();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

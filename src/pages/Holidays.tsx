@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ const schema = z.object({
 });
 
 const Holidays = () => {
-  const { companyId } = useAuth();
+  const companyId = useCompanyId();
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);

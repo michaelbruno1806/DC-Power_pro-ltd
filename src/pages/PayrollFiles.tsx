@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,8 @@ interface PayrollFile {
 }
 
 const PayrollFiles = () => {
-  const { companyId, user } = useAuth();
+  const { user } = useAuth();
+  const companyId = useCompanyId();
   const navigate = useNavigate();
   const [files, setFiles] = useState<PayrollFile[]>([]);
   const [loading, setLoading] = useState(true);
