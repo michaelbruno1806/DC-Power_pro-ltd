@@ -315,9 +315,12 @@ const CompanySetup = () => {
                 </Button>
               </div>
             ))}
+          </div>
         </div>
 
         <Accountants />
+
+
 
 
 
