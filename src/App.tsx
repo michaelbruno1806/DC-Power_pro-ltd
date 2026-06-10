@@ -57,6 +57,7 @@ const App = () => {
           {!splashDone && <SplashScreen onFinish={handleSplashFinish} />}
           <BrowserRouter>
             <AuthProvider>
+              <CompanyProvider>
               <Routes>
                 {/* Public marketing routes */}
                 <Route path="/" element={<Landing />} />
