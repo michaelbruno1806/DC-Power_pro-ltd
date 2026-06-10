@@ -87,6 +87,13 @@ const AppSidebar = () => {
         )}
       </div>
 
+      {/* Company switcher */}
+      {(!collapsed || isMobile) && (
+        <div className="px-4 py-3 border-b border-sidebar-border">
+          <CompanySwitcher />
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 overflow-auto scrollbar-thin">
         {sections.map((section) => (
