@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import TrialBanner from "@/components/TrialBanner";
@@ -30,7 +31,8 @@ const getMraDeadline = (month: number, year: number) => {
 };
 
 const Dashboard = () => {
-  const { displayName, companyId } = useAuth();
+  const { displayName } = useAuth();
+  const companyId = useCompanyId();
   const firstName = displayName ? displayName.split(" ")[0] : "";
 
   const now = new Date();

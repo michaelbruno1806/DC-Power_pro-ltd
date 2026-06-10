@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CompanySwitcher from "@/components/CompanySwitcher";
 import {
   LayoutDashboard, FolderOpen, FileText, CheckSquare, BarChart3,
   Building2, Users, Palmtree, Puzzle, Clock, PartyPopper,
@@ -85,6 +86,13 @@ const AppSidebar = () => {
           </button>
         )}
       </div>
+
+      {/* Company switcher */}
+      {(!collapsed || isMobile) && (
+        <div className="px-4 py-3 border-b border-sidebar-border">
+          <CompanySwitcher />
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 overflow-auto scrollbar-thin">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Plus, Palmtree, CheckCircle2, XCircle, Clock, Trash2, Settings2 } from "lucide-react";
 import PeriodSelector from "@/components/PeriodSelector";
+import LeaveBalances from "@/components/LeaveBalances";
 
 interface LeaveType {
   id: string;
@@ -59,7 +61,8 @@ const calcDays = (start: string, end: string) => {
 };
 
 const Leaves = () => {
-  const { companyId, user } = useAuth();
+  const { user } = useAuth();
+  const companyId = useCompanyId();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const now = new Date();
   const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
@@ -369,6 +372,8 @@ const Leaves = () => {
           </table>
         </div>
       </GlassCard>
+
+      <LeaveBalances year={selYear} />
     </div>
   );
 };

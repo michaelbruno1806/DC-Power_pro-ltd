@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
@@ -82,7 +83,7 @@ interface EntryDraft {
 const PayrollRun = () => {
   const { id: payrollFileId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { companyId } = useAuth();
+  const companyId = useCompanyId();
 
   const [file, setFile] = useState<PayrollFile | null>(null);
   const [company, setCompany] = useState<CompanyInfo | null>(null);

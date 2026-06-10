@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "@/components/GlassCard";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Building2, Save, ArrowLeft, Plus, Trash2, Upload } from "lucide-react";
+import Accountants from "@/components/Accountants";
 
 interface Director {
   id?: string;
@@ -22,7 +24,7 @@ interface Director {
 }
 
 const CompanySetup = () => {
-  const { companyId } = useAuth();
+  const companyId = useCompanyId();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -315,6 +317,12 @@ const CompanySetup = () => {
             ))}
           </div>
         </div>
+
+        <Accountants />
+
+
+
+
 
         <div className="flex gap-3 mt-8 pt-6 border-t border-border">
           <Button onClick={handleSave} disabled={loading} className="gap-2 h-11 px-6 font-medium tracking-wide" style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>

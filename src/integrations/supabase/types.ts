@@ -16,22 +16,31 @@ export type Database = {
     Tables: {
       accountant_company_links: {
         Row: {
-          accountant_user_id: string
+          accepted_at: string | null
+          accountant_user_id: string | null
           company_id: string
           created_at: string
           id: string
+          invite_email: string | null
+          role: string
         }
         Insert: {
-          accountant_user_id: string
+          accepted_at?: string | null
+          accountant_user_id?: string | null
           company_id: string
           created_at?: string
           id?: string
+          invite_email?: string | null
+          role?: string
         }
         Update: {
-          accountant_user_id?: string
+          accepted_at?: string | null
+          accountant_user_id?: string | null
           company_id?: string
           created_at?: string
           id?: string
+          invite_email?: string | null
+          role?: string
         }
         Relationships: []
       }
@@ -270,6 +279,76 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leave_balances: {
+        Row: {
+          accrued: number
+          adjustments: number
+          closing_balance: number
+          company_id: string
+          created_at: string
+          december_payout_days: number
+          employee_id: string
+          id: string
+          leave_type_id: string
+          opening_balance: number
+          taken: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          accrued?: number
+          adjustments?: number
+          closing_balance?: number
+          company_id: string
+          created_at?: string
+          december_payout_days?: number
+          employee_id: string
+          id?: string
+          leave_type_id: string
+          opening_balance?: number
+          taken?: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          accrued?: number
+          adjustments?: number
+          closing_balance?: number
+          company_id?: string
+          created_at?: string
+          december_payout_days?: number
+          employee_id?: string
+          id?: string
+          leave_type_id?: string
+          opening_balance?: number
+          taken?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leave_balances_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_balances_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leave_balances_leave_type_id_fkey"
+            columns: ["leave_type_id"]
+            isOneToOne: false
+            referencedRelation: "leave_types"
             referencedColumns: ["id"]
           },
         ]
@@ -651,6 +730,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_access_company: {
+        Args: { _company: string; _user: string }
+        Returns: boolean
+      }
+      can_manage_company: {
+        Args: { _company: string; _user: string }
+        Returns: boolean
+      }
+      get_accessible_company_ids: { Args: { _user: string }; Returns: string[] }
       get_user_company_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
@@ -660,6 +748,14 @@ export type Database = {
         Returns: boolean
       }
       is_company_active: { Args: { _company_id: string }; Returns: boolean }
+      recalculate_company_balances: {
+        Args: { _company: string; _year: number }
+        Returns: undefined
+      }
+      recalculate_leave_balance: {
+        Args: { _employee: string; _type: string; _year: number }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:

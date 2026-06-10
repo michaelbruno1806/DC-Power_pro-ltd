@@ -1,82 +1,76 @@
-# Plan — Round 1 of 4
 
-You confirmed everything in sequence. This round delivers the foundations that everything else depends on. The next 3 rounds will layer on top without breaking what we ship now.
+## Round 3 — Make the app fully functional
 
-## Round breakdown (high-level)
-
-1. **THIS ROUND** — Auth revamp + Wizard + Trial + Roles DB + Stripe enable
-2. Company details v2 (logo, directors, accountant, leave-cumulate toggle) + Employee model v2 + bulk CSV import
-3. Leave automation engine (6-month / 1-year auto-eligibility, sick reset, December payout)
-4. MRA exports in official format (PAYE/CSG/NSF + PRGF + exit statements) — needs your uploaded templates
+Three areas, in this order.
 
 ---
 
-## What ships in this round
+### 1) Accountant mode + company switcher
 
-### A. Database migrations
-- `companies`: add `trial_ends_at`, `subscription_status` (trial/active/expired/cancelled), `stripe_customer_id`, `setup_completed`, `payroll_frequency` (monthly/weekly/fortnightly), `payroll_start_month`, `currency` (default MUR), `tan`, `vat_number`, `logo_url`
-- `app_role` enum extended: `super_admin`, `company_owner`, `payroll_officer`, `hr_user`, `accountant`
-- `user_roles` already exists — add `company_id` (nullable, for multi-company accountant assignment)
-- New `accountant_company_links` table: maps an accountant `user_id` to many `company_id`s (foundation for accountant-mode switcher in round 2+)
-- New `company_logos` storage bucket (public)
-- `profiles`: add `phone`, `full_name`
-- `has_role` updated to optionally scope by company
+**Data**
+- `accountant_company_links` table already exists. Add `role` ('view' | 'manage') and `accepted_at` columns; add a `name` column on `companies` if a friendlier display name is missing (already present).
+- New SECURITY DEFINER function `get_accessible_company_ids(_user)` returning company_ids the user can access (own profile.company_id + linked accountant rows). Update RLS helpers/policies on companies, employees, payroll_files, payroll_entries, leave_requests, leave_types, public_holidays, working_day_configs, payroll_components, company_directors so accountants linked to a company can read (and, if role='manage', write) data — using a new helper `can_access_company(_user, _company)`.
+- Add admin UI in Company Setup → "Accountants" tab: invite by email, assign role, list/revoke. Invitations resolve when the invited user signs up with that email (trigger maps pending invites to user_id).
 
-### B. Sign-up flow rebuild (`src/pages/Auth.tsx`)
-- New `SignUp` form with: Full Name, Email, Mobile (Mauritius regex `^(?:\+230|230)?[0-9]{8}$`), Password, Confirm Password, T&C checkbox, Privacy checkbox
-- Zod schema with: email format, password strength (8 chars + 1 upper + 1 lower + 1 number), mobile MU format, password match
-- `supabase.auth.signUp` with `emailRedirectTo` and `data: { full_name, phone }`
-- Email verification gate — block dashboard until `email_confirmed_at` is set; show "Verify your email" screen with resend button
-- "Welcome back, {full_name}" on sign-in (fixes earlier bug)
-- Forgot Password link → `/forgot-password` page → `/reset-password` page (both new)
-- Google sign-in button (Lovable Cloud OAuth)
-
-### C. Company Setup Wizard (`src/pages/Onboarding.tsx`, replaces direct CompanySetup)
-- 3 steps with progress indicator:
-  - **Step 1 — Company Details**: name, BRN, TAN, VAT (optional), address, email, phone, logo upload (storage bucket)
-  - **Step 2 — Payroll Settings**: frequency (Monthly/Weekly/Fortnightly), start month picker, currency (locked MUR)
-  - **Step 3 — Employee Setup**: choice between "Add manually" or "Import from Excel" with a downloadable `.xlsx` template (basic columns now, full schema in round 2)
-- On finish: marks `setup_completed=true`, creates first `payroll_files` row for the start month, redirects to **/employees** (per your spec)
-
-### D. 14-day trial logic
-- On signup: trigger sets `trial_ends_at = now() + 14 days`, `subscription_status='trial'`
-- New `<TrialBanner />` component on dashboard: "X days remaining in your trial" with Upgrade CTA
-- Read-only guard hook `useTrialStatus()`: when expired AND status≠active, payroll-run actions blocked with toast + upgrade modal (full enforcement wired in round 4 after Stripe products are created)
-
-### E. Stripe billing enable
-- Run `recommend_payment_provider` then `enable_stripe_payments` (you confirmed Stripe)
-- After enable completes, scaffold a `subscription_plans` table + Pricing page at `/pricing` with placeholder tiers — actual product creation happens once Stripe is live
-
-### F. Auth email customization
-- Scaffold branded auth-email templates (verification, password reset, magic link) using emerald/navy theme — requires email domain. If you don't have one, the dialog will appear; otherwise we use defaults and you can add the domain later.
-
-### G. Routing changes (`src/App.tsx`)
-- `/` → Landing (unchanged)
-- `/auth` → new sign-in/sign-up
-- `/forgot-password`, `/reset-password` → new
-- `/onboarding` → wizard (gate: signed-in + email verified + setup_completed=false)
-- `/employees`, `/dashboard`, etc → require email verified + setup_completed=true
-- `<ProtectedRoute>` rewritten with these gates
+**Frontend**
+- New `CompanyContext` that exposes `activeCompanyId` (defaults to user's own company; accountants can switch). Stored in localStorage per user.
+- New `<CompanySwitcher />` in the sidebar header (shown only when user has access to >1 company). Lists own company + linked companies; click to switch.
+- Replace `companyId` reads across pages with `useActiveCompany()` (alias keeps `useAuth().companyId` for back-compat, but pages we touch use the new hook).
+- Update `AppSidebar` to show role badge ("Accountant" when active company ≠ own).
 
 ---
 
-## Technical notes (skim if non-technical)
+### 2) Leave automation engine
 
-- Mobile validation: MU mobile numbers are 8 digits starting `5`. Regex `^(?:\+230\s?|230\s?)?5\d{7}$`.
-- Logo upload uses Supabase storage with `company_id` as folder — RLS restricts each company to its own folder.
-- Trial enforcement uses a `is_company_active(company_id)` SQL function returning bool, used by future RLS on payroll mutations (round 4).
-- Roles migration is additive — existing `super_admin` / `client_admin` users keep working. We'll map `client_admin` → `company_owner` in the migration.
-- The wizard writes to `companies` row already created at signup (a trigger creates an empty company on first sign-up of a non-accountant user).
+**Data**
+- New `leave_balances` table: (employee_id, leave_type_id, year, opening_balance, accrued, taken, adjustments, closing_balance). Unique on (employee_id, leave_type_id, year).
+- SECURITY DEFINER RPC `recalculate_leave_balance(_employee, _type, _year)` — recomputes accrual from hire_date + annual_entitlement_days (pro-rated), subtracts approved leave_requests for that year, applies company policy:
+  - `local_leave_cumulate` = false → opening_balance resets each Jan 1.
+  - `local_leave_payout_december` = true → unused local-leave days payout flag (surfaces as a "Payout" line item in December payroll).
+  - `sick_leave_reset_january` = true → sick balances reset Jan 1.
+- RPC `recalculate_company_balances(_company, _year)` loops over employees × leave_types. Triggered on:
+  - Leave request approval/rejection (trigger).
+  - Manual "Recalculate balances" button on Leaves page.
+  - Year-end rollover when the user clicks "Run year-end rollover" (creates next-year row using policy).
+
+**Frontend**
+- Leaves page: add a "Balances" tab with a table per employee × type (opening, accrued, taken, balance), and a "Recalculate" button.
+- Employee profile: show current-year balances inline.
+- Payroll Run: when generating December payroll, surface a "Local leave payout" suggested addition for employees with positive local-leave balance and `local_leave_payout_december=true` (pre-filled, dismissible). When unpaid leave is approved within the period, auto-create a deduction line.
+- Payslip: show YTD leave taken + remaining for each leave type.
 
 ---
 
-## Out of scope for THIS round (coming next)
+### 3) Polish all existing pages
 
-- Director list editor, accountant assignment, leave-cumulate toggle on company → **Round 2**
-- Employee code/job/dept/transport/EDF/ID upload + bulk CSV → **Round 2**
-- 6-month / 1-year leave auto-promotion + sick reset + December payout calc → **Round 3**
-- MRA-format exports + PRGF + exit statement reminders → **Round 4** (need your templates)
-- Accountant company-switcher UI → **Round 3** (DB foundation ships now)
-- WhatsApp notifications → not started; structure-ready
+For every page in the protected app:
+- Add proper **loading skeletons** (Skeleton components from shadcn) and **empty states** with a clear CTA.
+- Add **error toasts** for every supabase call that currently swallows errors.
+- Add **zod validation** on every form that currently uses inline checks.
+- Trial/active **gating**: when `!isActive`, disable mutation buttons across Payroll Run, Employees (add/edit), Leaves (approve), Components (save) with a tooltip "Subscribe to continue". `TrialBanner` already shown on Dashboard — add it to PayrollFiles + PayrollRun headers too.
+- Add a top-bar "Active company" pill on every page so accountants always know which company they're operating on.
+- Fix mocked content:
+  - Dashboard "checklist" hard-coded array → reuse logic from `Checklist.tsx` so the dashboard ring reflects real status.
+  - Dashboard "Payroll Assistant" status pill → reflect actual file.status (draft/processing/completed).
+- Pricing page: wire the "Subscribe" button to Lovable Stripe payments (already enabled previously? — if not, skip in this round; otherwise just link to checkout).
 
-Approve and I'll execute the full migration, then code, then deploy.
+---
+
+### Technical notes
+
+- All schema changes go through one migration. Every new public table gets `GRANT`s + RLS + policies in the same migration.
+- New RPCs are SECURITY DEFINER with `SET search_path = public`.
+- Tests: add a vitest spec for the leave accrual math (pro-ration, reset rules, December payout flag).
+- No edits to `src/integrations/supabase/{client,types}.ts` — types regenerate after migration.
+
+---
+
+### Order of execution
+
+1. Migration (accountant access helper + leave_balances + invite columns).
+2. CompanyContext + CompanySwitcher + sidebar wiring.
+3. Accountants tab in Company Setup.
+4. Leave engine RPCs + Balances tab + Payroll Run integration.
+5. Polish pass (skeletons, empty states, validation, gating).
+
+I'll batch each step's file writes in parallel and verify after each major checkpoint.
