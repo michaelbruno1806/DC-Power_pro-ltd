@@ -372,6 +372,8 @@ const Leaves = () => {
           </table>
         </div>
       </GlassCard>
+
+      <LeaveBalances year={selYear} />
     </div>
   );
 };
