@@ -315,8 +315,11 @@ const CompanySetup = () => {
                 </Button>
               </div>
             ))}
-          </div>
         </div>
+
+        <Accountants />
+
+
 
         <div className="flex gap-3 mt-8 pt-6 border-t border-border">
           <Button onClick={handleSave} disabled={loading} className="gap-2 h-11 px-6 font-medium tracking-wide" style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
