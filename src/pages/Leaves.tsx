@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Plus, Palmtree, CheckCircle2, XCircle, Clock, Trash2, Settings2 } from "lucide-react";
 import PeriodSelector from "@/components/PeriodSelector";
+import LeaveBalances from "@/components/LeaveBalances";
 
 interface LeaveType {
   id: string;
