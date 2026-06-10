@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Building2, Save, ArrowLeft, Plus, Trash2, Upload } from "lucide-react";
+import Accountants from "@/components/Accountants";
 
 interface Director {
   id?: string;
