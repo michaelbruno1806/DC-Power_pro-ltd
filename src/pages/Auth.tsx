@@ -78,23 +78,16 @@ const Auth = () => {
 
   const handleGoogle = async () => {
     try {
-      const { lovable } = await import("@/integrations/lovable/index" as any).catch(() => ({
-        lovable: null,
-      }));
-      if (lovable?.auth?.signInWithOAuth) {
-        const result = await lovable.auth.signInWithOAuth("google", {
-          redirect_uri: window.location.origin,
-        });
-        if (result.error) throw new Error(result.error.message || "Google sign-in failed");
-        if (result.redirected) return;
-        navigate("/dashboard");
-      } else {
-        toast.info("Google sign-in is being prepared. Please use email for now.");
-      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
     } catch (e: any) {
       toast.error(e.message || "Google sign-in failed");
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-10">
