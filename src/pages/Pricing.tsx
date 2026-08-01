@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
-import { Check, ArrowLeft } from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import MarketingNav from "@/components/marketing/MarketingNav";
+import MarketingFooter from "@/components/marketing/MarketingFooter";
+
 
 const tiers = [
   {
@@ -33,25 +35,21 @@ const tiers = [
 ];
 
 const Pricing = () => (
-  <div className="min-h-screen bg-background py-12 px-6">
-    <div className="max-w-6xl mx-auto">
-      <Link
-        to="/dashboard"
-        className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground mb-6"
-      >
-        <ArrowLeft className="h-3 w-3" /> Back
-      </Link>
-      <div className="text-center mb-12 animate-fade-up">
-        <div className="eyebrow mb-2">Pricing</div>
-        <h1 className="heading-display text-foreground">Simple, transparent pricing</h1>
-        <div className="divider-elegant mt-3 mx-auto" />
-        <p className="text-muted-foreground mt-4">
-          14-day free trial · Cancel anytime · MUR billing
-        </p>
+  <div className="min-h-screen bg-background">
+    <MarketingNav />
+    <div className="bg-hero pt-32 pb-14 px-5 sm:px-8">
+      <div className="max-w-6xl mx-auto text-center animate-fade-up">
+        <p className="font-script text-3xl text-primary">Plans that fit —</p>
+        <h1 className="font-display text-4xl sm:text-6xl text-foreground mt-1">
+          Simple, transparent pricing
+        </h1>
+        <p className="text-muted-foreground mt-4">14-day free trial · Cancel anytime · MUR billing</p>
       </div>
-
+    </div>
+    <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16">
       <div className="grid md:grid-cols-3 gap-6">
         {tiers.map((t) => (
+
           <div
             key={t.name}
             className={`premium-card p-7 flex flex-col ${
@@ -96,7 +94,9 @@ const Pricing = () => (
         Secure online payments coming soon. Contact us at sales@dcpayroll.mu for early access.
       </p>
     </div>
+    <MarketingFooter />
   </div>
 );
+
 
 export default Pricing;

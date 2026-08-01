@@ -12,10 +12,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "Segoe UI", "sans-serif"],
         body: ["var(--font-body)", "Segoe UI", "sans-serif"],
         sans: ["var(--font-body)", "Segoe UI", "system-ui", "sans-serif"],
+        script: ["var(--font-script)", "cursive"],
       },
+
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

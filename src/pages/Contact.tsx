@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, MessageCircle, Mail, Phone } from "lucide-react";
+import { Send, MessageCircle, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import MarketingNav from "@/components/marketing/MarketingNav";
+import MarketingFooter from "@/components/marketing/MarketingFooter";
+
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -15,8 +17,8 @@ const contactSchema = z.object({
 });
 
 const Contact = () => {
-  const navigate = useNavigate();
   const [name, setName] = useState("");
+
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,16 +40,14 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-4xl mx-auto px-6 py-20">
-        <Button variant="ghost" onClick={() => navigate("/landing")} className="mb-8 gap-2 text-muted-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Button>
-
-        <div className="eyebrow text-primary mb-3">Contact Us</div>
-        <h1 className="font-display text-4xl md:text-5xl font-semibold text-foreground mb-6">Get in touch</h1>
+      <MarketingNav />
+      <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-32 pb-20">
+        <p className="font-script text-3xl text-primary">Say hello —</p>
+        <h1 className="font-display text-4xl md:text-6xl text-foreground mt-1 mb-5">Get in touch</h1>
         <p className="text-lg text-muted-foreground max-w-xl">
-          Have questions about DC Payroll? We'd love to hear from you.
+          Questions about DC Payroll, pricing or migrating your current payroll? We reply fast.
         </p>
+
 
         <div className="grid md:grid-cols-2 gap-10 mt-12">
           {/* Form */}
@@ -101,7 +101,9 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <MarketingFooter />
     </div>
+
   );
 };
 
