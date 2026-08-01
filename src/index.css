@@ -2,161 +2,166 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=Caveat:wght@500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Premium sophisticated dark palette — NLC inspired */
-    --background: 220 15% 6%;
-    --foreground: 45 15% 92%;
+    /* Deep ocean navy + cyan — EasyPay inspired */
+    --background: 209 62% 8%;
+    --foreground: 200 25% 96%;
 
-    --card: 220 15% 9%;
-    --card-foreground: 45 15% 92%;
+    --card: 209 52% 12%;
+    --card-foreground: 200 25% 96%;
 
-    --popover: 220 15% 9%;
-    --popover-foreground: 45 15% 92%;
+    --popover: 209 52% 12%;
+    --popover-foreground: 200 25% 96%;
 
-    /* Premium emerald accent */
-    --primary: 142 76% 45%;
-    --primary-foreground: 220 15% 6%;
+    /* Cyan accent */
+    --primary: 188 86% 55%;
+    --primary-foreground: 209 65% 8%;
 
-    --secondary: 220 12% 14%;
-    --secondary-foreground: 45 15% 92%;
+    --secondary: 209 42% 16%;
+    --secondary-foreground: 200 25% 96%;
 
-    --muted: 220 10% 18%;
-    --muted-foreground: 220 8% 65%;
+    --muted: 209 34% 20%;
+    --muted-foreground: 203 20% 70%;
 
-    --accent: 142 76% 45%;
-    --accent-foreground: 220 15% 6%;
+    --accent: 188 86% 55%;
+    --accent-foreground: 209 65% 8%;
 
-    --destructive: 0 65% 50%;
-    --destructive-foreground: 45 15% 92%;
+    --destructive: 0 68% 52%;
+    --destructive-foreground: 200 25% 96%;
 
-    --border: 220 12% 18%;
-    --input: 220 12% 16%;
-    --ring: 142 76% 45%;
+    --border: 209 34% 21%;
+    --input: 209 38% 17%;
+    --ring: 188 86% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.85rem;
 
-    --sidebar-background: 220 15% 7%;
-    --sidebar-foreground: 220 8% 65%;
-    --sidebar-primary: 142 76% 45%;
-    --sidebar-primary-foreground: 220 15% 6%;
-    --sidebar-accent: 220 12% 12%;
-    --sidebar-accent-foreground: 45 15% 92%;
-    --sidebar-border: 220 12% 16%;
-    --sidebar-ring: 142 76% 45%;
+    --sidebar-background: 209 58% 9%;
+    --sidebar-foreground: 203 20% 70%;
+    --sidebar-primary: 188 86% 55%;
+    --sidebar-primary-foreground: 209 65% 8%;
+    --sidebar-accent: 209 45% 14%;
+    --sidebar-accent-foreground: 200 25% 96%;
+    --sidebar-border: 209 34% 18%;
+    --sidebar-ring: 188 86% 55%;
 
-    /* Custom premium tokens */
-    --panel: 220 15% 9%;
-    --panel-2: 220 15% 7%;
-    --brand: 142 76% 45%;
-    --brand-hover: 142 76% 38%;
-    --brand-glow: 142 76% 45%;
-    --warning: 38 92% 55%;
-    --success: 142 76% 45%;
-    --chip: 220 12% 12%;
+    /* Custom tokens */
+    --panel: 209 52% 12%;
+    --panel-2: 209 58% 9%;
+    --brand: 188 86% 55%;
+    --brand-hover: 190 88% 46%;
+    --brand-glow: 188 86% 55%;
+    --warning: 38 92% 58%;
+    --success: 160 70% 45%;
+    --chip: 209 45% 14%;
 
-    /* Premium emerald tokens */
-    --emerald: 142 76% 45%;
-    --emerald-light: 142 70% 55%;
-    --emerald-dark: 142 80% 32%;
+    /* Accent scale (token names kept for compatibility) */
+    --emerald: 188 86% 55%;
+    --emerald-light: 182 84% 68%;
+    --emerald-dark: 200 90% 40%;
 
     /* Glass tokens */
-    --glass: 220 15% 10% / 0.6;
-    --glass-border: 220 12% 22% / 0.5;
-    --glass-highlight: 0 0% 100% / 0.04;
-    --glass-blur: 16px;
-    --glass-card: 220 15% 9% / 0.8;
+    --glass: 209 52% 13% / 0.6;
+    --glass-border: 200 40% 40% / 0.28;
+    --glass-highlight: 0 0% 100% / 0.05;
+    --glass-blur: 18px;
+    --glass-card: 209 52% 12% / 0.8;
 
-    /* Sophisticated gradients */
-    --gradient-brand: linear-gradient(135deg, hsl(142, 80%, 28%), hsl(142, 76%, 45%), hsl(142, 70%, 55%));
-    --gradient-emerald: linear-gradient(135deg, hsl(142, 80%, 32%), hsl(142, 76%, 45%), hsl(142, 70%, 55%));
-    --gradient-subtle: linear-gradient(180deg, hsl(220, 15%, 6%), hsl(220, 15%, 10%));
-    --gradient-card: linear-gradient(180deg, hsl(220, 15%, 10%), hsl(220, 15%, 7%));
-    --gradient-luxury: linear-gradient(135deg, hsl(220, 15%, 8%), hsl(220, 12%, 12%));
+    /* Gradients */
+    --gradient-brand: linear-gradient(135deg, hsl(202, 92%, 40%), hsl(188, 86%, 55%), hsl(180, 84%, 70%));
+    --gradient-emerald: linear-gradient(135deg, hsl(202, 92%, 40%), hsl(188, 86%, 55%), hsl(180, 84%, 70%));
+    --gradient-subtle: linear-gradient(180deg, hsl(209, 62%, 8%), hsl(209, 55%, 12%));
+    --gradient-card: linear-gradient(180deg, hsl(209, 52%, 13%), hsl(209, 58%, 10%));
+    --gradient-luxury: linear-gradient(135deg, hsl(209, 60%, 10%), hsl(205, 55%, 15%));
     --gradient-glass: linear-gradient(135deg, hsl(var(--glass-highlight)), transparent);
+    --gradient-hero: radial-gradient(120% 90% at 70% 10%, hsl(198, 70%, 22%) 0%, hsl(209, 65%, 10%) 45%, hsl(209, 66%, 7%) 100%);
 
-    /* Refined shadows */
-    --shadow-glow: 0 0 80px hsl(142, 76%, 45%, 0.18);
-    --shadow-card: 0 20px 40px -15px hsl(220, 50%, 3%, 0.6);
-    --shadow-elegant: 0 4px 20px hsl(220, 50%, 3%, 0.4);
-    --shadow-elevated: 0 24px 48px -16px hsl(220, 50%, 3%, 0.7);
+    /* Shadows */
+    --shadow-glow: 0 0 80px hsl(188, 86%, 55%, 0.22);
+    --shadow-card: 0 20px 40px -15px hsl(209, 70%, 3%, 0.6);
+    --shadow-elegant: 0 4px 20px hsl(209, 70%, 3%, 0.4);
+    --shadow-elevated: 0 24px 48px -16px hsl(209, 70%, 3%, 0.7);
 
     /* Typography */
-    --font-display: 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+    --font-display: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+    --font-script: 'Caveat', 'Segoe Script', cursive;
   }
 
+
   .light {
-    --background: 0 0% 98%;
-    --foreground: 220 15% 15%;
+    --background: 200 40% 98%;
+    --foreground: 209 45% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
+    --card-foreground: 209 45% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover-foreground: 209 45% 14%;
 
-    --primary: 142 76% 36%;
+    --primary: 196 88% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 12% 93%;
-    --secondary-foreground: 220 15% 15%;
+    --secondary: 200 30% 94%;
+    --secondary-foreground: 209 45% 14%;
 
-    --muted: 220 10% 90%;
-    --muted-foreground: 220 8% 46%;
+    --muted: 200 25% 91%;
+    --muted-foreground: 205 15% 42%;
 
-    --accent: 142 76% 36%;
+    --accent: 196 88% 40%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 68% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 12% 88%;
-    --input: 220 12% 90%;
-    --ring: 142 76% 36%;
+    --border: 200 25% 87%;
+    --input: 200 25% 90%;
+    --ring: 196 88% 40%;
 
-    --sidebar-background: 0 0% 99%;
-    --sidebar-foreground: 220 8% 46%;
-    --sidebar-primary: 142 76% 36%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 205 15% 42%;
+    --sidebar-primary: 196 88% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 12% 95%;
-    --sidebar-accent-foreground: 220 15% 15%;
-    --sidebar-border: 220 12% 90%;
-    --sidebar-ring: 142 76% 36%;
+    --sidebar-accent: 200 30% 95%;
+    --sidebar-accent-foreground: 209 45% 14%;
+    --sidebar-border: 200 25% 90%;
+    --sidebar-ring: 196 88% 40%;
 
     --panel: 0 0% 100%;
-    --panel-2: 0 0% 98%;
-    --brand: 142 76% 36%;
-    --brand-hover: 142 76% 30%;
-    --brand-glow: 142 76% 36%;
-    --warning: 38 92% 55%;
-    --success: 142 76% 36%;
-    --chip: 220 12% 95%;
+    --panel-2: 200 40% 98%;
+    --brand: 196 88% 40%;
+    --brand-hover: 198 90% 33%;
+    --brand-glow: 196 88% 40%;
+    --warning: 38 92% 50%;
+    --success: 160 70% 38%;
+    --chip: 200 30% 95%;
 
-    --emerald: 142 76% 36%;
-    --emerald-light: 142 70% 45%;
-    --emerald-dark: 142 80% 28%;
+    --emerald: 196 88% 40%;
+    --emerald-light: 188 84% 50%;
+    --emerald-dark: 202 92% 32%;
 
     --glass: 0 0% 100% / 0.7;
-    --glass-border: 220 12% 85% / 0.6;
+    --glass-border: 200 25% 85% / 0.6;
     --glass-highlight: 0 0% 100% / 0.5;
     --glass-blur: 16px;
     --glass-card: 0 0% 100% / 0.9;
 
-    --gradient-brand: linear-gradient(135deg, hsl(142, 80%, 28%), hsl(142, 76%, 36%), hsl(142, 70%, 45%));
-    --gradient-emerald: linear-gradient(135deg, hsl(142, 80%, 28%), hsl(142, 76%, 36%), hsl(142, 70%, 45%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0, 0%, 98%), hsl(0, 0%, 95%));
-    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%), hsl(0, 0%, 98%));
-    --gradient-luxury: linear-gradient(135deg, hsl(0, 0%, 97%), hsl(220, 12%, 95%));
+    --gradient-brand: linear-gradient(135deg, hsl(202, 92%, 34%), hsl(196, 88%, 42%), hsl(186, 84%, 52%));
+    --gradient-emerald: linear-gradient(135deg, hsl(202, 92%, 34%), hsl(196, 88%, 42%), hsl(186, 84%, 52%));
+    --gradient-subtle: linear-gradient(180deg, hsl(200, 40%, 98%), hsl(200, 30%, 95%));
+    --gradient-card: linear-gradient(180deg, hsl(0, 0%, 100%), hsl(200, 40%, 98%));
+    --gradient-luxury: linear-gradient(135deg, hsl(0, 0%, 99%), hsl(200, 30%, 95%));
     --gradient-glass: linear-gradient(135deg, hsl(0, 0%, 100%, 0.5), transparent);
+    --gradient-hero: radial-gradient(120% 90% at 70% 10%, hsl(196, 70%, 92%) 0%, hsl(200, 45%, 97%) 50%, hsl(200, 40%, 99%) 100%);
 
-    --shadow-glow: 0 0 60px hsl(142, 76%, 36%, 0.12);
-    --shadow-card: 0 10px 30px -10px hsl(220, 20%, 60%, 0.2);
-    --shadow-elegant: 0 2px 12px hsl(220, 20%, 60%, 0.1);
-    --shadow-elevated: 0 16px 40px -12px hsl(220, 20%, 60%, 0.2);
+    --shadow-glow: 0 0 60px hsl(196, 88%, 40%, 0.14);
+    --shadow-card: 0 10px 30px -10px hsl(205, 30%, 55%, 0.22);
+    --shadow-elegant: 0 2px 12px hsl(205, 30%, 55%, 0.12);
+    --shadow-elevated: 0 16px 40px -12px hsl(205, 30%, 55%, 0.22);
   }
+
 }
 
 @layer base {
@@ -180,15 +185,16 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 500;
-    letter-spacing: 0.015em;
-    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
   }
 
   h1 {
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
   }
+
 }
 
 @layer components {
@@ -351,5 +357,25 @@
   @keyframes splash-progress {
     0%   { transform: scaleX(0); }
     100% { transform: scaleX(1); }
+  }
+}
+
+@layer utilities {
+  .font-script {
+    font-family: var(--font-script);
+    letter-spacing: 0;
+  }
+
+  .bg-hero {
+    background-image: var(--gradient-hero);
+  }
+
+  .marquee-track {
+    animation: marquee 32s linear infinite;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
   }
 }

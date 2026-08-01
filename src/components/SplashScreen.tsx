@@ -21,21 +21,21 @@ const SplashScreen = ({ onFinish, duration = 3600 }: SplashScreenProps) => {
       className={`fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden transition-opacity duration-700 ${
         phase === "exit" ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
-      style={{ background: "linear-gradient(145deg, #000 0%, #0a0a0a 40%, #050d05 100%)" }}
+      style={{ background: "linear-gradient(145deg, #000308 0%, #03121c 45%, #041a26 100%)" }}
     >
       {/* Animated gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute top-1/2 left-1/2 w-[800px] h-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
-            background: "radial-gradient(circle, hsl(142,76%,45%,0.08) 0%, transparent 60%)",
+            background: "radial-gradient(circle, hsl(188,86%,55%,0.08) 0%, transparent 60%)",
             animation: "splash-orb-pulse 4s ease-in-out infinite",
           }}
         />
         <div
           className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full"
           style={{
-            background: "radial-gradient(circle, hsl(142,76%,45%,0.05) 0%, transparent 60%)",
+            background: "radial-gradient(circle, hsl(188,86%,55%,0.05) 0%, transparent 60%)",
             animation: "splash-orb-pulse 5s ease-in-out 0.5s infinite",
           }}
         />
@@ -45,7 +45,7 @@ const SplashScreen = ({ onFinish, duration = 3600 }: SplashScreenProps) => {
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: "linear-gradient(hsl(142,76%,45%) 1px, transparent 1px), linear-gradient(90deg, hsl(142,76%,45%) 1px, transparent 1px)",
+          backgroundImage: "linear-gradient(hsl(188,86%,55%) 1px, transparent 1px), linear-gradient(90deg, hsl(188,86%,55%) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
@@ -61,7 +61,7 @@ const SplashScreen = ({ onFinish, duration = 3600 }: SplashScreenProps) => {
           <div
             className="absolute inset-0 -m-8 rounded-full blur-[60px]"
             style={{
-              background: "radial-gradient(circle, hsl(142,76%,45%,0.2) 0%, transparent 70%)",
+              background: "radial-gradient(circle, hsl(188,86%,55%,0.2) 0%, transparent 70%)",
               animation: "splash-glow-breathe 3s ease-in-out infinite",
             }}
           />
@@ -70,7 +70,7 @@ const SplashScreen = ({ onFinish, duration = 3600 }: SplashScreenProps) => {
             alt="DC Payroll"
             className="relative w-56 md:w-64 h-auto select-none"
             style={{
-              filter: "drop-shadow(0 0 40px hsl(142,76%,45%,0.3))",
+              filter: "drop-shadow(0 0 40px hsl(188,86%,55%,0.3))",
             }}
             draggable={false}
           />
@@ -98,7 +98,7 @@ const SplashScreen = ({ onFinish, duration = 3600 }: SplashScreenProps) => {
           <div
             className="h-full rounded-full"
             style={{
-              background: "linear-gradient(90deg, hsl(142,76%,45%), hsl(142,70%,55%), hsl(142,76%,45%))",
+              background: "linear-gradient(90deg, hsl(188,86%,55%), hsl(180,84%,70%), hsl(188,86%,55%))",
               animation: "splash-progress 2.4s cubic-bezier(0.4,0,0.2,1) 0.6s both",
               transformOrigin: "left",
             }}

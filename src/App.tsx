@@ -19,6 +19,9 @@ import Pricing from "@/pages/Pricing";
 import Landing from "@/pages/Landing";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
+import Gallery from "@/pages/Gallery";
+import JoinUs from "@/pages/JoinUs";
+
 import Dashboard from "@/pages/Dashboard";
 import CompanySetup from "@/pages/CompanySetup";
 import PayrollComponents from "@/pages/PayrollComponents";
@@ -65,7 +68,10 @@ const App = () => {
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/gallery" element={<Gallery />} />
+                <Route path="/join-us" element={<JoinUs />} />
                 <Route path="/auth" element={<Auth />} />
+
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route

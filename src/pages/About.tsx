@@ -1,25 +1,25 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Target, Heart, Award } from "lucide-react";
+import { Target, Heart, Award } from "lucide-react";
+import MarketingNav from "@/components/marketing/MarketingNav";
+import MarketingFooter from "@/components/marketing/MarketingFooter";
 
 const About = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-4xl mx-auto px-6 py-20">
-        <Button variant="ghost" onClick={() => navigate("/landing")} className="mb-8 gap-2 text-muted-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Button>
-
-        <div className="eyebrow text-primary mb-3">About Us</div>
-        <h1 className="font-display text-4xl md:text-5xl font-semibold text-foreground mb-6">
+      <MarketingNav />
+      <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-32 pb-20">
+        <p className="font-script text-3xl text-primary">Our story —</p>
+        <h1 className="font-display text-4xl md:text-6xl text-foreground mt-1 mb-6">
           Making payroll simple for Mauritius
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
           DC Payroll was born out of a simple observation: payroll in Mauritius is unnecessarily complex.
           We built a platform that automates the tedious parts so you can focus on your business.
         </p>
+
 
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           {[
@@ -49,14 +49,16 @@ const About = () => {
         <div className="text-center mt-16">
           <Button
             onClick={() => navigate("/auth")}
-            className="gap-2"
+            className="gap-2 rounded-full h-12 px-7"
             style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
           >
-            Get Started Today
+            Start free trial
           </Button>
         </div>
       </div>
+      <MarketingFooter />
     </div>
+
   );
 };
 
