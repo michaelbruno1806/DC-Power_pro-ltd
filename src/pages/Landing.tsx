@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight, Check, Star, Shield, Users, BarChart3, Globe2, Clock,
-  FileText, Bot, Fingerprint, Wallet, ChevronRight,
+  FileText, Bot, Fingerprint, Wallet, ChevronRight, BadgePercent,
 } from "lucide-react";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
@@ -30,9 +31,9 @@ const steps = [
 ];
 
 const plans = [
-  { name: "Basic", price: "Rs 1,500", period: "/month", desc: "Up to 10 employees", features: ["Payroll calculation", "PDF payslips", "Basic reports", "Email support"], popular: false },
-  { name: "Pro", price: "Rs 3,500", period: "/month", desc: "Up to 50 employees", features: ["Everything in Basic", "MRA filing exports", "Leave management", "Multi-user access", "Priority support"], popular: true },
-  { name: "Enterprise", price: "Custom", period: "", desc: "Unlimited employees", features: ["Everything in Pro", "Accountant mode", "Custom integrations", "Dedicated manager", "SLA guarantee"], popular: false },
+  { name: "Basic", monthly: 1500, desc: "Up to 10 employees", features: ["Payroll calculation", "PDF payslips", "Basic reports", "Email support"], popular: false },
+  { name: "Pro", monthly: 3500, desc: "Up to 50 employees", features: ["Everything in Basic", "MRA filing exports", "Leave management", "Multi-user access", "Priority support"], popular: true },
+  { name: "Enterprise", monthly: null, desc: "Unlimited employees", features: ["Everything in Pro", "Accountant mode", "Custom integrations", "Dedicated manager", "SLA guarantee"], popular: false },
 ];
 
 const testimonials = [
@@ -49,6 +50,8 @@ const faqs = [
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+  const [selectedPlan, setSelectedPlan] = useState("Pro");
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -244,23 +247,62 @@ const Landing = () => {
             <div className="eyebrow mb-3">Pricing</div>
             <h2 className="font-display text-3xl sm:text-5xl text-foreground">Simple, transparent pricing.</h2>
             <p className="text-muted-foreground mt-4">Start free for 14 days. No credit card required.</p>
+            <div className="mt-8 inline-flex items-center rounded-full border border-border/60 bg-card/70 p-1">
+              {(["monthly", "annual"] as const).map((b) => (
+                <button
+                  key={b}
+                  onClick={() => setBilling(b)}
+                  className={`rounded-full px-5 h-9 text-sm font-semibold transition-all capitalize ${billing === b ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  style={billing === b ? { background: "var(--gradient-emerald)" } : undefined}
+                >
+                  {b}
+                  {b === "annual" && (
+                    <span className={`ml-2 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5 ${billing === "annual" ? "bg-white/20 text-primary-foreground" : "bg-primary/15 text-primary"}`}>
+                      2 months free
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            {plans.map((p) => (
+            {plans.map((p) => {
+              const isSelected = selectedPlan === p.name;
+              return (
               <div
                 key={p.name}
-                className={`rounded-2xl p-8 border bg-card/70 relative ${p.popular ? "border-primary/50 ring-1 ring-primary/25" : "border-border/60"}`}
+                onClick={() => setSelectedPlan(p.name)}
+                className={`rounded-2xl p-8 border bg-card/70 relative cursor-pointer transition-all duration-300 ${
+                  isSelected
+                    ? "border-primary ring-2 ring-primary/40 shadow-[var(--shadow-glow)] -translate-y-1"
+                    : p.popular
+                      ? "border-primary/50 ring-1 ring-primary/25"
+                      : "border-border/60 hover:border-primary/30"
+                }`}
               >
-                {p.popular && (
+                {(isSelected || p.popular) && (
                   <span className="absolute -top-3 left-8 text-[10px] font-semibold uppercase tracking-[0.2em] rounded-full px-3 py-1 text-primary-foreground" style={{ background: "var(--gradient-emerald)" }}>
-                    Most popular
+                    {isSelected ? "Selected plan" : "Most popular"}
                   </span>
                 )}
                 <h3 className="font-display text-xl font-semibold text-foreground">{p.name}</h3>
                 <div className="mt-4 flex items-baseline gap-1">
-                  <span className="font-display text-4xl font-bold text-foreground">{p.price}</span>
-                  <span className="text-sm text-muted-foreground">{p.period}</span>
+                  <span className="font-display text-4xl font-bold text-foreground">
+                    {p.monthly
+                      ? `Rs ${(billing === "monthly" ? p.monthly : Math.round((p.monthly * 10) / 12)).toLocaleString("en-US")}`
+                      : "Custom"}
+                  </span>
+                  {p.monthly && <span className="text-sm text-muted-foreground">/month</span>}
                 </div>
+                {p.monthly && billing === "annual" && (
+                  <div className="mt-2 flex items-center gap-2 text-xs">
+                    <span className="text-muted-foreground line-through">Rs {(p.monthly * 12).toLocaleString("en-US")}/yr</span>
+                    <span className="text-foreground font-medium">Rs {(p.monthly * 10).toLocaleString("en-US")}/yr</span>
+                    <span className="inline-flex items-center gap-1 text-primary">
+                      <BadgePercent className="h-3.5 w-3.5" /> Save Rs {(p.monthly * 2).toLocaleString("en-US")}
+                    </span>
+                  </div>
+                )}
                 <p className="text-sm text-muted-foreground mt-2">{p.desc}</p>
                 <ul className="mt-6 space-y-3">
                   {p.features.map((f) => (
@@ -270,14 +312,19 @@ const Landing = () => {
                   ))}
                 </ul>
                 <button
-                  onClick={() => navigate(p.name === "Enterprise" ? "/contact" : "/auth")}
-                  className={`w-full mt-8 rounded-full h-11 text-sm font-semibold transition-colors ${p.popular ? "text-primary-foreground" : "border border-border/60 text-foreground hover:bg-secondary"}`}
-                  style={p.popular ? { background: "var(--gradient-emerald)" } : undefined}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedPlan(p.name);
+                    navigate(p.name === "Enterprise" ? "/contact" : "/auth");
+                  }}
+                  className={`w-full mt-8 rounded-full h-11 text-sm font-semibold transition-colors ${isSelected ? "text-primary-foreground" : "border border-border/60 text-foreground hover:bg-secondary"}`}
+                  style={isSelected ? { background: "var(--gradient-emerald)" } : undefined}
                 >
-                  {p.name === "Enterprise" ? "Contact sales" : "Start free trial"}
+                  {p.name === "Enterprise" ? "Contact sales" : isSelected ? "Start free trial" : `Choose ${p.name}`}
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
