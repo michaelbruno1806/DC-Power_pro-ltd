@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight, Check, Star, Shield, Users, BarChart3, Globe2, Clock,
-  FileText, Bot, Fingerprint, Wallet, ChevronRight,
+  FileText, Bot, Fingerprint, Wallet, ChevronRight, BadgePercent,
 } from "lucide-react";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
@@ -49,6 +50,8 @@ const faqs = [
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
+  const [selectedPlan, setSelectedPlan] = useState("Pro");
 
   return (
     <div className="min-h-screen bg-background text-foreground">
