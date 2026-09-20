@@ -21,6 +21,10 @@ import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Gallery from "@/pages/Gallery";
 import JoinUs from "@/pages/JoinUs";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
+import ScrollManager from "@/components/ScrollManager";
+
 
 import Dashboard from "@/pages/Dashboard";
 import CompanySetup from "@/pages/CompanySetup";
@@ -61,6 +65,7 @@ const App = () => {
           <BrowserRouter>
             <AuthProvider>
               <CompanyProvider>
+              <ScrollManager />
               <Routes>
                 {/* Public marketing routes */}
                 <Route path="/" element={<Landing />} />
@@ -70,7 +75,10 @@ const App = () => {
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/join-us" element={<JoinUs />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
                 <Route path="/auth" element={<Auth />} />
+
 
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

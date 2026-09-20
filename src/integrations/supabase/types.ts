@@ -189,6 +189,7 @@ export type Database = {
         Row: {
           address: string | null
           bank_account: string | null
+          bank_code: string | null
           bank_name: string | null
           basic_salary: number | null
           company_id: string
@@ -218,6 +219,7 @@ export type Database = {
         Insert: {
           address?: string | null
           bank_account?: string | null
+          bank_code?: string | null
           bank_name?: string | null
           basic_salary?: number | null
           company_id: string
@@ -247,6 +249,7 @@ export type Database = {
         Update: {
           address?: string | null
           bank_account?: string | null
+          bank_code?: string | null
           bank_name?: string | null
           basic_salary?: number | null
           company_id?: string
@@ -551,6 +554,7 @@ export type Database = {
           created_by: string | null
           id: string
           month: number
+          mra_filed_at: string | null
           status: string | null
           total_deductions: number | null
           total_gross: number | null
@@ -564,6 +568,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           month: number
+          mra_filed_at?: string | null
           status?: string | null
           total_deductions?: number | null
           total_gross?: number | null
@@ -577,6 +582,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           month?: number
+          mra_filed_at?: string | null
           status?: string | null
           total_deductions?: number | null
           total_gross?: number | null

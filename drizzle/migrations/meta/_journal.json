@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789906571367,
+      "tag": "0000_add_bank_code_and_mra_filed_at",
+      "breakpoints": true
+    }
+  ]
+}

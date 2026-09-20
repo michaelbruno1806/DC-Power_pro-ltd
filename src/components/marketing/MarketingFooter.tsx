@@ -8,6 +8,7 @@ const columns = [
       { label: "Features", to: "/#features" },
       { label: "Pricing", to: "/pricing" },
       { label: "Gallery", to: "/gallery" },
+      { label: "FAQ", to: "/#faq" },
     ],
   },
   {
@@ -24,9 +25,12 @@ const columns = [
       { label: "Sign in", to: "/auth" },
       { label: "Start free trial", to: "/auth" },
       { label: "Employee portal", to: "/my-portal" },
+      { label: "Terms & Conditions", to: "/terms" },
+      { label: "Privacy Policy", to: "/privacy" },
     ],
   },
 ];
+
 
 const MarketingFooter = () => (
   <footer className="border-t border-border/60 bg-panel-2/60">
