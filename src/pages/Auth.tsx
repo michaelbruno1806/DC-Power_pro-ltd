@@ -192,7 +192,10 @@ const Auth = () => {
                       className="mt-0.5"
                     />
                     <span>
-                      I accept the <span className="text-primary">Terms &amp; Conditions</span>
+                      I accept the{" "}
+                      <Link to="/terms" target="_blank" className="text-primary hover:underline">
+                        Terms &amp; Conditions
+                      </Link>
                     </span>
                   </label>
                   <label className="flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
@@ -202,8 +205,12 @@ const Auth = () => {
                       className="mt-0.5"
                     />
                     <span>
-                      I accept the <span className="text-primary">Privacy Policy</span>
+                      I accept the{" "}
+                      <Link to="/privacy" target="_blank" className="text-primary hover:underline">
+                        Privacy Policy
+                      </Link>
                     </span>
+
                   </label>
                 </div>
               </>

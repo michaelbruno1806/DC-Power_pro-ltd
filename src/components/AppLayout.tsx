@@ -43,13 +43,9 @@ const AppLayout = () => {
               </div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground/70">
                 Powered by{" "}
-                <a
-                  href="#"
-                  className="text-[#d4af37]/90 hover:text-[#d4af37] font-medium transition-colors"
-                >
-                  MB18 Solutions
-                </a>
+                <span className="text-[#d4af37]/90 font-medium">MB18 Solutions</span>
               </div>
+
             </div>
           </div>
         </footer>
