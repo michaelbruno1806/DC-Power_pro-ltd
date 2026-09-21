@@ -4,6 +4,7 @@ import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import PeriodSelector from "@/components/PeriodSelector";
+import MraNoticeAnalyzer from "@/components/MraNoticeAnalyzer";
 import { Button } from "@/components/ui/button";
 import { BarChart3, FileSpreadsheet, Download, ExternalLink, ShieldCheck } from "lucide-react";
 
@@ -352,6 +353,30 @@ const MraFilings = () => {
               </div>
             </div>
           </GlassCard>
+
+          {/* AI notice check */}
+          <MraNoticeAnalyzer
+            period={`${months[row.month - 1]} ${row.year}`}
+            company={company}
+            totals={{
+              "Gross emoluments": row.breakdown.reduce((s, b) => s + b.gross, 0),
+              PAYE: row.paye,
+              "CSG (employee + employer)": row.csgTotal,
+              "NSF (employee + employer)": row.nsfTotal,
+              "PRGF (employee + employer)": row.prgfTotal,
+              "HRDC training levy": row.levy,
+              "Total payable to MRA": row.totalPayable,
+            }}
+            employees={row.breakdown.map(b => ({
+              name: b.name,
+              nic: b.nic,
+              gross: b.gross,
+              paye: b.paye,
+              csg: b.csgEmp + b.csgEr,
+              nsf: b.nsfEmp + b.nsfEr,
+              prgf: b.prgfEmp + b.prgfEr,
+            }))}
+          />
 
           {/* Employee breakdown */}
           <GlassCard className="p-0 overflow-hidden">
