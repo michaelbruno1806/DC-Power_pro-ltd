@@ -279,6 +279,30 @@ const MraFilings = () => {
         badge={`Filing Deadline: ${getMraDeadline(selMonth, selYear)}`}
       />
 
+      {/* MRA Portal */}
+      <GlassCard>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="h-6 w-6 text-primary shrink-0 mt-0.5" />
+            <div>
+              <div className="text-sm font-medium text-foreground">File your returns on the MRA Portal</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Download your returns below, then sign in to the Mauritius Revenue Authority e-services portal to submit
+                PAYE / CSG / NSF / PRGF for {months[selMonth - 1]} {selYear}. Deadline: {getMraDeadline(selMonth, selYear)}.
+              </div>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            className="gap-1.5 shrink-0"
+            style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
+            onClick={() => window.open(MRA_PORTAL_URL, "_blank", "noopener,noreferrer")}
+          >
+            <ExternalLink className="h-3.5 w-3.5" /> Log in to MRA Portal
+          </Button>
+        </div>
+      </GlassCard>
+
       {filteredFilings.length === 0 ? (
         <GlassCard className="text-center py-16">
           <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
