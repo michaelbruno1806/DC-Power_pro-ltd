@@ -5,7 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import PeriodSelector from "@/components/PeriodSelector";
 import { Button } from "@/components/ui/button";
-import { BarChart3, FileSpreadsheet, Download } from "lucide-react";
+import { BarChart3, FileSpreadsheet, Download, ExternalLink, ShieldCheck } from "lucide-react";
+
+const MRA_PORTAL_URL = "https://eservices.mra.mu";
 import * as XLSX from "xlsx";
 
 const months = [
