@@ -346,6 +346,9 @@ const MraFilings = () => {
                   style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}>
                   <FileSpreadsheet className="h-3.5 w-3.5" /> Summary (XLSX)
                 </Button>
+                <Button size="sm" onClick={() => window.open(MRA_PORTAL_URL, "_blank", "noopener,noreferrer")} className="gap-1.5">
+                  <ExternalLink className="h-3.5 w-3.5" /> File on MRA Portal
+                </Button>
               </div>
             </div>
           </GlassCard>
