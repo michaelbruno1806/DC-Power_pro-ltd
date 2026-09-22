@@ -65,7 +65,11 @@ const MraFilings = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId) {
+      setFilings([]);
+      setLoading(false);
+      return;
+    }
     (async () => {
       setLoading(true);
       const [filesRes, companyRes, empRes] = await Promise.all([
