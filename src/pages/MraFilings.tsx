@@ -58,6 +58,7 @@ interface FilingRow {
 
 const MraFilings = () => {
   const companyId = useCompanyId();
+  const navigate = useNavigate();
   const now = new Date();
   const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
   const [selYear, setSelYear] = useState(now.getFullYear());
