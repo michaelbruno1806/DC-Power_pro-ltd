@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
@@ -317,7 +318,7 @@ const MraFilings = () => {
             Run the payroll for this month and finalise it — the returns, totals and filing record appear here
             automatically.
           </p>
-          <Button size="sm" variant="outline" className="mt-5" onClick={() => navigate("/payroll-run")}>
+          <Button size="sm" variant="outline" className="mt-5" onClick={() => navigate("/payroll")}>
             Go to Payroll Run
           </Button>
         </GlassCard>
