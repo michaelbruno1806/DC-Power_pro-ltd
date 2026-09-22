@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanyId } from "@/hooks/use-company-id";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,6 +58,7 @@ interface FilingRow {
 
 const MraFilings = () => {
   const companyId = useCompanyId();
+  const navigate = useNavigate();
   const now = new Date();
   const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
   const [selYear, setSelYear] = useState(now.getFullYear());
@@ -65,7 +67,11 @@ const MraFilings = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!companyId) return;
+    if (!companyId) {
+      setFilings([]);
+      setLoading(false);
+      return;
+    }
     (async () => {
       setLoading(true);
       const [filesRes, companyRes, empRes] = await Promise.all([
@@ -308,7 +314,14 @@ const MraFilings = () => {
       {filteredFilings.length === 0 ? (
         <GlassCard className="text-center py-16">
           <BarChart3 className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No completed payroll run for {months[selMonth - 1]} {selYear}.</p>
+          <p className="text-muted-foreground">No finalised payroll for {months[selMonth - 1]} {selYear}.</p>
+          <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
+            Run the payroll for this month and finalise it — the returns, totals and filing record appear here
+            automatically.
+          </p>
+          <Button size="sm" variant="outline" className="mt-5" onClick={() => navigate("/payroll")}>
+            Go to Payroll Run
+          </Button>
         </GlassCard>
       ) : filteredFilings.map(row => (
         <div key={row.fileId} className="space-y-4">
