@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import GlassCard from "@/components/GlassCard";
 import PeriodSelector from "@/components/PeriodSelector";
 import MraNoticeAnalyzer from "@/components/MraNoticeAnalyzer";
+import MraSubmission from "@/components/MraSubmission";
 import { Button } from "@/components/ui/button";
 import { BarChart3, FileSpreadsheet, Download, ExternalLink, ShieldCheck } from "lucide-react";
 
@@ -353,6 +354,18 @@ const MraFilings = () => {
               </div>
             </div>
           </GlassCard>
+
+          {/* Filing submission record */}
+          {companyId && (
+            <MraSubmission
+              companyId={companyId}
+              payrollFileId={row.fileId}
+              month={row.month}
+              year={row.year}
+              period={`${months[row.month - 1]} ${row.year}`}
+              totalPayable={row.totalPayable}
+            />
+          )}
 
           {/* AI notice check */}
           <MraNoticeAnalyzer

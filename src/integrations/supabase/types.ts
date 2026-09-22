@@ -440,6 +440,78 @@ export type Database = {
         }
         Relationships: []
       }
+      mra_submissions: {
+        Row: {
+          acknowledgement_path: string | null
+          amount_paid: number | null
+          company_id: string
+          confirmed_at: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          month: number
+          notes: string | null
+          payroll_file_id: string
+          reference_number: string | null
+          return_path: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          acknowledgement_path?: string | null
+          amount_paid?: number | null
+          company_id: string
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          month: number
+          notes?: string | null
+          payroll_file_id: string
+          reference_number?: string | null
+          return_path?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          acknowledgement_path?: string | null
+          amount_paid?: number | null
+          company_id?: string
+          confirmed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          month?: number
+          notes?: string | null
+          payroll_file_id?: string
+          reference_number?: string | null
+          return_path?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mra_submissions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mra_submissions_payroll_file_id_fkey"
+            columns: ["payroll_file_id"]
+            isOneToOne: false
+            referencedRelation: "payroll_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payroll_components: {
         Row: {
           amount: number | null
