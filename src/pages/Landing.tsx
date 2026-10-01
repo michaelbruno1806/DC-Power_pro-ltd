@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowRight, Check, Star, Shield, Users, BarChart3, Globe2, Clock,
+  ArrowRight, Check, Shield, Users, BarChart3, Globe2, Clock,
   FileText, Bot, Fingerprint, Wallet, ChevronRight, BadgePercent,
 } from "lucide-react";
 import MarketingNav from "@/components/marketing/MarketingNav";
@@ -12,8 +12,6 @@ const stats = [
   { value: "10s", label: "Payroll processing*" },
   { value: "14 days", label: "Free to try" },
 ];
-
-const clients = ["Sezwan Technologies", "Candy Palace", "Applied Nutrition", "Horus Group", "Island Exports", "Créole Services"];
 
 const features = [
   { icon: Wallet, title: "One-click payroll run", desc: "Salaries, PAYE, NPF, CSG, PRGF, allowances and overtime — calculated, validated and ready for the bank batch." },
@@ -34,12 +32,6 @@ const plans = [
   { name: "Basic", monthly: 1500, desc: "Up to 10 employees", features: ["Payroll calculation", "PDF payslips", "Basic reports", "Email support"], popular: false },
   { name: "Pro", monthly: 3500, desc: "Up to 50 employees", features: ["Everything in Basic", "MRA filing exports", "Leave management", "Multi-user access", "Priority support"], popular: true },
   { name: "Enterprise", monthly: null, desc: "Unlimited employees", features: ["Everything in Pro", "Accountant mode", "Custom integrations", "Dedicated manager", "SLA guarantee"], popular: false },
-];
-
-const testimonials = [
-  { name: "Ravi Doorgakant", role: "CFO, TechMauritius Ltd", text: "What took two days now takes thirty minutes. The MRA exports are exactly what our accountant asked for." },
-  { name: "Anisha Doorgakant", role: "HR Manager, Island Exports", text: "Leaves, holidays and working days all flow into payroll. No more spreadsheets at month end." },
-  { name: "Jean-Pierre L.", role: "Director, Créole Services", text: "Clean, fast and built for Mauritius. Onboarding our 60 staff took one afternoon." },
 ];
 
 const faqs = [
@@ -142,22 +134,6 @@ const Landing = () => {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Client marquee */}
-      <section className="py-10 border-y border-border/50 overflow-hidden">
-        <p className="text-center text-xs text-muted-foreground mb-6">
-          Run by businesses across Mauritius — from 5 to 500+ employees
-        </p>
-        <div className="relative">
-          <div className="flex w-max marquee-track gap-12 px-6">
-            {[...clients, ...clients].map((c, i) => (
-              <span key={`${c}-${i}`} className="font-display text-lg font-semibold text-muted-foreground/50 whitespace-nowrap">
-                {c}
-              </span>
-            ))}
           </div>
         </div>
       </section>
@@ -325,32 +301,6 @@ const Landing = () => {
               </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 px-5 sm:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="eyebrow mb-3">Testimonials</div>
-          <h2 className="font-display text-3xl sm:text-5xl text-foreground max-w-2xl">
-            Trusted by teams across the island.
-          </h2>
-          <div className="grid md:grid-cols-3 gap-5 mt-12">
-            {testimonials.map((t) => (
-              <div key={t.name} className="premium-card p-6">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 text-primary fill-primary" />
-                  ))}
-                </div>
-                <p className="text-sm text-foreground leading-relaxed">"{t.text}"</p>
-                <div className="mt-5">
-                  <div className="text-sm font-semibold text-foreground">{t.name}</div>
-                  <div className="text-xs text-muted-foreground">{t.role}</div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
