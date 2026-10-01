@@ -9,7 +9,6 @@ const links = [
   { label: "Pricing", to: "/pricing" },
   { label: "About", to: "/about" },
   { label: "Gallery", to: "/gallery" },
-  { label: "Join Us", to: "/join-us" },
   { label: "Contact", to: "/contact" },
 ];
 
