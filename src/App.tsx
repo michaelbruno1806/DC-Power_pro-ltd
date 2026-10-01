@@ -20,7 +20,6 @@ import Landing from "@/pages/Landing";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
 import Gallery from "@/pages/Gallery";
-import JoinUs from "@/pages/JoinUs";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
 import ScrollManager from "@/components/ScrollManager";
@@ -74,7 +73,6 @@ const App = () => {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/gallery" element={<Gallery />} />
-                <Route path="/join-us" element={<JoinUs />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/auth" element={<Auth />} />
