@@ -4,8 +4,8 @@
 - [x] Link/route audit: Terms + Privacy pages, footer legal links, hash-anchor scrolling, branded 404
 - [x] Reviewed uploaded multi-tenant schema; added employees.bank_code and payroll_files.mra_filed_at
 
-## In progress
-- [ ] Apply the Midnight Cyber-Precision landing design and connect its actions to onboarding and payroll
+## Done
+- [x] Apply the Midnight Cyber-Precision landing design and connect its actions to onboarding and payroll
 
 ## Notes
 - Live DB is already multi-tenant (companies + profiles + user_roles, isolation via can_access_company/can_manage_company)

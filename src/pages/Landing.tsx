@@ -235,10 +235,11 @@ const Landing = () => {
             <p className="text-muted-foreground mt-4">Start free for 14 days. No credit card required.</p>
             <div className="mt-8 inline-flex items-center rounded-full border border-border/60 bg-card/70 p-1">
               {(["monthly", "annual"] as const).map((b) => (
-                <button
+                <Button
+                  variant="ghost"
                   key={b}
                   onClick={() => setBilling(b)}
-                  className={`rounded-full px-5 h-9 text-sm font-semibold transition-all capitalize ${billing === b ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                  className={`rounded-full px-5 h-9 text-sm font-semibold transition-all capitalize ${billing === b ? "text-primary-foreground hover:text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
                   style={billing === b ? { background: "var(--gradient-emerald)" } : undefined}
                 >
                   {b}
@@ -247,7 +248,7 @@ const Landing = () => {
                       2 months free
                     </span>
                   )}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -297,17 +298,18 @@ const Landing = () => {
                     </li>
                   ))}
                 </ul>
-                <button
+                <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedPlan(p.name);
-                    navigate(p.name === "Enterprise" ? "/contact" : "/auth");
+                    navigate(p.name === "Enterprise" ? "/contact" : primaryPath);
                   }}
-                  className={`w-full mt-8 rounded-full h-11 text-sm font-semibold transition-colors ${isSelected ? "text-primary-foreground" : "border border-border/60 text-foreground hover:bg-secondary"}`}
+                  variant={isSelected ? "default" : "outline"}
+                  className={`w-full mt-8 rounded-full h-11 text-sm font-semibold transition-colors ${isSelected ? "text-primary-foreground" : "border-border/60"}`}
                   style={isSelected ? { background: "var(--gradient-emerald)" } : undefined}
                 >
-                  {p.name === "Enterprise" ? "Contact sales" : isSelected ? "Start free trial" : `Choose ${p.name}`}
-                </button>
+                  {p.name === "Enterprise" ? "Contact sales" : isSelected ? primaryLabel : `Choose ${p.name}`}
+                </Button>
               </div>
               );
             })}
@@ -339,19 +341,22 @@ const Landing = () => {
             <p className="font-script text-3xl text-primary">Ready when you are —</p>
             <h2 className="font-display text-3xl sm:text-5xl text-foreground mt-1">Run your next payroll here.</h2>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-              <button
-                onClick={() => navigate("/auth")}
-                className="inline-flex items-center gap-2 rounded-full px-7 h-12 text-sm font-semibold text-primary-foreground"
+              <Button
+                onClick={() => navigate(primaryPath)}
+                size="lg"
+                className="rounded-full px-7 h-12 text-sm font-semibold text-primary-foreground"
                 style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
               >
-                Start free trial <ArrowRight className="h-4 w-4" />
-              </button>
-              <button
+                {primaryLabel} <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button
                 onClick={() => navigate("/contact")}
-                className="inline-flex items-center gap-2 rounded-full px-7 h-12 text-sm font-semibold bg-secondary/70 border border-border/60 text-foreground hover:bg-secondary transition-colors"
+                variant="outline"
+                size="lg"
+                className="rounded-full px-7 h-12 text-sm font-semibold bg-secondary/70 border-border/60"
               >
                 Talk to sales <ChevronRight className="h-4 w-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
