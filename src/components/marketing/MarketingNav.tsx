@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Moon, Sun, X, ArrowRight } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const links = [
   { label: "Home", to: "/" },
@@ -16,6 +18,7 @@ const MarketingNav = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { user, company } = useAuth();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -28,17 +31,21 @@ const MarketingNav = () => {
 
   useEffect(() => setOpen(false), [pathname]);
 
+  const workspacePath = company?.setup_completed ? "/payroll" : "/onboarding";
+  const actionPath = user ? workspacePath : "/auth";
+  const actionLabel = user ? "Open payroll" : "Start free trial";
+
   return (
     <header
       className={cn(
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
-        scrolled ? "bg-background/85 backdrop-blur-xl border-b border-border/60" : "bg-transparent",
+        scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border/60" : "bg-transparent",
       )}
     >
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 h-18 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 h-20 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
           <span
-            className="h-9 w-9 rounded-xl flex items-center justify-center font-display font-bold text-[13px] text-primary-foreground"
+            className="h-9 w-9 rounded-lg flex items-center justify-center font-display font-bold text-[13px] text-primary-foreground transition-transform hover:scale-105"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
           >
             DC
@@ -48,7 +55,7 @@ const MarketingNav = () => {
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 rounded-full bg-secondary/40 border border-border/50 px-1.5 py-1.5">
+        <nav className="hidden lg:flex items-center gap-7">
           {links.map((l) => {
             const active = pathname === l.to;
             return (
@@ -56,9 +63,9 @@ const MarketingNav = () => {
                 key={l.to}
                 to={l.to}
                 className={cn(
-                  "text-sm px-4 py-1.5 rounded-full transition-colors",
+                  "text-xs font-medium uppercase tracking-[0.12em] transition-colors",
                   active
-                    ? "bg-primary text-primary-foreground font-medium"
+                    ? "text-primary"
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
@@ -69,35 +76,39 @@ const MarketingNav = () => {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={toggleTheme}
             aria-label="Toggle theme"
-            className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+            className="rounded-full text-muted-foreground"
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
+          </Button>
           <Link
-            to="/auth"
+            to={user ? "/dashboard" : "/auth"}
             className="text-sm text-muted-foreground hover:text-foreground px-3 py-2 transition-colors"
           >
-            Sign in
+            {user ? "Dashboard" : "Sign in"}
           </Link>
-          <button
-            onClick={() => navigate("/auth")}
-            className="text-sm font-medium rounded-full px-5 py-2.5 text-primary-foreground inline-flex items-center gap-1.5 transition-transform hover:scale-[1.03]"
+          <Button
+            onClick={() => navigate(actionPath)}
+            className="h-10 rounded-full px-5 text-sm font-semibold transition-transform hover:scale-[1.03]"
             style={{ background: "var(--gradient-emerald)" }}
           >
-            Start free trial <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+            {actionLabel} <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
         </div>
 
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => setOpen((v) => !v)}
           aria-label="Menu"
-          className="lg:hidden p-2 rounded-lg text-foreground hover:bg-secondary/60"
+          className="lg:hidden rounded-lg text-foreground"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+        </Button>
       </div>
 
       {open && (
@@ -115,19 +126,21 @@ const MarketingNav = () => {
             </Link>
           ))}
           <div className="flex items-center gap-2 pt-2">
-            <button
+            <Button
+              variant="outline"
+              size="icon"
               onClick={toggleTheme}
-              className="p-2.5 rounded-lg border border-border/60 text-muted-foreground"
+              className="rounded-lg text-muted-foreground"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            </Button>
             <Link
-              to="/auth"
+              to={actionPath}
               className="flex-1 text-center text-sm font-medium rounded-full px-5 py-2.5 text-primary-foreground"
               style={{ background: "var(--gradient-emerald)" }}
             >
-              Start free trial
+              {actionLabel}
             </Link>
           </div>
         </div>

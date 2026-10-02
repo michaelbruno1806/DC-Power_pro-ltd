@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowRight, Check, Shield, Users, BarChart3, Globe2, Clock,
+  ArrowRight, Check, Shield, Users, BarChart3, Globe2, Clock, Activity,
   FileText, Bot, Fingerprint, Wallet, ChevronRight, BadgePercent,
 } from "lucide-react";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const stats = [
   { value: "100+", label: "Mauritian businesses" },
@@ -42,98 +44,106 @@ const faqs = [
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { user, company } = useAuth();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [selectedPlan, setSelectedPlan] = useState("Pro");
+
+  const payrollPath = company?.setup_completed ? "/payroll" : "/onboarding";
+  const primaryPath = user ? payrollPath : "/auth";
+  const primaryLabel = user ? "Open payroll" : "Start free trial";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <MarketingNav />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-hero pt-32 pb-20 lg:pt-40 lg:pb-28">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 right-1/4 w-[640px] h-[640px] rounded-full bg-primary/[0.10] blur-[160px]" />
-          <div className="absolute -bottom-24 left-0 w-[420px] h-[420px] rounded-full bg-primary/[0.07] blur-[130px]" />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-5 sm:px-8 grid lg:grid-cols-2 gap-14 items-center">
-          <div className="animate-fade-up">
-            <p className="font-script text-3xl sm:text-4xl text-primary mb-1">Built in Mauritius —</p>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl text-foreground">
-              Payday,
-              <br />
-              <span className="text-primary">on autopilot.</span>
-            </h1>
-            <p className="text-base sm:text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
-              Attendance, salaries, leaves, statutory filings and payslips. DC Payroll runs every payroll the
-              same way, every month.
-            </p>
-            <div className="flex flex-wrap items-center gap-3 mt-9">
-              <button
-                onClick={() => navigate("/auth")}
-                className="inline-flex items-center gap-2 rounded-full px-7 h-12 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.03]"
-                style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
-              >
-                Start free trial <ArrowRight className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => navigate("/contact")}
-                className="inline-flex items-center gap-2 rounded-full px-7 h-12 text-sm font-semibold bg-secondary/70 border border-border/60 text-foreground hover:bg-secondary transition-colors"
-              >
-                Talk to sales
-              </button>
+      <section className="cyber-hero relative overflow-hidden px-3 pb-6 pt-24 sm:px-6 sm:pb-10 sm:pt-28 lg:min-h-[760px] lg:pt-28">
+        <div className="cyber-grid absolute inset-0 pointer-events-none" />
+        <div className="cyber-contours cyber-contours-one" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+        <div className="cyber-contours cyber-contours-two" aria-hidden="true"><i /><i /><i /><i /></div>
+        <div className="relative mx-auto grid min-h-[620px] max-w-7xl items-center gap-14 rounded-3xl border border-border/70 bg-panel-2/80 px-6 py-16 shadow-[var(--shadow-elevated)] sm:px-10 lg:grid-cols-[1.08fr_0.92fr] lg:px-14 lg:py-20">
+          <div className="relative z-10 animate-fade-up">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.06] px-3 py-1.5">
+              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-50" /><span className="relative inline-flex h-2 w-2 rounded-full bg-primary" /></span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Mauritius payroll system · Online</span>
             </div>
-            <div className="mt-12 pt-8 border-t border-border/60 grid grid-cols-3 gap-6 max-w-lg">
+            <h1 className="max-w-3xl font-display text-5xl font-extrabold leading-[0.98] text-foreground sm:text-6xl lg:text-7xl">
+              Payroll operations,
+              <br />
+              <span className="text-gradient">under control.</span>
+            </h1>
+            <p className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Attendance, salaries, leaves, statutory filings and payslips — connected in one secure workflow built for Mauritius.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <Button onClick={() => navigate(primaryPath)} size="lg" className="h-12 rounded-xl px-7 font-semibold shadow-[var(--shadow-glow)]">
+                {primaryLabel} <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button onClick={() => navigate("/pricing")} variant="outline" size="lg" className="h-12 rounded-xl border-border/80 bg-secondary/40 px-7">
+                View pricing
+              </Button>
+            </div>
+            <div className="mt-12 grid max-w-lg grid-cols-3 gap-4 border-t border-border/60 pt-7">
               {stats.map((s) => (
                 <div key={s.label}>
-                  <div className="font-display text-2xl font-bold text-foreground">{s.value}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+                  <div className="font-display text-xl font-bold text-foreground sm:text-2xl">{s.value}</div>
+                  <div className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground sm:text-xs">{s.label}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Product mock */}
-          <div className="relative animate-fade-in">
-            <div className="absolute inset-0 -m-10 rounded-full bg-primary/10 blur-[100px]" />
-            <div className="relative glass-elevated rounded-3xl p-5 sm:p-7">
+          <div className="relative z-10 animate-fade-in lg:pl-4">
+            <div className="absolute -inset-4 rounded-3xl bg-primary/[0.08] blur-3xl" />
+            <button
+              type="button"
+              onClick={() => navigate(primaryPath)}
+              className="cyber-console group relative w-full overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 text-left shadow-[var(--shadow-card)] transition-transform duration-300 hover:-translate-y-1 sm:p-7"
+              aria-label={user ? "Open payroll workspace" : "Start free trial and create a payroll workspace"}
+            >
+              <div className="mb-7 flex items-center justify-between border-b border-border/60 pb-4">
+                <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground"><Activity className="h-3.5 w-3.5 text-primary" /> Payroll control</span>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">Cycle active</span>
+              </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Payroll · This month</div>
-                  <div className="font-display text-3xl font-bold text-foreground mt-1">Rs 1,240,000</div>
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Payroll · October 2026</div>
+                  <div className="mt-1 font-display text-3xl font-bold text-foreground">Rs 1,240,000</div>
                 </div>
-                <span className="text-xs font-medium text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1">
-                  +2.4%
+                <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  Draft
                 </span>
               </div>
-
-              <div className="mt-6 h-2.5 w-full rounded-full overflow-hidden flex">
-                <span className="h-full" style={{ width: "84%", background: "var(--gradient-emerald)" }} />
-                <span className="h-full bg-primary/40" style={{ width: "8%" }} />
-                <span className="h-full bg-primary/25" style={{ width: "5%" }} />
-                <span className="h-full bg-muted" style={{ width: "3%" }} />
+              <div className="mt-7 flex h-28 items-end gap-2 border-b border-border/50 px-1">
+                {[42, 68, 54, 82, 64, 94, 76, 88].map((height, index) => (
+                  <span key={height + index} className={`w-full rounded-t-sm transition-all duration-700 ${index === 5 ? "bg-primary" : "bg-secondary group-hover:bg-primary/30"}`} style={{ height: `${height}%` }} />
+                ))}
               </div>
-              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-muted-foreground">
-                <span>Salaries 84%</span><span>NPF 8%</span><span>CSG 5%</span><span>PAYE 3%</span>
+              <div className="mt-3 flex items-center justify-between text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
+                <span>Gross payroll</span><span>Validated 94%</span>
               </div>
-
-              <div className="mt-6 space-y-3">
+              <div className="mt-6 space-y-2.5">
                 {[
-                  { label: "470 payslips generated", meta: "Ready" },
-                  { label: "Clock-in · 08:00", meta: "Approved" },
-                  { label: "Leave · 3 days", meta: "Approved" },
+                  { label: "Employee records", meta: "Complete" },
+                  { label: "PAYE · CSG · PRGF", meta: "Calculated" },
+                  { label: "Payslips & MRA returns", meta: "Ready" },
                 ].map((row) => (
-                  <div key={row.label} className="flex items-center justify-between rounded-xl bg-secondary/50 border border-border/50 px-4 py-3">
+                  <div key={row.label} className="flex items-center justify-between rounded-lg border border-border/50 bg-secondary/40 px-4 py-3">
                     <div className="flex items-center gap-3 text-sm text-foreground">
-                      <span className="h-6 w-6 rounded-md bg-primary/15 border border-primary/25 flex items-center justify-center">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-md border border-primary/25 bg-primary/10">
                         <Check className="h-3.5 w-3.5 text-primary" />
                       </span>
                       {row.label}
                     </div>
-                    <span className="text-xs text-primary">{row.meta}</span>
+                    <span className="hidden text-xs text-primary sm:inline">{row.meta}</span>
                   </div>
                 ))}
               </div>
-            </div>
+              <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
+                <span>Company → Employees → Payroll → Filing</span>
+                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
+              </div>
+            </button>
           </div>
         </div>
       </section>
@@ -150,8 +160,8 @@ const Landing = () => {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
             {features.map((f) => (
-              <div key={f.title} className="premium-card p-6 hover:-translate-y-1 transition-all duration-300">
-                <div className="h-11 w-11 rounded-xl bg-primary/12 border border-primary/25 flex items-center justify-center mb-5">
+              <div key={f.title} className="premium-card cyber-card p-6 hover:-translate-y-1 transition-all duration-300">
+                <div className="h-11 w-11 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center mb-5">
                   <f.icon className="h-5 w-5 text-primary" />
                 </div>
                 <h3 className="font-display text-lg font-semibold text-foreground mb-2">{f.title}</h3>
@@ -169,8 +179,8 @@ const Landing = () => {
           <h2 className="font-display text-3xl sm:text-5xl text-foreground max-w-xl">Live in an afternoon.</h2>
           <div className="grid md:grid-cols-3 gap-6 mt-12">
             {steps.map((s) => (
-              <div key={s.n} className="rounded-2xl border border-border/60 bg-card/60 p-7">
-                <div className="font-script text-3xl text-primary">{s.n}</div>
+              <div key={s.n} className="cyber-card rounded-lg border border-border/60 bg-card/60 p-7">
+                <div className="font-display text-xs font-bold tracking-[0.2em] text-primary">STEP {s.n}</div>
                 <h3 className="font-display text-xl font-semibold text-foreground mt-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{s.desc}</p>
               </div>

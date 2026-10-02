@@ -77,6 +77,9 @@
     --gradient-luxury: linear-gradient(135deg, hsl(209, 60%, 10%), hsl(205, 55%, 15%));
     --gradient-glass: linear-gradient(135deg, hsl(var(--glass-highlight)), transparent);
     --gradient-hero: radial-gradient(120% 90% at 70% 10%, hsl(198, 70%, 22%) 0%, hsl(209, 65%, 10%) 45%, hsl(209, 66%, 7%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(var(--primary)), hsl(202 92% 48%));
+    --cyber-stage: 210 72% 4%;
+    --cyber-grid: 188 86% 55%;
 
     /* Shadows */
     --shadow-glow: 0 0 80px hsl(188, 86%, 55%, 0.22);
@@ -155,6 +158,9 @@
     --gradient-luxury: linear-gradient(135deg, hsl(0, 0%, 99%), hsl(200, 30%, 95%));
     --gradient-glass: linear-gradient(135deg, hsl(0, 0%, 100%, 0.5), transparent);
     --gradient-hero: radial-gradient(120% 90% at 70% 10%, hsl(196, 70%, 92%) 0%, hsl(200, 45%, 97%) 50%, hsl(200, 40%, 99%) 100%);
+    --gradient-cyber: linear-gradient(135deg, hsl(var(--primary)), hsl(186 84% 52%));
+    --cyber-stage: 200 40% 96%;
+    --cyber-grid: 196 88% 40%;
 
     --shadow-glow: 0 0 60px hsl(196, 88%, 40%, 0.14);
     --shadow-card: 0 10px 30px -10px hsl(205, 30%, 55%, 0.22);
@@ -302,6 +308,73 @@
   .eyebrow {
     @apply text-[11px] font-medium uppercase tracking-[0.2em] text-primary;
   }
+
+  .cyber-hero {
+    background:
+      radial-gradient(70% 65% at 78% 35%, hsl(var(--primary) / 0.1), transparent 72%),
+      hsl(var(--cyber-stage));
+  }
+
+  .cyber-grid {
+    opacity: 0.08;
+    background-image:
+      linear-gradient(hsl(var(--cyber-grid) / 0.18) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--cyber-grid) / 0.18) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: linear-gradient(to bottom, transparent, black 22%, black 78%, transparent);
+  }
+
+  .cyber-console::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(125deg, hsl(var(--primary) / 0.08), transparent 38%);
+  }
+
+  .cyber-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cyber-card::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: var(--gradient-cyber);
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .cyber-card:hover::after {
+    opacity: 0.8;
+  }
+
+  .cyber-contours {
+    position: absolute;
+    pointer-events: none;
+    width: 420px;
+    height: 420px;
+    opacity: 0.32;
+    animation: contour-drift 12s ease-in-out infinite alternate;
+  }
+
+  .cyber-contours-one { right: 29%; top: 8%; transform: rotate(18deg); }
+  .cyber-contours-two { right: -8%; bottom: -13%; transform: rotate(-24deg); animation-delay: -5s; }
+
+  .cyber-contours i {
+    position: absolute;
+    inset: calc(var(--contour-index, 0) * 26px);
+    border: 2px solid hsl(var(--primary) / 0.55);
+    border-radius: 42% 58% 68% 32% / 52% 34% 66% 48%;
+  }
+
+  .cyber-contours i:nth-child(1) { --contour-index: 0; }
+  .cyber-contours i:nth-child(2) { --contour-index: 1; }
+  .cyber-contours i:nth-child(3) { --contour-index: 2; }
+  .cyber-contours i:nth-child(4) { --contour-index: 3; }
+  .cyber-contours i:nth-child(5) { --contour-index: 4; }
 }
 
 @layer utilities {
@@ -326,6 +399,19 @@
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+
+  @keyframes contour-drift {
+    from { translate: 0 0; scale: 0.98; }
+    to { translate: 18px -10px; scale: 1.04; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cyber-contours,
+    .animate-fade-up,
+    .animate-fade-in {
+      animation: none;
+    }
   }
 
   .animate-glow-pulse {
