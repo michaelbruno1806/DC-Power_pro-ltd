@@ -3,8 +3,6 @@
 ## Done
 - [x] Link/route audit: Terms + Privacy pages, footer legal links, hash-anchor scrolling, branded 404
 - [x] Reviewed uploaded multi-tenant schema; added employees.bank_code and payroll_files.mra_filed_at
-
-## Done
 - [x] Apply the Midnight Cyber-Precision landing design and connect its actions to onboarding and payroll
 
 ## Notes

@@ -95,10 +95,11 @@ const Landing = () => {
 
           <div className="relative z-10 animate-fade-in lg:pl-4">
             <div className="absolute -inset-4 rounded-3xl bg-primary/[0.08] blur-3xl" />
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => navigate(primaryPath)}
-              className="cyber-console group relative w-full overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 text-left shadow-[var(--shadow-card)] transition-transform duration-300 hover:-translate-y-1 sm:p-7"
+              className="cyber-console group relative h-auto w-full whitespace-normal overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 text-left shadow-[var(--shadow-card)] transition-transform duration-300 hover:-translate-y-1 hover:bg-card/90 sm:p-7"
               aria-label={user ? "Open payroll workspace" : "Start free trial and create a payroll workspace"}
             >
               <div className="mb-7 flex items-center justify-between border-b border-border/60 pb-4">
@@ -143,7 +144,7 @@ const Landing = () => {
                 <span>Company → Employees → Payroll → Filing</span>
                 <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
               </div>
-            </button>
+            </Button>
           </div>
         </div>
       </section>
