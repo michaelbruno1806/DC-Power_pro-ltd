@@ -1,8 +1,15 @@
+@import '@fontsource/outfit/400.css';
+@import '@fontsource/outfit/500.css';
+@import '@fontsource/outfit/600.css';
+@import '@fontsource/outfit/700.css';
+@import '@fontsource/outfit/800.css';
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/500.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/figtree/700.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&family=Caveat:wght@500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -465,3 +472,36 @@
     to { transform: translateX(-50%); }
   }
 }
+
+/* Landing-only editorial palette; app workspaces keep their existing theme. */
+.landing-editorial, .editorial-nav {
+  --background: 120 11% 96%;
+  --foreground: 205 42% 11%;
+  --card: 120 11% 96%;
+  --card-foreground: 205 42% 11%;
+  --primary: 186 73% 35%;
+  --primary-foreground: 120 11% 96%;
+  --secondary: 175 30% 78%;
+  --secondary-foreground: 205 42% 11%;
+  --muted: 175 30% 78%;
+  --muted-foreground: 205 25% 32%;
+  --border: 205 42% 11% / 0.2;
+  --ring: 186 73% 35%;
+  --font-body: 'Figtree', 'Segoe UI', sans-serif;
+  --font-display: 'Outfit', 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
+}
+.landing-editorial { background: hsl(var(--background)); color: hsl(var(--foreground)); }
+.editorial-nav { background: hsl(var(--background)); border-bottom: 1px solid hsl(var(--border)); }
+.landing-editorial h1, .landing-editorial h2, .landing-editorial h3 { letter-spacing: 0; }
+.landing-kicker { letter-spacing: 0; }
+.landing-action { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.landing-action:hover { background: hsl(var(--foreground)); color: hsl(var(--background)); }
+.landing-ledger { --primary: 175 30% 78%; }
+.landing-ledger-mark { font-size: 22rem; line-height: 1; }
+.landing-feature { transition: background 200ms ease, padding 200ms ease; }
+.landing-feature:hover { background: hsl(var(--secondary) / 0.18); }
+.landing-plan { transition: border-color 200ms ease, transform 200ms ease; }
+.landing-plan:hover { transform: translateY(-3px); }
+@media (max-width: 639px) { .landing-ledger-mark { font-size: 15rem; } }
+@media (prefers-reduced-motion: reduce) { .landing-feature, .landing-plan { transition: none; } .landing-plan:hover { transform: none; } }

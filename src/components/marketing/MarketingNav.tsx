@@ -39,7 +39,8 @@ const MarketingNav = () => {
     <header
       className={cn(
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
-        scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border/60" : "bg-transparent",
+        pathname === "/" && "editorial-nav",
+        pathname === "/" ? "" : scrolled ? "bg-background/90 backdrop-blur-xl border-b border-border/60" : "bg-transparent",
       )}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 h-20 py-3 flex items-center justify-between">
