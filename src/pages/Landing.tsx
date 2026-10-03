@@ -47,322 +47,155 @@ const Landing = () => {
   const { user, company } = useAuth();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [selectedPlan, setSelectedPlan] = useState("Pro");
-
-  const payrollPath = company?.setup_completed ? "/payroll" : "/onboarding";
-  const primaryPath = user ? payrollPath : "/auth";
+  const primaryPath = user ? (company?.setup_completed ? "/payroll" : "/onboarding") : "/auth";
   const primaryLabel = user ? "Open payroll" : "Start free trial";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="landing-editorial min-h-screen bg-background text-foreground">
       <MarketingNav />
 
-      {/* Hero */}
-      <section className="cyber-hero relative overflow-hidden px-3 pb-6 pt-24 sm:px-6 sm:pb-10 sm:pt-28 lg:min-h-[760px] lg:pt-28">
-        <div className="cyber-grid absolute inset-0 pointer-events-none" />
-        <div className="cyber-contours cyber-contours-one" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-        <div className="cyber-contours cyber-contours-two" aria-hidden="true"><i /><i /><i /><i /></div>
-        <div className="relative mx-auto grid min-h-[620px] max-w-7xl items-center gap-14 rounded-3xl border border-border/70 bg-panel-2/80 px-6 py-16 shadow-[var(--shadow-elevated)] sm:px-10 lg:grid-cols-[1.08fr_0.92fr] lg:px-14 lg:py-20">
-          <div className="relative z-10 animate-fade-up">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.06] px-3 py-1.5">
-              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-50" /><span className="relative inline-flex h-2 w-2 rounded-full bg-primary" /></span>
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Mauritius payroll system · Online</span>
-            </div>
-            <h1 className="max-w-3xl font-display text-5xl font-extrabold leading-[0.98] text-foreground sm:text-6xl lg:text-7xl">
-              Payroll operations,
-              <br />
-              <span className="text-gradient">under control.</span>
-            </h1>
-            <p className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Attendance, salaries, leaves, statutory filings and payslips — connected in one secure workflow built for Mauritius.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Button onClick={() => navigate(primaryPath)} size="lg" className="h-12 rounded-xl px-7 font-semibold shadow-[var(--shadow-glow)]">
-                {primaryLabel} <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button onClick={() => navigate("/pricing")} variant="outline" size="lg" className="h-12 rounded-xl border-border/80 bg-secondary/40 px-7">
-                View pricing
-              </Button>
-            </div>
-            <div className="mt-12 grid max-w-lg grid-cols-3 gap-4 border-t border-border/60 pt-7">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <div className="font-display text-xl font-bold text-foreground sm:text-2xl">{s.value}</div>
-                  <div className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted-foreground sm:text-xs">{s.label}</div>
-                </div>
-              ))}
-            </div>
+      <main>
+        <section className="landing-hero pt-20" aria-labelledby="landing-title">
+          <div className="landing-masthead mx-auto flex max-w-7xl items-center justify-between border-b border-border px-5 py-4 sm:px-8">
+            <span className="font-display text-sm font-bold uppercase text-foreground">DC Payroll <span className="text-primary">/ Mauritius</span></span>
+            <span className="hidden text-xs font-medium uppercase text-muted-foreground sm:block">Payroll, considered from every angle.</span>
           </div>
-
-          <div className="relative z-10 animate-fade-in lg:pl-4">
-            <div className="absolute -inset-4 rounded-3xl bg-primary/[0.08] blur-3xl" />
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => navigate(primaryPath)}
-              className="cyber-console group relative h-auto w-full whitespace-normal overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-5 text-left shadow-[var(--shadow-card)] transition-transform duration-300 hover:-translate-y-1 hover:bg-card/90 sm:p-7"
-              aria-label={user ? "Open payroll workspace" : "Start free trial and create a payroll workspace"}
-            >
-              <div className="mb-7 flex items-center justify-between border-b border-border/60 pb-4">
-                <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground"><Activity className="h-3.5 w-3.5 text-primary" /> Payroll control</span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">Cycle active</span>
+          <div className="mx-auto grid max-w-7xl lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+            <div className="landing-hero-copy flex min-h-[550px] flex-col justify-between px-5 pb-12 pt-12 sm:px-8 sm:pt-16 lg:min-h-[630px] lg:border-r lg:border-border lg:px-12 lg:pb-14 lg:pt-20">
+              <div>
+                <p className="landing-kicker mb-7 text-xs font-bold uppercase text-primary">Mauritius payroll system · Online</p>
+                <h1 id="landing-title" className="max-w-3xl font-display text-5xl font-extrabold leading-[0.98] text-foreground sm:text-6xl xl:text-[5.8rem]">
+                  Payroll<br />operations,<br /><span className="text-primary">under control.</span>
+                </h1>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="mt-10 grid gap-8 border-t border-border pt-7 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Payroll · October 2026</div>
-                  <div className="mt-1 font-display text-3xl font-bold text-foreground">Rs 1,240,000</div>
+                  <p className="max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
+                    Attendance, salaries, leaves, statutory filings and payslips — connected in one secure workflow built for Mauritius.
+                  </p>
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <Button onClick={() => navigate(primaryPath)} size="lg" className="landing-action h-12 rounded-sm px-6 font-semibold">
+                      {primaryLabel} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button onClick={() => navigate("/pricing")} variant="outline" size="lg" className="h-12 rounded-sm px-6">View pricing</Button>
+                  </div>
                 </div>
-                <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  Draft
-                </span>
+                <span className="hidden font-display text-5xl font-semibold text-primary/40 md:block" aria-hidden="true">↗</span>
               </div>
-              <div className="mt-7 flex h-28 items-end gap-2 border-b border-border/50 px-1">
-                {[42, 68, 54, 82, 64, 94, 76, 88].map((height, index) => (
-                  <span key={height + index} className={`w-full rounded-t-sm transition-all duration-700 ${index === 5 ? "bg-primary" : "bg-secondary group-hover:bg-primary/30"}`} style={{ height: `${height}%` }} />
-                ))}
+            </div>
+
+            <div className="landing-ledger relative flex min-h-[460px] flex-col justify-between overflow-hidden bg-foreground px-5 pb-9 pt-9 text-background sm:px-8 lg:min-h-[630px] lg:px-10 lg:pb-12 lg:pt-12">
+              <div className="relative z-10 flex items-center justify-between border-b border-background/20 pb-5">
+                <span className="flex items-center gap-2 text-xs font-semibold uppercase"><Activity className="h-4 w-4 text-primary" /> Payroll control</span>
+                <span className="text-xs text-background/60">01 / 03</span>
               </div>
-              <div className="mt-3 flex items-center justify-between text-[10px] uppercase tracking-[0.12em] text-muted-foreground">
-                <span>Gross payroll</span><span>Validated 94%</span>
+              <div className="landing-ledger-mark absolute right-0 top-20 select-none font-display font-extrabold text-background/5" aria-hidden="true">DC</div>
+              <div className="relative z-10 mt-8">
+                <p className="text-xs font-semibold uppercase text-background/60">Payroll · October 2026</p>
+                <p className="mt-3 font-display text-4xl font-bold sm:text-5xl">Rs 1,240,000</p>
+                <div className="mt-3 flex items-center justify-between text-xs text-background/65"><span>Gross payroll</span><span className="text-primary">Draft</span></div>
+                <div className="mt-8 flex h-24 items-end gap-2 border-b border-background/25">
+                  {[42, 68, 54, 82, 64, 94, 76, 88].map((height, index) => (
+                    <span key={index} className={`w-full ${index === 5 ? "bg-primary" : "bg-background/20"}`} style={{ height: `${height}%` }} />
+                  ))}
+                </div>
               </div>
-              <div className="mt-6 space-y-2.5">
+              <div className="relative z-10 mt-10">
                 {[
                   { label: "Employee records", meta: "Complete" },
                   { label: "PAYE · CSG · PRGF", meta: "Calculated" },
                   { label: "Payslips & MRA returns", meta: "Ready" },
-                ].map((row) => (
-                  <div key={row.label} className="flex items-center justify-between rounded-lg border border-border/50 bg-secondary/40 px-4 py-3">
-                    <div className="flex items-center gap-3 text-sm text-foreground">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-md border border-primary/25 bg-primary/10">
-                        <Check className="h-3.5 w-3.5 text-primary" />
-                      </span>
-                      {row.label}
-                    </div>
-                    <span className="hidden text-xs text-primary sm:inline">{row.meta}</span>
+                ].map((row, index) => (
+                  <div key={row.label} className="flex items-center justify-between gap-3 border-t border-background/20 py-3.5 text-sm">
+                    <span className="flex items-center gap-3"><span className="text-xs text-primary">0{index + 1}</span>{row.label}</span>
+                    <span className="flex items-center gap-1.5 text-xs text-background/65"><Check className="h-3.5 w-3.5 text-primary" />{row.meta}</span>
                   </div>
                 ))}
+                <Button onClick={() => navigate(primaryPath)} variant="ghost" className="mt-4 h-auto w-full justify-between rounded-none border-t border-background/20 px-0 pt-5 text-left text-xs text-background hover:bg-transparent hover:text-primary">
+                  Company → Employees → Payroll → Filing <ArrowRight className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
-                <span>Company → Employees → Payroll → Filing</span>
-                <ArrowRight className="h-4 w-4 text-primary transition-transform group-hover:translate-x-1" />
-              </div>
-            </Button>
+            </div>
+          </div>
+        </section>
+
+        <div className="landing-stats border-y border-border bg-secondary/30">
+          <div className="mx-auto grid max-w-7xl grid-cols-3 divide-x divide-border">
+            {stats.map((s) => <div key={s.label} className="px-4 py-5 sm:px-8"><strong className="block font-display text-xl text-foreground sm:text-3xl">{s.value}</strong><span className="mt-1 block text-[10px] uppercase text-muted-foreground sm:text-xs">{s.label}</span></div>)}
           </div>
         </div>
-      </section>
 
-      {/* Features */}
-      <section id="features" className="py-20 lg:py-28 px-5 sm:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-2xl">
-            <div className="eyebrow mb-3">What's inside</div>
-            <h2 className="font-display text-3xl sm:text-5xl text-foreground">Everything HR needs.</h2>
-            <p className="text-muted-foreground mt-4">
-              One platform, every payroll job. Built for the way Mauritian businesses actually work.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-12">
-            {features.map((f) => (
-              <div key={f.title} className="premium-card cyber-card p-6 hover:-translate-y-1 transition-all duration-300">
-                <div className="h-11 w-11 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center mb-5">
-                  <f.icon className="h-5 w-5 text-primary" />
+        <section id="features" className="landing-section px-5 py-20 sm:px-8 lg:py-28">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-6 border-b border-border pb-9 md:grid-cols-[1fr_1fr] md:items-end">
+              <div><p className="landing-kicker mb-4 text-xs font-bold uppercase text-primary">01 / What's inside</p><h2 className="max-w-lg font-display text-4xl font-semibold sm:text-5xl">Everything HR needs.</h2></div>
+              <p className="max-w-md text-muted-foreground md:justify-self-end">One platform, every payroll job. Built for the way Mauritian businesses actually work.</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3">
+              {features.map((f, index) => (
+                <div key={f.title} className="landing-feature group border-b border-border px-1 py-9 sm:px-6 lg:min-h-[225px]">
+                  <div className="mb-10 flex items-start justify-between"><f.icon className="h-6 w-6 text-primary" strokeWidth={1.5} /><span className="text-xs text-muted-foreground">0{index + 1}</span></div>
+                  <h3 className="font-display text-xl font-semibold">{f.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                 </div>
-                <h3 className="font-display text-lg font-semibold text-foreground mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-20 px-5 sm:px-8 bg-secondary/25 border-y border-border/50">
-        <div className="max-w-7xl mx-auto">
-          <div className="eyebrow mb-3">How it works</div>
-          <h2 className="font-display text-3xl sm:text-5xl text-foreground max-w-xl">Live in an afternoon.</h2>
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            {steps.map((s) => (
-              <div key={s.n} className="cyber-card rounded-lg border border-border/60 bg-card/60 p-7">
-                <div className="font-display text-xs font-bold tracking-[0.2em] text-primary">STEP {s.n}</div>
-                <h3 className="font-display text-xl font-semibold text-foreground mt-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Compliance strip */}
-      <section className="py-20 px-5 sm:px-8">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="eyebrow mb-3">Mauritius compliance</div>
-            <h2 className="font-display text-3xl sm:text-4xl text-foreground">
-              Statutory rates, already configured.
-            </h2>
-            <p className="text-muted-foreground mt-4 leading-relaxed">
-              PAYE, CSG/NSF, PRGF and the training levy are calculated on every run, and your MRA filing
-              deadline is always the end of the month following the payroll period.
-            </p>
-            <div className="flex flex-wrap gap-2 mt-6">
-              {["PAYE", "CSG / NSF", "PRGF", "Training levy", "MRA CSV", "Bank batch"].map((t) => (
-                <span key={t} className="text-xs rounded-full border border-primary/25 bg-primary/10 text-primary px-3 py-1.5">
-                  {t}
-                </span>
               ))}
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-5">
-            {[
-              { icon: BarChart3, k: "Auto-calculated", v: "Every deduction" },
-              { icon: Globe2, k: "MUR ready", v: "Multi-currency" },
-              { icon: Clock, k: "Deadlines", v: "Tracked monthly" },
-              { icon: Shield, k: "Audit logs", v: "Who did what" },
-            ].map((c) => (
-              <div key={c.k} className="premium-card p-6">
-                <c.icon className="h-5 w-5 text-primary" />
-                <div className="font-display text-lg font-semibold text-foreground mt-4">{c.k}</div>
-                <div className="text-sm text-muted-foreground">{c.v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-5 sm:px-8 bg-secondary/25 border-y border-border/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center max-w-xl mx-auto">
-            <div className="eyebrow mb-3">Pricing</div>
-            <h2 className="font-display text-3xl sm:text-5xl text-foreground">Simple, transparent pricing.</h2>
-            <p className="text-muted-foreground mt-4">Start free for 14 days. No credit card required.</p>
-            <div className="mt-8 inline-flex items-center rounded-full border border-border/60 bg-card/70 p-1">
-              {(["monthly", "annual"] as const).map((b) => (
-                <Button
-                  variant="ghost"
-                  key={b}
-                  onClick={() => setBilling(b)}
-                  className={`rounded-full px-5 h-9 text-sm font-semibold transition-all capitalize ${billing === b ? "text-primary-foreground hover:text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                  style={billing === b ? { background: "var(--gradient-emerald)" } : undefined}
-                >
-                  {b}
-                  {b === "annual" && (
-                    <span className={`ml-2 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5 ${billing === "annual" ? "bg-white/20 text-primary-foreground" : "bg-primary/15 text-primary"}`}>
-                      2 months free
-                    </span>
-                  )}
-                </Button>
-              ))}
+        <section className="landing-section border-y border-border bg-secondary/30 px-5 py-20 sm:px-8 lg:py-28">
+          <div className="mx-auto max-w-7xl">
+            <p className="landing-kicker mb-4 text-xs font-bold uppercase text-primary">02 / How it works</p>
+            <h2 className="max-w-xl font-display text-4xl font-semibold sm:text-5xl">Live in an afternoon.</h2>
+            <div className="mt-12 grid border-t border-border md:grid-cols-3">
+              {steps.map((s) => <div key={s.n} className="border-b border-border py-8 md:border-b-0 md:px-7 md:first:pl-0 md:last:pr-0"><div className="mb-10 font-display text-5xl font-semibold text-primary/60">{s.n}</div><h3 className="font-display text-xl font-semibold">{s.title}</h3><p className="mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p></div>)}
             </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            {plans.map((p) => {
-              const isSelected = selectedPlan === p.name;
-              return (
-              <div
-                key={p.name}
-                onClick={() => setSelectedPlan(p.name)}
-                className={`rounded-2xl p-8 border bg-card/70 relative cursor-pointer transition-all duration-300 ${
-                  isSelected
-                    ? "border-primary ring-2 ring-primary/40 shadow-[var(--shadow-glow)] -translate-y-1"
-                    : p.popular
-                      ? "border-primary/50 ring-1 ring-primary/25"
-                      : "border-border/60 hover:border-primary/30"
-                }`}
-              >
-                {(isSelected || p.popular) && (
-                  <span className="absolute -top-3 left-8 text-[10px] font-semibold uppercase tracking-[0.2em] rounded-full px-3 py-1 text-primary-foreground" style={{ background: "var(--gradient-emerald)" }}>
-                    {isSelected ? "Selected plan" : "Most popular"}
-                  </span>
-                )}
-                <h3 className="font-display text-xl font-semibold text-foreground">{p.name}</h3>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="font-display text-4xl font-bold text-foreground">
-                    {p.monthly
-                      ? `Rs ${(billing === "monthly" ? p.monthly : Math.round((p.monthly * 10) / 12)).toLocaleString("en-US")}`
-                      : "Custom"}
-                  </span>
-                  {p.monthly && <span className="text-sm text-muted-foreground">/month</span>}
-                </div>
-                {p.monthly && billing === "annual" && (
-                  <div className="mt-2 flex items-center gap-2 text-xs">
-                    <span className="text-muted-foreground line-through">Rs {(p.monthly * 12).toLocaleString("en-US")}/yr</span>
-                    <span className="text-foreground font-medium">Rs {(p.monthly * 10).toLocaleString("en-US")}/yr</span>
-                    <span className="inline-flex items-center gap-1 text-primary">
-                      <BadgePercent className="h-3.5 w-3.5" /> Save Rs {(p.monthly * 2).toLocaleString("en-US")}
-                    </span>
-                  </div>
-                )}
-                <p className="text-sm text-muted-foreground mt-2">{p.desc}</p>
-                <ul className="mt-6 space-y-3">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPlan(p.name);
-                    navigate(p.name === "Enterprise" ? "/contact" : primaryPath);
-                  }}
-                  variant={isSelected ? "default" : "outline"}
-                  className={`w-full mt-8 rounded-full h-11 text-sm font-semibold transition-colors ${isSelected ? "text-primary-foreground" : "border-border/60"}`}
-                  style={isSelected ? { background: "var(--gradient-emerald)" } : undefined}
-                >
-                  {p.name === "Enterprise" ? "Contact sales" : isSelected ? primaryLabel : `Choose ${p.name}`}
-                </Button>
-              </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* FAQ */}
-      <section id="faq" className="py-20 px-5 sm:px-8 border-t border-border/50">
-        <div className="max-w-3xl mx-auto">
-          <div className="eyebrow mb-3">FAQ</div>
-          <h2 className="font-display text-3xl sm:text-4xl text-foreground">Questions, answered.</h2>
-          <div className="mt-10 divide-y divide-border/60">
-            {faqs.map((f) => (
-              <div key={f.q} className="py-6">
-                <h3 className="font-display text-lg font-semibold text-foreground">{f.q}</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{f.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section id="contact" className="py-20 px-5 sm:px-8">
-        <div className="max-w-5xl mx-auto rounded-3xl border border-primary/25 bg-hero p-10 sm:p-14 text-center relative overflow-hidden">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[520px] h-[320px] rounded-full bg-primary/15 blur-[120px]" />
-          <div className="relative">
-            <p className="font-script text-3xl text-primary">Ready when you are —</p>
-            <h2 className="font-display text-3xl sm:text-5xl text-foreground mt-1">Run your next payroll here.</h2>
-            <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-              <Button
-                onClick={() => navigate(primaryPath)}
-                size="lg"
-                className="rounded-full px-7 h-12 text-sm font-semibold text-primary-foreground"
-                style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
-              >
-                {primaryLabel} <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button
-                onClick={() => navigate("/contact")}
-                variant="outline"
-                size="lg"
-                className="rounded-full px-7 h-12 text-sm font-semibold bg-secondary/70 border-border/60"
-              >
-                Talk to sales <ChevronRight className="h-4 w-4" />
-              </Button>
+        <section className="landing-section px-5 py-20 sm:px-8 lg:py-28">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:gap-20">
+            <div><p className="landing-kicker mb-4 text-xs font-bold uppercase text-primary">03 / Mauritius compliance</p><h2 className="font-display text-4xl font-semibold sm:text-5xl">Statutory rates, already configured.</h2><p className="mt-6 max-w-xl leading-relaxed text-muted-foreground">PAYE, CSG/NSF, PRGF and the training levy are calculated on every run, and your MRA filing deadline is always the end of the month following the payroll period.</p><div className="mt-8 flex flex-wrap gap-2">{["PAYE", "CSG / NSF", "PRGF", "Training levy", "MRA CSV", "Bank batch"].map((t) => <span key={t} className="border border-primary/30 px-3 py-1.5 text-xs text-primary">{t}</span>)}</div></div>
+            <div className="grid grid-cols-2 border-t border-l border-border">
+              {[
+                { icon: BarChart3, k: "Auto-calculated", v: "Every deduction" },
+                { icon: Globe2, k: "MUR ready", v: "Multi-currency" },
+                { icon: Clock, k: "Deadlines", v: "Tracked monthly" },
+                { icon: Shield, k: "Audit logs", v: "Who did what" },
+              ].map((c) => <div key={c.k} className="flex min-h-40 flex-col justify-between border-b border-r border-border p-5 sm:p-7"><c.icon className="h-6 w-6 text-primary" strokeWidth={1.5} /><div><h3 className="font-display text-lg font-semibold">{c.k}</h3><p className="text-sm text-muted-foreground">{c.v}</p></div></div>)}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
+        <section id="pricing" className="landing-section border-y border-border bg-secondary/30 px-5 py-20 sm:px-8 lg:py-28">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex flex-wrap items-end justify-between gap-8 border-b border-border pb-10">
+              <div><p className="landing-kicker mb-4 text-xs font-bold uppercase text-primary">04 / Pricing</p><h2 className="font-display text-4xl font-semibold sm:text-5xl">Simple, transparent pricing.</h2><p className="mt-4 text-muted-foreground">Start free for 14 days. No credit card required.</p></div>
+              <div className="flex border border-border p-1" role="group" aria-label="Billing period">
+                {(["monthly", "annual"] as const).map((b) => <Button key={b} variant={billing === b ? "default" : "ghost"} onClick={() => setBilling(b)} aria-pressed={billing === b} className="h-10 rounded-none px-4 capitalize">{b}{b === "annual" && <span className="ml-2 text-[10px]">2 months free</span>}</Button>)}
+              </div>
+            </div>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {plans.map((p) => {
+                const isSelected = selectedPlan === p.name;
+                return <div key={p.name} className={`landing-plan relative flex flex-col border p-6 sm:p-8 ${isSelected ? "border-primary bg-card" : "border-border bg-background"}`}>
+                  <div className="mb-7 flex items-center justify-between"><h3 className="font-display text-xl font-semibold">{p.name}</h3>{(isSelected || p.popular) && <span className="text-[10px] font-semibold uppercase text-primary">{isSelected ? "Selected plan" : "Most popular"}</span>}</div>
+                  <div className="flex items-baseline gap-1"><span className="font-display text-4xl font-bold">{p.monthly ? `Rs ${(billing === "monthly" ? p.monthly : Math.round((p.monthly * 10) / 12)).toLocaleString("en-US")}` : "Custom"}</span>{p.monthly && <span className="text-sm text-muted-foreground">/month</span>}</div>
+                  {p.monthly && billing === "annual" && <div className="mt-2 flex flex-wrap items-center gap-2 text-xs"><span className="text-muted-foreground line-through">Rs {(p.monthly * 12).toLocaleString("en-US")}/yr</span><span>Rs {(p.monthly * 10).toLocaleString("en-US")}/yr</span><span className="inline-flex items-center gap-1 text-primary"><BadgePercent className="h-3.5 w-3.5" />Save Rs {(p.monthly * 2).toLocaleString("en-US")}</span></div>}
+                  <p className="mt-2 text-sm text-muted-foreground">{p.desc}</p>
+                  <ul className="mb-8 mt-8 flex-1 space-y-3">{p.features.map((f) => <li key={f} className="flex items-start gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{f}</li>)}</ul>
+                  <Button onClick={() => { setSelectedPlan(p.name); navigate(p.name === "Enterprise" ? "/contact" : primaryPath); }} variant={isSelected ? "default" : "outline"} className="h-11 w-full rounded-sm">{p.name === "Enterprise" ? "Contact sales" : isSelected ? primaryLabel : `Choose ${p.name}`}</Button>
+                  {!isSelected && <Button onClick={() => setSelectedPlan(p.name)} variant="ghost" className="mt-2 h-8 w-full rounded-none text-xs text-muted-foreground">Select plan</Button>}
+                </div>;
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" className="landing-section px-5 py-20 sm:px-8 lg:py-28"><div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1fr_1.3fr]"><div><p className="landing-kicker mb-4 text-xs font-bold uppercase text-primary">05 / FAQ</p><h2 className="font-display text-4xl font-semibold sm:text-5xl">Questions, answered.</h2></div><div className="border-t border-border">{faqs.map((f) => <div key={f.q} className="border-b border-border py-6"><h3 className="font-display text-lg font-semibold">{f.q}</h3><p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.a}</p></div>)}</div></div></section>
+
+        <section id="contact" className="landing-section bg-foreground px-5 py-20 text-background sm:px-8 lg:py-24"><div className="mx-auto flex max-w-7xl flex-col justify-between gap-10 md:flex-row md:items-end"><div><p className="mb-5 text-xs font-semibold uppercase text-primary">Ready when you are</p><h2 className="max-w-2xl font-display text-4xl font-semibold sm:text-6xl">Run your next payroll here.</h2></div><div className="flex shrink-0 flex-wrap gap-3"><Button onClick={() => navigate(primaryPath)} className="landing-action h-12 rounded-sm px-6">{primaryLabel}<ArrowRight className="ml-2 h-4 w-4" /></Button><Button onClick={() => navigate("/contact")} variant="outline" className="h-12 rounded-sm border-background/50 bg-transparent px-6 text-background hover:text-foreground">Talk to sales<ChevronRight className="ml-2 h-4 w-4" /></Button></div></div></section>
+      </main>
       <MarketingFooter />
     </div>
   );
