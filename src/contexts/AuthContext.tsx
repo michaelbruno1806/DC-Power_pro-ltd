@@ -100,14 +100,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setDisplayName(
             meta?.full_name || meta?.display_name || meta?.name || session.user.email || null
           );
-          setTimeout(() => fetchUserMeta(session.user.id), 0);
+          setLoading(true);
+          setTimeout(() => {
+            void fetchUserMeta(session.user.id).finally(() => setLoading(false));
+          }, 0);
         } else {
           setRole(null);
           setCompanyId(null);
           setDisplayName(null);
           setCompany(null);
         }
-        setLoading(false);
+        if (!session?.user) setLoading(false);
       }
     );
 
@@ -119,9 +122,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setDisplayName(
           meta?.full_name || meta?.display_name || meta?.name || session.user.email || null
         );
-        fetchUserMeta(session.user.id);
+        void fetchUserMeta(session.user.id).finally(() => setLoading(false));
       }
-      setLoading(false);
+      if (!session?.user) setLoading(false);
     });
 
     return () => subscription.unsubscribe();
