@@ -1,10 +1,11 @@
 # Roadmap
 
-## In progress
-- [ ] Verify redesigned landing on desktop and mobile, including pricing and public links
-- [ ] Verify signed-in landing-to-payroll journey end to end and fix any failures
+## Blocked
+- [ ] Complete signed-in payroll save/finalise/export verification: requesting account has no company assignment or role; requires user to identify the company/account to test, without fabricating company details or granting privileges.
 
 ## Done
+- [x] Verify redesigned landing on desktop and mobile, pricing toggle/selection, navigation, public pages, trial signup links, sales links and employee sign-in gate
+- [x] Fix accountant-company query and invitation access errors; wait for auth metadata; prevent false setup saves without a company; payroll calculation tests: 19 passed
 - [x] Refresh landing page with selected editorial design, preserve flows and optimize presentation
 - [x] Link/route audit: Terms + Privacy pages, footer legal links, hash-anchor scrolling, branded 404
 - [x] Reviewed uploaded multi-tenant schema; added employees.bank_code and payroll_files.mra_filed_at
