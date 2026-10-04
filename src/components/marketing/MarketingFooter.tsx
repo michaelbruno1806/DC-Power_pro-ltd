@@ -22,7 +22,7 @@ const columns = [
     title: "Account",
     links: [
       { label: "Sign in", to: "/auth" },
-      { label: "Start free trial", to: "/auth" },
+      { label: "Start free trial", to: "/auth?mode=signup" },
       { label: "Employee portal", to: "/my-portal" },
       { label: "Terms & Conditions", to: "/terms" },
       { label: "Privacy Policy", to: "/privacy" },

@@ -4,6 +4,7 @@ import { Check, BadgePercent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MarketingNav from "@/components/marketing/MarketingNav";
 import MarketingFooter from "@/components/marketing/MarketingFooter";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Billing = "monthly" | "annual";
 
@@ -38,6 +39,8 @@ const fmt = (n: number) => `MUR ${n.toLocaleString("en-US")}`;
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const { user, company } = useAuth();
+  const primaryPath = user ? (company?.setup_completed ? "/payroll" : "/onboarding") : "/auth?mode=signup";
   const [billing, setBilling] = useState<Billing>("monthly");
   const [selected, setSelected] = useState<string>("Business");
 
@@ -152,10 +155,10 @@ const Pricing = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelected(t.name);
-                    navigate(t.name === "Enterprise" ? "/contact" : "/auth");
+                    navigate(t.name === "Enterprise" ? "/contact" : primaryPath);
                   }}
                 >
-                  {t.name === "Enterprise" ? "Contact sales" : isSelected ? "Start free trial" : `Choose ${t.name}`}
+                  {t.name === "Enterprise" ? "Contact sales" : isSelected ? (user ? "Open payroll" : "Start free trial") : `Choose ${t.name}`}
                 </Button>
               </div>
             );

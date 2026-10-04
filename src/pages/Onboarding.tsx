@@ -99,6 +99,10 @@ const Onboarding = () => {
   };
 
   const saveStep1 = async () => {
+    if (!companyId) {
+      toast.error("Your account has no company assigned. Contact your administrator before continuing.");
+      return false;
+    }
     if (!details.name.trim()) {
       toast.error("Company name is required");
       return false;
@@ -125,7 +129,7 @@ const Onboarding = () => {
         phone: details.phone || null,
         logo_url: logo_url || null,
       } as any)
-      .eq("id", companyId!);
+      .eq("id", companyId);
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -136,6 +140,10 @@ const Onboarding = () => {
   };
 
   const saveStep2 = async () => {
+    if (!companyId) {
+      toast.error("Your account has no company assigned. Contact your administrator before continuing.");
+      return false;
+    }
     setSaving(true);
     const startDate = `${payroll.payroll_start_month}-01`;
     const { error } = await supabase
@@ -145,7 +153,7 @@ const Onboarding = () => {
         payroll_start_month: startDate,
         currency: "MUR",
       } as any)
-      .eq("id", companyId!);
+      .eq("id", companyId);
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -155,12 +163,16 @@ const Onboarding = () => {
   };
 
   const finish = async (mode: "manual" | "import") => {
+    if (!companyId || !user) {
+      toast.error("Your account has no company assigned. Contact your administrator before continuing.");
+      return;
+    }
     setSaving(true);
     // Mark setup complete
     const { error } = await supabase
       .from("companies")
       .update({ setup_completed: true } as any)
-      .eq("id", companyId!);
+      .eq("id", companyId);
     if (error) {
       setSaving(false);
       toast.error(error.message);
@@ -170,11 +182,11 @@ const Onboarding = () => {
     // Create first payroll period from start month
     const [y, m] = payroll.payroll_start_month.split("-").map(Number);
     await supabase.from("payroll_files").insert({
-      company_id: companyId!,
+      company_id: companyId,
       year: y,
       month: m,
       status: "draft",
-      created_by: user!.id,
+      created_by: user.id,
     } as any);
 
     await refreshMeta();

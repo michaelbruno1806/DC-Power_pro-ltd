@@ -47,7 +47,7 @@ const Landing = () => {
   const { user, company } = useAuth();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const [selectedPlan, setSelectedPlan] = useState("Pro");
-  const primaryPath = user ? (company?.setup_completed ? "/payroll" : "/onboarding") : "/auth";
+  const primaryPath = user ? (company?.setup_completed ? "/payroll" : "/onboarding") : "/auth?mode=signup";
   const primaryLabel = user ? "Open payroll" : "Start free trial";
 
   return (

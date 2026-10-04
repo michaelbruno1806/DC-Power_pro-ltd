@@ -32,7 +32,7 @@ const MarketingNav = () => {
   useEffect(() => setOpen(false), [pathname]);
 
   const workspacePath = company?.setup_completed ? "/payroll" : "/onboarding";
-  const actionPath = user ? workspacePath : "/auth";
+  const actionPath = user ? workspacePath : "/auth?mode=signup";
   const actionLabel = user ? "Open payroll" : "Start free trial";
 
   return (
