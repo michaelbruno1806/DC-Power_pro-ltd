@@ -1,0 +1,1 @@
+ALTER POLICY "Invitees can view pending invites" ON public.accountant_company_links TO authenticated USING (accountant_user_id IS NULL AND invite_email IS NOT NULL AND lower(invite_email) = lower(auth.jwt() ->> 'email'));
