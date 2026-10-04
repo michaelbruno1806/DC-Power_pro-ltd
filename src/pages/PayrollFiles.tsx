@@ -36,7 +36,11 @@ const PayrollFiles = () => {
   const [newYear, setNewYear] = useState(String(new Date().getFullYear()));
 
   const fetchFiles = async () => {
-    if (!companyId) return;
+    if (!companyId) {
+      setFiles([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase
       .from("payroll_files")

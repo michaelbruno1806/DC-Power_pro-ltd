@@ -54,13 +54,19 @@ export const CompanyProvider = ({ children }: { children: ReactNode }) => {
 
     const { data: links } = await supabase
       .from("accountant_company_links")
-      .select("company_id, role, companies(name)")
+      .select("company_id, role")
       .eq("accountant_user_id", user.id);
-    (links || []).forEach((l: any) => {
+    const linkedIds = [...new Set((links || []).map(link => link.company_id))];
+    const { data: linkedCompanies } = linkedIds.length
+      ? await supabase.from("companies").select("id, name").in("id", linkedIds)
+      : { data: [] };
+    (links || []).forEach((l) => {
+      const linkedCompany = linkedCompanies?.find(c => c.id === l.company_id);
+      if (!linkedCompany) return;
       if (!list.find(c => c.id === l.company_id)) {
         list.push({
           id: l.company_id,
-          name: l.companies?.name || "Client company",
+          name: linkedCompany.name || "Client company",
           isOwn: false,
           role: l.role === "manage" ? "accountant_manage" : "accountant_view",
         });
