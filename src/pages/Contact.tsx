@@ -6,8 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, MessageCircle, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
-import MarketingNav from "@/components/marketing/MarketingNav";
-import MarketingFooter from "@/components/marketing/MarketingFooter";
+import MarketingPage from "@/components/marketing/MarketingPage";
 
 
 const contactSchema = z.object({
@@ -39,19 +38,11 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <MarketingNav />
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-32 pb-20">
-        <p className="font-script text-3xl text-primary">Say hello —</p>
-        <h1 className="font-display text-4xl md:text-6xl text-foreground mt-1 mb-5">Get in touch</h1>
-        <p className="text-lg text-muted-foreground max-w-xl">
-          Questions about DC Payroll, pricing or migrating your current payroll? We reply fast.
-        </p>
-
-
+    <MarketingPage eyebrow="04 / Contact" title="Get in touch" description="Questions about DC Payroll, pricing or migrating your current payroll? We reply fast.">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pb-20">
         <div className="grid md:grid-cols-2 gap-10 mt-12">
           {/* Form */}
-          <div className="premium-card p-8">
+          <div className="border-t border-border py-8 md:pr-10">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <Label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Full Name</Label>
@@ -68,8 +59,7 @@ const Contact = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full gap-2"
-                style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
+                className="landing-action w-full gap-2 h-12"
               >
                 <Send className="h-4 w-4" /> Send Message
               </Button>
@@ -79,7 +69,7 @@ const Contact = () => {
           {/* Contact Info */}
           <div className="space-y-6">
             {[
-              { icon: MessageCircle, label: "WhatsApp", value: "+230 5718 1234", href: "https://wa.me/23057181234", color: "text-green-500" },
+              { icon: MessageCircle, label: "WhatsApp", value: "+230 5718 1234", href: "https://wa.me/23057181234", color: "text-primary" },
               { icon: Mail, label: "Email", value: "hello@dcpayroll.mu", href: "mailto:hello@dcpayroll.mu", color: "text-primary" },
               { icon: Phone, label: "Phone", value: "+230 5718 1234", href: "tel:+23057181234", color: "text-primary" },
             ].map((c) => (
@@ -101,8 +91,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
-      <MarketingFooter />
-    </div>
+    </MarketingPage>
 
   );
 };

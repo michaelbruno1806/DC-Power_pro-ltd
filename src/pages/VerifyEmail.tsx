@@ -39,11 +39,11 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <div className="landing-editorial min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-md premium-card p-8 text-center animate-fade-up">
         <div
           className="inline-flex h-14 w-14 items-center justify-center rounded-full mb-4"
-          style={{ background: "var(--gradient-emerald)" }}
+          style={{ background: "hsl(var(--primary))" }}
         >
           <Mail className="h-7 w-7 text-primary-foreground" />
         </div>

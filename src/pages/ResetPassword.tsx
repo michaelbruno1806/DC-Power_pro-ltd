@@ -40,7 +40,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <div className="landing-editorial min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-md premium-card p-8 animate-fade-up">
         <h1 className="font-display text-2xl font-medium text-foreground">Choose a new password</h1>
         <p className="text-sm text-muted-foreground mt-1.5 mb-6">
@@ -74,7 +74,7 @@ const ResetPassword = () => {
               type="submit"
               disabled={loading}
               className="w-full h-11"
-              style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
+              style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
             >
               {loading ? "Updating..." : "Update password"}
             </Button>
