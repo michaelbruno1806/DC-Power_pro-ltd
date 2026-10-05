@@ -32,14 +32,13 @@ const columns = [
 
 
 const MarketingFooter = () => (
-  <footer className="border-t border-border/60 bg-panel-2/60">
+  <footer className="landing-editorial border-t border-border bg-secondary/30">
     <div className="max-w-7xl mx-auto px-5 sm:px-8 py-14">
       <div className="grid gap-10 md:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div>
           <div className="flex items-center gap-2.5">
             <span
-              className="h-9 w-9 rounded-xl flex items-center justify-center font-display font-bold text-[13px] text-primary-foreground"
-              style={{ background: "var(--gradient-emerald)" }}
+              className="h-9 w-9 rounded-md flex items-center justify-center bg-primary font-display font-bold text-[13px] text-primary-foreground"
             >
               DC
             </span>
