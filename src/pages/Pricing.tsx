@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, BadgePercent } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import MarketingNav from "@/components/marketing/MarketingNav";
-import MarketingFooter from "@/components/marketing/MarketingFooter";
+import MarketingPage from "@/components/marketing/MarketingPage";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Billing = "monthly" | "annual";
@@ -45,46 +44,38 @@ const Pricing = () => {
   const [selected, setSelected] = useState<string>("Business");
 
   return (
-    <div className="min-h-screen bg-background">
-      <MarketingNav />
-      <div className="bg-hero pt-32 pb-14 px-5 sm:px-8">
-        <div className="max-w-6xl mx-auto text-center animate-fade-up">
-          <p className="font-script text-3xl text-primary">Plans that fit —</p>
-          <h1 className="font-display text-4xl sm:text-6xl text-foreground mt-1">
-            Simple, transparent pricing
-          </h1>
-          <p className="text-muted-foreground mt-4">14-day free trial · Cancel anytime · MUR billing</p>
-
+    <MarketingPage eyebrow="02 / Plans" title="Simple, transparent pricing" description="14-day free trial · Cancel anytime · MUR billing">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pt-10">
           {/* Billing toggle */}
           <div className="mt-8 inline-flex items-center rounded-full border border-border/60 bg-card/70 p-1">
             {(["monthly", "annual"] as Billing[]).map((b) => (
-              <button
+              <Button
                 key={b}
+                variant={billing === b ? "default" : "ghost"}
+                aria-pressed={billing === b}
                 onClick={() => setBilling(b)}
                 className={`rounded-full px-5 h-9 text-sm font-semibold transition-all capitalize ${
                   billing === b
                     ? "text-primary-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
-                style={billing === b ? { background: "var(--gradient-emerald)" } : undefined}
               >
                 {b}
                 {b === "annual" && (
                   <span
                     className={`ml-2 text-[10px] font-bold uppercase tracking-wide rounded-full px-2 py-0.5 ${
-                      billing === "annual" ? "bg-white/20 text-primary-foreground" : "bg-primary/15 text-primary"
+                      billing === "annual" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/15 text-primary"
                     }`}
                   >
                     2 months free
                   </span>
                 )}
-              </button>
+              </Button>
             ))}
           </div>
-        </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-16">
         <div className="grid md:grid-cols-3 gap-6">
           {tiers.map((t) => {
             const isSelected = selected === t.name;
@@ -93,18 +84,17 @@ const Pricing = () => {
               <div
                 key={t.name}
                 onClick={() => setSelected(t.name)}
-                className={`premium-card p-7 flex flex-col cursor-pointer transition-all duration-300 relative ${
+                className={`landing-plan border p-7 flex flex-col cursor-pointer transition-all duration-300 relative ${
                   isSelected
-                    ? "border-primary ring-2 ring-primary/40 shadow-[var(--shadow-glow)] -translate-y-1"
+                    ? "border-primary bg-secondary/30"
                     : t.featured
-                      ? "border-primary/50 shadow-lg"
-                      : "hover:border-primary/30"
+                      ? "border-primary/50"
+                      : "border-border hover:border-primary/30"
                 }`}
               >
                 {isSelected && (
                   <span
-                    className="absolute -top-3 left-7 text-[10px] font-semibold uppercase tracking-[0.2em] rounded-full px-3 py-1 text-primary-foreground"
-                    style={{ background: "var(--gradient-emerald)" }}
+                    className="absolute -top-3 left-7 bg-primary text-[10px] font-semibold uppercase px-3 py-1 text-primary-foreground"
                   >
                     Selected plan
                   </span>
@@ -120,13 +110,13 @@ const Pricing = () => {
                   {t.monthly ? (
                     <>
                       <span className="font-display text-4xl font-medium text-foreground">
-                        {billing === "monthly" ? fmt(t.monthly) : fmt(Math.round(annualTotal! / 12))}
+                        {billing === "monthly" ? fmt(t.monthly) : fmt(Math.round((annualTotal ?? 0) / 12))}
                       </span>
                       <span className="text-sm text-muted-foreground ml-1">/ month</span>
                       {billing === "annual" && (
-                        <div className="mt-2 flex items-center gap-2 text-xs">
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
                           <span className="text-muted-foreground line-through">{fmt(t.monthly * 12)}/yr</span>
-                          <span className="text-foreground font-medium">{fmt(annualTotal!)}/yr</span>
+                          <span className="text-foreground font-medium">{fmt((annualTotal ?? 0))}/yr</span>
                           <span className="inline-flex items-center gap-1 text-primary">
                             <BadgePercent className="h-3.5 w-3.5" /> Save {fmt(t.monthly * 2)}
                           </span>
@@ -147,11 +137,6 @@ const Pricing = () => {
                 <Button
                   className="mt-6 h-11"
                   variant={isSelected ? "default" : "outline"}
-                  style={
-                    isSelected
-                      ? { background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }
-                      : undefined
-                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelected(t.name);
@@ -172,8 +157,7 @@ const Pricing = () => {
           {" "}Secure online payments coming soon. Contact us at sales@dcpayroll.mu for early access.
         </p>
       </div>
-      <MarketingFooter />
-    </div>
+    </MarketingPage>
   );
 };
 

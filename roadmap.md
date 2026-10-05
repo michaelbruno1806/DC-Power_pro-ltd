@@ -1,5 +1,8 @@
 # Roadmap
 
+## Done this update
+- [x] Match public pages and account screens to Home's editorial design; add six module icons to Gallery; desktop/mobile layout, pricing toggle, signup link and mobile navigation checks passed.
+
 ## Blocked
 - [ ] Complete signed-in payroll save/finalise/export verification: requesting account has no company assignment or role; requires user to identify the company/account to test, without fabricating company details or granting privileges.
 

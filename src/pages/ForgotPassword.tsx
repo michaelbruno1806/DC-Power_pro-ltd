@@ -28,7 +28,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <div className="landing-editorial min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-md premium-card p-8 animate-fade-up">
         <Link
           to="/auth"
@@ -70,7 +70,7 @@ const ForgotPassword = () => {
               type="submit"
               disabled={loading}
               className="w-full h-11"
-              style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
+              style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
             >
               {loading ? "Sending..." : "Send reset link"}
             </Button>

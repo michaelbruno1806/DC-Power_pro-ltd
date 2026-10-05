@@ -486,6 +486,11 @@
   --muted: 175 30% 78%;
   --muted-foreground: 205 25% 32%;
   --border: 205 42% 11% / 0.2;
+  --input: 205 25% 78%;
+  --accent: 175 30% 88%;
+  --accent-foreground: 205 42% 11%;
+  --popover: 120 11% 96%;
+  --popover-foreground: 205 42% 11%;
   --ring: 186 73% 35%;
   --font-body: 'Figtree', 'Segoe UI', sans-serif;
   --font-display: 'Outfit', 'Segoe UI', sans-serif;
@@ -494,6 +499,17 @@
 .landing-editorial { background: hsl(var(--background)); color: hsl(var(--foreground)); }
 .editorial-nav { background: hsl(var(--background)); border-bottom: 1px solid hsl(var(--border)); }
 .landing-editorial h1, .landing-editorial h2, .landing-editorial h3 { letter-spacing: 0; }
+.landing-editorial, .editorial-nav { letter-spacing: 0; }
+.landing-editorial .premium-card { border-radius: 4px; box-shadow: none; background: transparent; }
+.landing-editorial .premium-card:hover { box-shadow: none; }
+.landing-editorial button, .landing-editorial input, .landing-editorial textarea { border-radius: 4px; }
+.editorial-nav a, .editorial-nav span, .landing-editorial [class*="tracking-"] { letter-spacing: 0; }
+.marketing-page .premium-card { border-color: hsl(var(--border)); }
+.gallery-art { transition: background 200ms ease; }
+.gallery-item:hover .gallery-art { background: hsl(var(--secondary)); }
+.gallery-symbol { transition: transform 250ms ease; }
+.gallery-item:hover .gallery-symbol { transform: translateY(-5px); }
+@media (prefers-reduced-motion: reduce) { .gallery-art, .gallery-symbol { transition: none; } .gallery-item:hover .gallery-symbol { transform: none; } }
 .landing-kicker { letter-spacing: 0; }
 .landing-action { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
 .landing-action:hover { background: hsl(var(--foreground)); color: hsl(var(--background)); }

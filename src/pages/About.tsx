@@ -1,26 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Target, Heart, Award } from "lucide-react";
-import MarketingNav from "@/components/marketing/MarketingNav";
-import MarketingFooter from "@/components/marketing/MarketingFooter";
+import MarketingPage from "@/components/marketing/MarketingPage";
 
 const About = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <MarketingNav />
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 pt-32 pb-20">
-        <p className="font-script text-3xl text-primary">Our story —</p>
-        <h1 className="font-display text-4xl md:text-6xl text-foreground mt-1 mb-6">
-          Making payroll simple for Mauritius
-        </h1>
-        <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl">
-          DC Payroll was born out of a simple observation: payroll in Mauritius is unnecessarily complex.
-          We built a platform that automates the tedious parts so you can focus on your business.
-        </p>
-
-
+    <MarketingPage eyebrow="01 / Our story" title="Making payroll simple for Mauritius" description="DC Payroll was born out of a simple observation: payroll in Mauritius is unnecessarily complex. We built a platform that automates the tedious parts so you can focus on your business.">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 pb-20">
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           {[
             { icon: Target, title: "Our Mission", desc: "To eliminate payroll errors and save businesses hours every month through intelligent automation." },
@@ -37,7 +25,7 @@ const About = () => {
           ))}
         </div>
 
-        <div className="mt-16 premium-card p-8">
+        <div className="mt-16 border-y border-border py-10">
           <h2 className="font-display text-2xl font-medium text-foreground mb-4">Built by MB18 Solutions</h2>
           <p className="text-muted-foreground leading-relaxed">
             DC Payroll is a product of MB18 Solutions, a Mauritian software company specialising in
@@ -48,16 +36,14 @@ const About = () => {
 
         <div className="text-center mt-16">
           <Button
-            onClick={() => navigate("/auth")}
-            className="gap-2 rounded-full h-12 px-7"
-            style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
+            onClick={() => navigate("/auth?mode=signup")}
+            className="landing-action gap-2 rounded-sm h-12 px-7"
           >
             Start free trial
           </Button>
         </div>
       </div>
-      <MarketingFooter />
-    </div>
+    </MarketingPage>
 
   );
 };

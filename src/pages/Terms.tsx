@@ -1,5 +1,4 @@
-import MarketingNav from "@/components/marketing/MarketingNav";
-import MarketingFooter from "@/components/marketing/MarketingFooter";
+import MarketingPage from "@/components/marketing/MarketingPage";
 
 const sections = [
   {
@@ -45,25 +44,11 @@ const sections = [
 ];
 
 const Terms = () => (
-  <div className="min-h-screen bg-background">
-    <MarketingNav />
-
-    <section className="pt-32 pb-14 px-5 sm:px-8 bg-hero border-b border-border/60">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-[11px] uppercase tracking-[0.3em] text-primary font-semibold">Legal</div>
-        <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground mt-3 tracking-tight">
-          Terms &amp; Conditions
-        </h1>
-        <p className="text-muted-foreground mt-4 leading-relaxed">
-          The rules for using DC Payroll. Written in plain language so you can actually read them.
-        </p>
-      </div>
-    </section>
-
+  <MarketingPage eyebrow="Legal / Terms" title="Terms & Conditions" description="The rules for using DC Payroll. Written in plain language so you can actually read them.">
     <section className="py-16 px-5 sm:px-8">
       <div className="max-w-3xl mx-auto space-y-8">
         {sections.map((s) => (
-          <div key={s.title}>
+          <div key={s.title} className="border-b border-border pb-8">
             <h2 className="font-display text-lg font-semibold text-foreground">{s.title}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed mt-2">{s.body}</p>
           </div>
@@ -78,8 +63,7 @@ const Terms = () => (
       </div>
     </section>
 
-    <MarketingFooter />
-  </div>
+  </MarketingPage>
 );
 
 export default Terms;

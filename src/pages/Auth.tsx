@@ -91,17 +91,12 @@ const Auth = () => {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-10">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] rounded-full bg-primary/[0.06] blur-[120px]" />
-        <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[120px]" />
-      </div>
-
+    <div className="landing-editorial min-h-screen flex items-center justify-center bg-background relative overflow-hidden py-10">
       <div className="relative z-10 w-full max-w-md px-6 animate-fade-up">
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center h-14 w-14 rounded-lg font-display font-semibold text-xl text-primary-foreground mb-4"
-            style={{ background: "var(--gradient-emerald)", boxShadow: "var(--shadow-glow)" }}
+            style={{ background: "hsl(var(--primary))" }}
           >
             DC
           </div>
@@ -161,13 +156,16 @@ const Auth = () => {
                 placeholder="••••••••"
                 className="pl-10 pr-10 h-11 bg-secondary/40"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
+                aria-label={showPassword ? "Hide password" : "Show password"}
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+              </Button>
             </Field>
 
             {!isLogin && (
@@ -232,7 +230,7 @@ const Auth = () => {
               type="submit"
               disabled={loading}
               className="w-full h-11 font-medium gap-2 mt-3 tracking-wide"
-              style={{ background: "var(--gradient-emerald)", color: "hsl(var(--primary-foreground))" }}
+              style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
             >
               {loading ? (
                 <span className="animate-spin h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full" />
@@ -270,13 +268,14 @@ const Auth = () => {
           </Button>
 
           <div className="mt-5 pt-5 border-t border-border text-center">
-            <button
+            <Button
+              variant="link"
               onClick={() => setIsLogin(!isLogin)}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {isLogin ? "New to DC Payroll? " : "Already have an account? "}
               <span className="text-primary font-medium">{isLogin ? "Create account" : "Sign in"}</span>
-            </button>
+            </Button>
           </div>
         </div>
 

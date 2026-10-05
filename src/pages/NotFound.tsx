@@ -12,10 +12,10 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="landing-editorial min-h-screen bg-background flex flex-col">
       <MarketingNav />
 
-      <main className="flex-1 flex items-center justify-center px-5 py-32 bg-hero">
+      <main className="flex-1 flex items-center justify-center px-5 py-32 bg-background">
         <div className="max-w-xl text-center">
           <div className="font-display text-[88px] leading-none font-bold text-primary/25">404</div>
           <h1 className="font-display text-3xl font-bold text-foreground mt-2 tracking-tight">
@@ -29,7 +29,7 @@ const NotFound = () => {
             <Link
               to="/"
               className="inline-flex items-center gap-2 text-sm font-medium rounded-full px-5 py-2.5 text-primary-foreground"
-              style={{ background: "var(--gradient-emerald)" }}
+              style={{ background: "hsl(var(--primary))" }}
             >
               <Home className="h-4 w-4" /> Home
             </Link>
