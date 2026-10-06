@@ -29,6 +29,13 @@
       "when": 1791096289111,
       "tag": "0003_fix_invitee_policy_email_access",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791287296633,
+      "tag": "0004_seed_test_company_for_owner",
+      "breakpoints": true
     }
   ]
 }

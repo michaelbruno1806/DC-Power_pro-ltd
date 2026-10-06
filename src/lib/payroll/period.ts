@@ -21,7 +21,7 @@ export async function getPeriodConfig(
     .select("month, working_days, hours_per_week")
     .eq("company_id", companyId)
     .eq("year", year)
-    .in("month", [month, null as any]);
+    .or(`month.eq.${month},month.is.null`);
 
   const monthRow = data?.find(r => r.month === month);
   const yearRow = data?.find(r => r.month === null);
@@ -65,7 +65,7 @@ export async function getUnpaidLeaveDaysByEmployee(
 
   const { data, error } = await supabase
     .from("leave_requests")
-    .select("employee_id, start_date, end_date, status, leave_types ( is_paid )")
+    .select("employee_id, start_date, end_date, status, leave_type_id")
     .eq("company_id", companyId)
     .eq("status", "approved")
     .lte("start_date", end)
@@ -73,9 +73,15 @@ export async function getUnpaidLeaveDaysByEmployee(
 
   if (error || !data) return {};
 
+  const typeIds = [...new Set(data.map(r => r.leave_type_id).filter(Boolean))] as string[];
+  const { data: types } = typeIds.length
+    ? await supabase.from("leave_types").select("id, is_paid").in("id", typeIds)
+    : { data: [] as { id: string; is_paid: boolean | null }[] };
+  const paid = new Map((types || []).map(t => [t.id, t.is_paid]));
+
   const out: Record<string, number> = {};
   for (const row of data as any[]) {
-    if (row.leave_types && row.leave_types.is_paid !== false) continue; // only unpaid
+    if (paid.get(row.leave_type_id) !== false) continue; // only unpaid
     const days = overlapDays(row.start_date, row.end_date, start, end);
     if (days > 0) {
       out[row.employee_id] = (out[row.employee_id] || 0) + days;
