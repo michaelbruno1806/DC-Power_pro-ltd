@@ -5,7 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import CompanySwitcher from "@/components/CompanySwitcher";
 import {
   LayoutDashboard, FolderOpen, FileText, CheckSquare, BarChart3,
-  Building2, Users, Palmtree, Puzzle, Clock, PartyPopper,
+  Building2, Users, Palmtree, CalendarCheck, Puzzle, Clock, PartyPopper,
   LogOut, Shield, ChevronLeft, ChevronRight, Sun, Moon, Menu, X
 } from "lucide-react";
 import { useState } from "react";
@@ -30,6 +30,7 @@ const navSections = [
       { icon: Building2, label: "Company Details", path: "/company-setup" },
       { icon: Users, label: "Employees", path: "/employees" },
       { icon: Palmtree, label: "Leaves", path: "/leaves" },
+      { icon: CalendarCheck, label: "Attendance", path: "/attendance" },
     ],
   },
   {
