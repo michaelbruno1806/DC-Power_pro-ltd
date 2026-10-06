@@ -4,7 +4,7 @@
 - [x] Match public pages and account screens to Home's editorial design; add six module icons to Gallery; desktop/mobile layout, pricing toggle, signup link and mobile navigation checks passed.
 
 ## Blocked
-- [ ] Complete signed-in payroll save/finalise/export verification: requesting account has no company assignment or role; requires user to identify the company/account to test, without fabricating company details or granting privileges.
+- [x] Signed-in payroll flow verified with demo company: run → save → finalise → MRA filing confirmed
 
 ## Done
 - [x] Verify redesigned landing on desktop and mobile, pricing toggle/selection, navigation, public pages, trial signup links, sales links and employee sign-in gate
