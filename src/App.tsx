@@ -34,6 +34,7 @@ import PayrollRun from "@/pages/PayrollRun";
 import AdminPanel from "@/pages/AdminPanel";
 import Leaves from "@/pages/Leaves";
 import Holidays from "@/pages/Holidays";
+import Attendance from "@/pages/Attendance";
 import WorkingDays from "@/pages/WorkingDays";
 import EmployeePortal from "@/pages/EmployeePortal";
 import Payslips from "@/pages/Payslips";
@@ -113,6 +114,7 @@ const App = () => {
                   <Route path="/leaves" element={<Leaves />} />
                   <Route path="/working-days" element={<WorkingDays />} />
                   <Route path="/holidays" element={<Holidays />} />
+                  <Route path="/attendance" element={<Attendance />} />
                 </Route>
                 <Route path="*" element={<NotFound />} />
               </Routes>
