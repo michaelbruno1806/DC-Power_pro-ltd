@@ -25,7 +25,6 @@ import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
 import ScrollManager from "@/components/ScrollManager";
 
-
 import Dashboard from "@/pages/Dashboard";
 import CompanySetup from "@/pages/CompanySetup";
 import PayrollComponents from "@/pages/PayrollComponents";
@@ -44,6 +43,9 @@ import MraFilings from "@/pages/MraFilings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+// 1. SET THIS TO true TO ACTIVATE, OR false TO DEACTIVATE
+const IS_MAINTENANCE_MODE = true;
 
 const App = () => {
   const [splashDone, setSplashDone] = useState(() => {
@@ -67,58 +69,65 @@ const App = () => {
             <AuthProvider>
               <CompanyProvider>
               <ScrollManager />
-              <Routes>
-                {/* Public marketing routes */}
-                <Route path="/" element={<Landing />} />
-                <Route path="/landing" element={<Navigate to="/" replace />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/gallery" element={<Gallery />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/auth" element={<Auth />} />
+              
+              {/* 2. Intercept routing conditionally here */}
+              {IS_MAINTENANCE_MODE ? (
+                <Routes>
+                  <Route path="*" element={<Maintenance />} />
+                </Routes>
+              ) : (
+                <Routes>
+                  {/* Public marketing routes */}
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/landing" element={<Navigate to="/" replace />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/gallery" element={<Gallery />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/auth" element={<Auth />} />
 
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route
+                    path="/verify-email"
+                    element = {
+                      <ProtectedRoute allowUnverified allowSetup>
+                        <VerifyEmail />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/onboarding"
+                    element = {
+                      <ProtectedRoute allowSetup>
+                        <Onboarding />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route path="/my-portal" element={<ProtectedRoute><EmployeePortal /></ProtectedRoute>} />
 
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route
-                  path="/verify-email"
-                  element={
-                    <ProtectedRoute allowUnverified allowSetup>
-                      <VerifyEmail />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/onboarding"
-                  element={
-                    <ProtectedRoute allowSetup>
-                      <Onboarding />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path="/my-portal" element={<ProtectedRoute><EmployeePortal /></ProtectedRoute>} />
-
-                {/* Protected admin routes */}
-                <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/company-setup" element={<CompanySetup />} />
-                  <Route path="/components" element={<PayrollComponents />} />
-                  <Route path="/payroll" element={<PayrollFiles />} />
-                  <Route path="/payroll/:id" element={<PayrollRun />} />
-                  <Route path="/employees" element={<Employees />} />
-                  <Route path="/admin" element={<AdminPanel />} />
-                  <Route path="/payslips" element={<Payslips />} />
-                  <Route path="/checklist" element={<Checklist />} />
-                  <Route path="/mra-filings" element={<MraFilings />} />
-                  <Route path="/leaves" element={<Leaves />} />
-                  <Route path="/working-days" element={<WorkingDays />} />
-                  <Route path="/holidays" element={<Holidays />} />
-                  <Route path="/attendance" element={<Attendance />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                  {/* Protected admin routes */}
+                  <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/company-setup" element={<CompanySetup />} />
+                    <Route path="/components" element={<PayrollComponents />} />
+                    <Route path="/payroll" element={<PayrollFiles />} />
+                    <Route path="/payroll/:id" element={<PayrollRun />} />
+                    <Route path="/employees" element={<Employees />} />
+                    <Route path="/admin" element={<AdminPanel />} />
+                    <Route path="/payslips" element={<Payslips />} />
+                    <Route path="/checklist" element={<Checklist />} />
+                    <Route path="/mra-filings" element={<MraFilings />} />
+                    <Route path="/leaves" element={<Leaves />} />
+                    <Route path="/working-days" element={<WorkingDays />} />
+                    <Route path="/holidays" element={<Holidays />} />
+                    <Route path="/attendance" element={<Attendance />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              )}
               </CompanyProvider>
             </AuthProvider>
           </BrowserRouter>
